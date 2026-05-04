@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Jelajahi lebih dari 200 destinasi wisata pilihan di Bandung melalui peta interaktif.">
+<title>WisataBandung — Peta Wisata Kota Kembang</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE;
+  --earth: #C4956A;
+  --forest: #2D5016;
+  --mist: #8BA89C;
+  --charcoal: #1E2520;
+  --gold: #D4A853;
+  --soft: #EDE8E0;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+}
+
+/* SMOOTH REVEAL */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* NAV */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 3rem;
+  background: rgba(247,243,238,0.97);
+  border-bottom: 1px solid rgba(45,80,22,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--forest);
+  text-decoration: none;
+}
+.logo span { color: var(--earth); font-style: italic; }
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  opacity: 0.65;
+  transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.nav-btn {
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s;
+}
+.nav-btn:hover { background: var(--earth); }
+.nav-login-btn {
+  background: transparent;
+  color: var(--forest);
+  border: 1.5px solid rgba(45,80,22,0.35);
+  padding: 0.55rem 1.2rem;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-login-btn:hover { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+/* MODAL */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.modal-backdrop.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  margin: 1rem;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.modal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line, #dce5ee);
+}
+.modal-tab {
+  flex: 1;
+  padding: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  color: rgba(30,37,32,0.45);
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.modal-tab.active { color: var(--forest); border-bottom: 2.5px solid var(--forest); }
+.modal-body { padding: 1.8rem; }
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--forest);
+  margin-bottom: 0.3rem;
+}
+.modal-sub { font-size: 0.84rem; color: rgba(30,37,32,0.5); margin-bottom: 1.4rem; }
+.modal-panel { display: none; }
+.modal-panel.active { display: block; }
+.role-chooser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.4rem;
+}
+.role-card {
+  border: 2px solid rgba(45,80,22,0.15);
+  border-radius: 12px;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--soft, #EDE8E0);
+}
+.role-card:hover, .role-card.selected {
+  border-color: var(--forest);
+  background: rgba(45,80,22,0.06);
+}
+.role-card.selected { box-shadow: 0 0 0 3px rgba(45,80,22,0.12); }
+.role-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.role-name { font-size: 0.82rem; font-weight: 700; color: var(--forest); }
+.role-desc { font-size: 0.7rem; color: rgba(30,37,32,0.5); margin-top: 2px; }
+.form-field { margin-bottom: 1rem; }
+.form-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 5px;
+}
+.form-field input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid rgba(45,80,22,0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-field input:focus { border-color: var(--forest); }
+.modal-submit {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  margin-top: 0.5rem;
+}
+.modal-submit:hover { background: #3a6b1f; }
+.modal-msg {
+  font-size: 0.82rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 7px;
+  margin-bottom: 1rem;
+  display: none;
+}
+.modal-msg.error { background: #fff1f1; color: #9b1c1c; display: block; }
+.modal-msg.success { background: #f0faf3; color: #166534; display: block; }
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.08);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-box { position: relative; }
+.switch-text {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(30,37,32,0.5);
+  margin-top: 1rem;
+}
+.switch-text a { color: var(--forest); font-weight: 700; cursor: pointer; text-decoration: none; }
+.nav-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--forest);
+}
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.nav-logout {
+  font-size: 0.78rem;
+  color: rgba(30,37,32,0.45);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-logout:hover { color: var(--coral, #e15b4f); }
+
+/* PROFILE DROPDOWN */
+.nav-profile-wrap { position: relative; }
+.nav-user-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--forest);
+  padding: 0.3rem 0.6rem 0.3rem 0.35rem;
+  border-radius: 40px;
+  transition: background 0.18s;
+}
+.nav-user-toggle:hover { background: rgba(45,80,22,0.07); }
+.nav-user-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-profile-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.08);
+  min-width: 210px;
+  padding: 0.5rem 0;
+  z-index: 3000;
+  border: 1px solid rgba(45,80,22,0.1);
+  animation: dropdownFadeIn 0.15s ease;
+}
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+.nav-profile-dropdown.open { display: block; }
+.nav-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+.nav-avatar-lg {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.nav-dropdown-name { font-size: 0.85rem; font-weight: 700; color: var(--charcoal); }
+.nav-dropdown-role { font-size: 0.72rem; color: rgba(30,37,32,0.45); margin-top: 2px; }
+.nav-dropdown-divider { height: 1px; background: rgba(45,80,22,0.1); margin: 0.25rem 0; }
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.62rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+  transition: background 0.15s;
+}
+.nav-dropdown-item:hover { background: rgba(45,80,22,0.05); }
+.nav-dropdown-logout { color: #c0392b; }
+.nav-dropdown-logout:hover { background: rgba(192,57,43,0.06) !important; }
+
+/* HERO */
+.hero {
+  position: relative;
+  min-height: 580px;
+  display: flex;
+  align-items: flex-end;
+  padding: 4rem 3rem;
+  background: linear-gradient(150deg, #1a3a0a 0%, #2D5016 35%, #5a8a3c 65%, #8BA89C 100%);
+  overflow: hidden;
+}
+.hero-orb1 {
+  position: absolute;
+  top: -80px; right: -100px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: rgba(212,168,83,0.12);
+}
+.hero-orb2 {
+  position: absolute;
+  top: 60px; right: 60px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(196,149,106,0.15);
+}
+.hero-badge {
+  position: absolute;
+  top: 2.5rem; left: 3rem;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  color: rgba(255,255,255,0.9);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0.45rem 1.1rem;
+  border-radius: 40px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hero-content { position: relative; z-index: 2; max-width: 580px; }
+.hero-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 1.1rem;
+}
+.hero-content h1 em { color: var(--gold); font-style: italic; }
+.hero-content p {
+  color: rgba(255,255,255,0.78);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-bottom: 1.8rem;
+}
+.hero-actions { display: flex; gap: 1rem; }
+.btn-primary {
+  background: var(--gold);
+  color: var(--charcoal);
+  border: none;
+  padding: 0.85rem 2rem;
+  border-radius: 40px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  padding: 0.85rem 1.8rem;
+  border-radius: 40px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.12); }
+
+/* SEARCH */
+.search-bar {
+  background: var(--soft);
+  padding: 1.5rem 3rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  flex-wrap: wrap;
+}
+.search-input {
+  flex: 1;
+  min-width: 220px;
+  border: 1.5px solid rgba(45,80,22,0.22);
+  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--charcoal);
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.search-input:focus { border-color: var(--forest); }
+.search-select {
+  border: 1.5px solid rgba(45,80,22,0.22);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  background: #fff;
+  color: var(--charcoal);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.search-btn {
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.8rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.search-btn:hover { background: var(--earth); }
+
+/* STATS */
+.stats-strip {
+  background: var(--charcoal);
+  color: #fff;
+  display: flex;
+  justify-content: space-around;
+  padding: 1.6rem 3rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  color: var(--gold);
+  display: block;
+}
+.stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  opacity: 0.55;
+  margin-top: 3px;
+}
+
+/* SECTION HELPERS */
+.section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--earth);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.1rem;
+  color: var(--forest);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+.section-sub {
+  font-size: 0.92rem;
+  color: rgba(30,37,32,0.58);
+  line-height: 1.65;
+  max-width: 500px;
+}
+
+/* CATEGORIES */
+.categories { padding: 3rem; background: var(--cream); }
+.cat-pills {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+.pill {
+  border: 1.5px solid rgba(45,80,22,0.22);
+  border-radius: 40px;
+  padding: 0.55rem 1.3rem;
+  font-size: 0.83rem;
+  cursor: pointer;
+  background: #fff;
+  color: var(--charcoal);
+  font-weight: 500;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+}
+.pill.active, .pill:hover {
+  background: var(--forest);
+  color: #fff;
+  border-color: var(--forest);
+}
+
+/* DESTINATIONS */
+.destinations { padding: 0 3rem 3rem; }
+.dest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.4rem;
+}
+.see-all {
+  font-size: 0.83rem;
+  color: var(--earth);
+  text-decoration: none;
+  border-bottom: 1px solid var(--earth);
+  cursor: pointer;
+}
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.1rem;
+}
+.dest-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.dest-img {
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  position: relative;
+}
+.dest-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--gold);
+  color: var(--charcoal);
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.dest-body { padding: 0.9rem 1rem; }
+.dest-name { font-weight: 500; font-size: 0.92rem; margin-bottom: 3px; }
+.dest-area { font-size: 0.76rem; color: var(--mist); margin-bottom: 8px; }
+.dest-meta { display: flex; justify-content: space-between; align-items: center; }
+.dest-rating { font-size: 0.8rem; color: var(--earth); }
+.dest-type {
+  font-size: 0.68rem;
+  background: var(--soft);
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: rgba(30,37,32,0.6);
+}
+
+/* MAP */
+.map-section {
+  margin: 0 3rem 3rem;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 0.5px solid rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.map-header {
+  background: var(--forest);
+  color: #fff;
+  padding: 1.3rem 1.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.map-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; }
+.map-controls { display: flex; gap: 0.5rem; align-items: center; }
+.map-ctrl {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.map-ctrl:hover { background: rgba(255,255,255,0.25); }
+.map-fullscreen-btn {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.35);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.map-fullscreen-btn:hover { background: rgba(255,255,255,0.28); }
+#preview-map {
+  height: 420px;
+  width: 100%;
+  position: relative;
+  cursor: grab;
+}
+#preview-map:active { cursor: grabbing; }
+.map-overlay-btn {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(45,80,22,0.92);
+  color: #fff;
+  padding: 0.65rem 1.6rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+}
+.map-overlay-btn:hover {
+  background: rgba(45,80,22,1);
+  transform: translateX(-50%) translateY(-2px);
+}
+.map-legend {
+  background: #fff;
+  padding: 0.8rem 1.8rem;
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  font-size: 0.76rem;
+  color: rgba(30,37,32,0.65);
+  align-items: center;
+  font-family: 'DM Sans', sans-serif;
+}
+.legend-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+/* FEATURES */
+.features { padding: 3rem; background: var(--soft); }
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.1rem;
+  margin-top: 1.8rem;
+}
+.feat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.4rem;
+  border: 0.5px solid rgba(0,0,0,0.07);
+  transition: transform 0.2s;
+}
+.feat-card:hover { transform: translateY(-2px); }
+.feat-icon {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 20px;
+}
+.feat-card h3 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.45rem; }
+.feat-card p { font-size: 0.82rem; color: rgba(30,37,32,0.58); line-height: 1.65; }
+
+/* ITINERARY */
+.itinerary { padding: 3rem; background: var(--cream); }
+.iter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.3rem 0 1.8rem;
+  flex-wrap: wrap;
+}
+.iter-tab {
+  padding: 0.45rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 500;
+  background: var(--soft);
+  color: rgba(30,37,32,0.6);
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.iter-tab.active { background: var(--forest); color: #fff; }
+.iter-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  align-items: flex-start;
+}
+.iter-time {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--earth);
+  min-width: 58px;
+  padding-top: 3px;
+  letter-spacing: 0.5px;
+}
+.iter-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+}
+.iter-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--forest);
+  border: 2px solid var(--cream);
+  outline: 1.5px solid var(--forest);
+  flex-shrink: 0;
+}
+.iter-line {
+  width: 1.5px;
+  min-height: 24px;
+  background: rgba(45,80,22,0.2);
+  margin-top: 4px;
+}
+.iter-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
+.iter-desc { font-size: 0.78rem; color: rgba(30,37,32,0.54); }
+
+/* REVIEWS */
+.reviews { padding: 3rem; background: var(--soft); }
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.1rem;
+  margin-top: 1.8rem;
+}
+.review-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.3rem;
+  border: 0.5px solid rgba(0,0,0,0.07);
+}
+.review-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.65rem; }
+.review-text {
+  font-size: 0.84rem;
+  line-height: 1.68;
+  color: rgba(30,37,32,0.72);
+  margin-bottom: 0.9rem;
+  font-style: italic;
+}
+.reviewer { display: flex; align-items: center; gap: 0.65rem; }
+.reviewer-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+}
+.reviewer-name { font-size: 0.82rem; font-weight: 500; }
+.reviewer-city { font-size: 0.71rem; color: var(--mist); }
+
+/* NEARBY / EVENTS */
+.events { padding: 3rem; background: var(--cream); }
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.1rem;
+  margin-top: 1.8rem;
+}
+.event-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid rgba(0,0,0,0.07);
+  display: flex;
+}
+.event-date-col {
+  background: var(--forest);
+  color: #fff;
+  padding: 1rem 0.8rem;
+  text-align: center;
+  min-width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.event-day { font-family: 'Playfair Display', serif; font-size: 1.6rem; line-height: 1; }
+.event-month { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.75; }
+.event-body { padding: 0.9rem; flex: 1; }
+.event-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 3px; }
+.event-loc { font-size: 0.75rem; color: var(--mist); margin-bottom: 6px; }
+.event-type {
+  display: inline-block;
+  font-size: 0.68rem;
+  background: var(--soft);
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: rgba(30,37,32,0.6);
+}
+
+/* CTA */
+.cta {
+  background: var(--forest);
+  padding: 4rem 3rem;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.cta::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: rgba(212,168,83,0.12);
+}
+.cta::after {
+  content: '';
+  position: absolute;
+  bottom: -50px; left: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(196,149,106,0.1);
+}
+.cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  margin-bottom: 0.75rem;
+  position: relative; z-index: 1;
+}
+.cta p {
+  font-size: 0.92rem;
+  opacity: 0.72;
+  margin-bottom: 1.8rem;
+  position: relative; z-index: 1;
+}
+.cta-actions { display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 1; flex-wrap: wrap; }
+
+/* FOOTER */
+footer {
+  background: var(--charcoal);
+  color: rgba(255,255,255,0.65);
+  padding: 3rem;
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2rem;
+}
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+.footer-brand span { color: var(--gold); font-style: italic; }
+.footer-desc { font-size: 0.78rem; line-height: 1.65; margin-bottom: 1rem; }
+.footer-social { display: flex; gap: 0.5rem; }
+.social-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.social-btn:hover { background: rgba(255,255,255,0.1); }
+.footer-col h4 {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #fff;
+  margin-bottom: 0.85rem;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.footer-col ul li:hover { color: var(--gold); }
+.footer-bottom {
+  background: #111;
+  padding: 1rem 3rem;
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.28);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* SMOOTH LEAFLET POPUP */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
+  animation: popupIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: 'DM Sans', sans-serif !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+  font-size: 0.88rem !important;
+}
+.leaflet-popup-tip { box-shadow: none !important; }
+.leaflet-popup-close-button {
+  font-size: 1.1rem !important;
+  color: var(--mist) !important;
+  top: 6px !important; right: 8px !important;
+}
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* SMOOTH PILL */
+.pill { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+
+/* SMOOTH CARDS */
+.dest-card, .feat-card, .review-card, .event-card {
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1),
+              box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* SMOOTH MODAL */
+.modal-backdrop { transition: opacity 0.2s ease; opacity: 0; }
+.modal-backdrop.open { opacity: 1; }
+.modal-box {
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+              opacity 0.2s ease;
+  opacity: 0;
+}
+.modal-backdrop.open .modal-box { transform: none; opacity: 1; }
+
+/* NAV SCROLL EFFECT */
+nav { transition: box-shadow 0.3s ease, background 0.3s ease; }
+nav.scrolled {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: rgba(247,243,238,0.99);
+}
+
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 2.5rem 1.5rem; }
+  .categories, .destinations, .features, .itinerary, .reviews, .events, .cta { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .map-section { margin: 0 1.5rem 2.5rem; }
+  footer { grid-template-columns: 1fr 1fr; padding: 2rem 1.5rem; }
+  .footer-bottom { padding: 1rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="landing.html" class="logo">Wisata<span>Bandung</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Peta</a></li>
+    <li><a href="#destinations">Destinasi</a></li>
+    <li><a href="#itinerary">Itinerary</a></li>
+    <li><a href="#features">Fitur</a></li>
+    <li><a href="#events">Event</a></li>
+  </ul>
+  <div class="nav-right">
+    <div id="nav-auth-area">
+      <button class="nav-login-btn" onclick="openModal('login')">Masuk / Daftar</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-badge">✦ Peta Interaktif Wisata Kota Bandung</div>
+  <div class="hero-content">
+    <h1>Temukan Pesona<br><em>Kota Kembang</em></h1>
+    <p>Jelajahi lebih dari 200 destinasi wisata pilihan di Bandung — dari alam, kuliner, budaya, hingga belanja — semua dalam satu peta interaktif yang lengkap dan mudah digunakan.</p>
+    <div class="hero-actions">
+      <a href="index.html" class="btn-primary">🗺️ Buka Peta Wisata</a>
+      <a href="#destinations" class="btn-ghost">Lihat Destinasi</a>
+    </div>
+  </div>
+</section>
+
+<!-- LOGIN / REGISTER MODAL -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Masuk</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Daftar</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- LOGIN PANEL -->
+      <div class="modal-panel active" id="panel-login">
+        <div class="modal-title">Selamat datang</div>
+        <div class="modal-sub">Masuk ke akun Anda</div>
+        <div id="login-msg" class="modal-msg"></div>
+        <div class="form-field">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Masukkan username">
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Masukkan password">
+        </div>
+        <button class="modal-submit" onclick="doLogin()">Masuk</button>
+        <div class="switch-text">Belum punya akun? <a onclick="switchTab('register')">Daftar sekarang</a></div>
+      </div>
+
+      <!-- REGISTER PANEL (pengguna biasa only) -->
+      <div class="modal-panel" id="panel-register">
+        <div class="modal-title">Buat akun baru</div>
+        <div class="modal-sub">Daftar sebagai pengguna untuk menyimpan favorit</div>
+        <div id="register-msg" class="modal-msg"></div>
+        <div class="form-field">
+          <label>Nama Lengkap</label>
+          <input type="text" id="reg-name" placeholder="Nama lengkap Anda">
+        </div>
+        <div class="form-field">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="Buat username unik">
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Min. 6 karakter">
+        </div>
+        <button class="modal-submit" onclick="doRegister()">Daftar Sekarang</button>
+        <div class="switch-text">Sudah punya akun? <a onclick="switchTab('login')">Masuk di sini</a></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip reveal">
+  <div class="stat">
+    <span class="stat-num" id="stat-total">198</span>
+    <span class="stat-label">Destinasi Wisata</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">10</span>
+    <span class="stat-label">Kategori Wisata</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num" id="stat-rating">4.5</span>
+    <span class="stat-label">Rating Rata-rata</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">12K+</span>
+    <span class="stat-label">Ulasan Wisatawan</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">Free</span>
+    <span class="stat-label">Akses Gratis</span>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="categories reveal">
+  <div class="section-label">Jelajahi Berdasarkan</div>
+  <div class="section-title">Kategori Wisata</div>
+  <p class="section-sub">Temukan pengalaman terbaik sesuai minat kamu — dari puncak gunung hingga taman seni lokal.</p>
+  <div class="cat-pills">
+    <a href="index.html" class="pill active">🗺️ Semua</a>
+    <a href="index.html?kategori=attraction" class="pill">🎢 Atraksi Wisata</a>
+    <a href="index.html?kategori=viewpoint" class="pill">🏞️ Pemandangan</a>
+    <a href="index.html?kategori=museum" class="pill">🏛️ Museum & Sejarah</a>
+    <a href="index.html?kategori=theme_park" class="pill">🎠 Taman Hiburan</a>
+    <a href="index.html?kategori=gallery" class="pill">🎨 Galeri & Seni</a>
+    <a href="index.html?kategori=zoo" class="pill">🦁 Kebun Binatang</a>
+    <a href="index.html?kategori=camp_site" class="pill">⛺ Camping</a>
+    <a href="index.html?kategori=picnic_site" class="pill">🌿 Piknik</a>
+    <a href="index.html?kategori=artwork" class="pill">🖼️ Seni Publik</a>
+  </div>
+</section>
+
+<!-- DESTINATIONS -->
+<section class="destinations reveal" id="destinations">
+  <div class="dest-header">
+    <div>
+      <div class="section-label">Terpopuler</div>
+      <div class="section-title" style="font-size:1.6rem">Destinasi Pilihan</div>
+    </div>
+    <a href="index.html" class="see-all">Lihat semua destinasi →</a>
+  </div>
+  <div class="dest-grid" id="dest-grid">
+    <!-- Loaded dynamically -->
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#C8D8C0;">🌋<div class="dest-badge">Populer</div></div>
+      <div class="dest-body">
+        <div class="dest-name">Tangkuban Perahu</div>
+        <div class="dest-area">📍 Lembang, Bandung Utara</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.7</span><span class="dest-type">Alam</span></div>
+      </div>
+    </a>
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#E2D5C0;">🏛️<div class="dest-badge">Sejarah</div></div>
+      <div class="dest-body">
+        <div class="dest-name">Gedung Sate</div>
+        <div class="dest-area">📍 Pusat Kota Bandung</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.8</span><span class="dest-type">Budaya</span></div>
+      </div>
+    </a>
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#E0E8F0;">🎭<div class="dest-badge">Unggulan</div></div>
+      <div class="dest-body">
+        <div class="dest-name">Saung Angklung Udjo</div>
+        <div class="dest-area">📍 Padasuka, Bandung</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.9</span><span class="dest-type">Seni</span></div>
+      </div>
+    </a>
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#C0D8D8;">🌊<div class="dest-badge">Trending</div></div>
+      <div class="dest-body">
+        <div class="dest-name">Kawah Putih</div>
+        <div class="dest-area">📍 Ciwidey, Bandung Selatan</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.6</span><span class="dest-type">Alam</span></div>
+      </div>
+    </a>
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#D0DDD0;">🌸</div>
+      <div class="dest-body">
+        <div class="dest-name">Kebun Mawar Cihideung</div>
+        <div class="dest-area">📍 Cihideung, Bandung</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.5</span><span class="dest-type">Taman</span></div>
+      </div>
+    </a>
+    <a href="index.html" class="dest-card">
+      <div class="dest-img" style="background:#E8E0D0;">🛍️</div>
+      <div class="dest-body">
+        <div class="dest-name">Cihampelas Walk</div>
+        <div class="dest-area">📍 Cihampelas, Bandung</div>
+        <div class="dest-meta"><span class="dest-rating">★ 4.3</span><span class="dest-type">Belanja</span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- MAP PREVIEW -->
+<div class="map-section">
+  <div class="map-header">
+    <span class="map-title">Peta Interaktif Bandung</span>
+    <div class="map-controls">
+      <a href="index.html" class="map-fullscreen-btn">Buka Peta Penuh →</a>
+    </div>
+  </div>
+  <div style="position:relative;">
+    <div id="preview-map"></div>
+    <a href="index.html" class="map-overlay-btn">🗺️ Jelajahi Semua Destinasi →</a>
+  </div>
+  <div class="map-legend">
+    <span><span class="legend-dot" style="background:#FF6B6B;"></span>Atraksi</span>
+    <span><span class="legend-dot" style="background:#4ECDC4;"></span>Museum</span>
+    <span><span class="legend-dot" style="background:#45B7D1;"></span>Pemandangan</span>
+    <span><span class="legend-dot" style="background:#DDA0DD;"></span>Taman Hiburan</span>
+    <span><span class="legend-dot" style="background:#F8B500;"></span>Galeri</span>
+    <span><span class="legend-dot" style="background:#9B59B6;"></span>Kebun Binatang</span>
+    <span><span class="legend-dot" style="background:#96CEB4;"></span>Camping</span>
+    <span><span class="legend-dot" style="background:#95A5A6;"></span>Lainnya</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features reveal" id="features">
+  <div class="section-label">Mengapa Kami</div>
+  <div class="section-title">Fitur Unggulan Platform</div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#E1F5EE;">🗺️</div>
+      <h3>Peta Interaktif Real-Time</h3>
+      <p>Navigasi mudah ke seluruh destinasi wisata dengan peta Leaflet yang selalu diperbarui dan akurat.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#E6F1FB;">🔍</div>
+      <h3>Filter & Pencarian Cerdas</h3>
+      <p>Temukan wisata sesuai kategori, nama tempat, dan lokasi terdekat dari posisi kamu saat ini.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#FAECE7;">⭐</div>
+      <h3>Rating & Foto Google</h3>
+      <p>Foto asli dan rating dari Google Places API serta Wikimedia Commons untuk setiap destinasi.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#EAF3DE;">🚗</div>
+      <h3>Navigasi & Rute Jalan</h3>
+      <p>Dapatkan rute perjalanan dari lokasi kamu ke destinasi menggunakan OpenStreetMap routing gratis.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#EEEDFE;">📍</div>
+      <h3>Marker Berwarna per Kategori</h3>
+      <p>Setiap kategori wisata memiliki warna marker tersendiri agar mudah diidentifikasi di peta.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#FAEEDA;">📱</div>
+      <h3>Responsif di Semua Device</h3>
+      <p>Akses peta wisata Bandung dari smartphone, tablet, maupun desktop dengan tampilan optimal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ITINERARY -->
+<section class="itinerary reveal" id="itinerary">
+  <div class="section-label">Inspirasi Perjalanan</div>
+  <div class="section-title">Rute Wisata Sehari</div>
+  <p class="section-sub">Ikuti rute yang telah dikurasi atau eksplorasi sendiri dengan peta interaktif.</p>
+  <div class="iter-tabs">
+    <div class="iter-tab active">🏔️ Bandung Utara</div>
+    <div class="iter-tab">🌊 Bandung Selatan</div>
+    <div class="iter-tab">🏛️ Wisata Kota</div>
+  </div>
+  <div id="iter-content">
+    <div class="iter-row">
+      <div class="iter-time">07.00</div>
+      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
+      <div>
+        <div class="iter-name">Sarapan di Warung Nasi Ampera</div>
+        <div class="iter-desc">Mulai hari dengan nasi sunda tradisional yang autentik dan mengenyangkan</div>
+      </div>
+    </div>
+    <div class="iter-row">
+      <div class="iter-time">09.00</div>
+      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
+      <div>
+        <div class="iter-name">Tangkuban Perahu</div>
+        <div class="iter-desc">Menikmati kawah vulkanik aktif dan udara sejuk pegunungan Lembang</div>
+      </div>
+    </div>
+    <div class="iter-row">
+      <div class="iter-time">12.00</div>
+      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
+      <div>
+        <div class="iter-name">Floating Market Lembang</div>
+        <div class="iter-desc">Kuliner unik di atas danau dengan suasana alam yang sejuk</div>
+      </div>
+    </div>
+    <div class="iter-row">
+      <div class="iter-time">14.30</div>
+      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
+      <div>
+        <div class="iter-name">Farm House Lembang</div>
+        <div class="iter-desc">Wisata agro bergaya Eropa dengan aneka spot foto tematik yang populer</div>
+      </div>
+    </div>
+    <div class="iter-row">
+      <div class="iter-time">17.00</div>
+      <div class="iter-dot-col"><div class="iter-dot"></div></div>
+      <div>
+        <div class="iter-name">Sunset di The Lodge Maribaya</div>
+        <div class="iter-desc">Tutup hari dengan pemandangan panorama kota Bandung dari ketinggian</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="events reveal" id="events">
+  <div class="section-label">Yang Sedang Berlangsung</div>
+  <div class="section-title">Event & Festival Terdekat</div>
+  <div class="events-grid">
+    <div class="event-card">
+      <div class="event-date-col">
+        <div class="event-day">28</div>
+        <div class="event-month">Apr</div>
+      </div>
+      <div class="event-body">
+        <div class="event-name">Festival Kuliner Bandung 2025</div>
+        <div class="event-loc">📍 Lapangan Gasibu</div>
+        <span class="event-type">Kuliner</span>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-date-col">
+        <div class="event-day">05</div>
+        <div class="event-month">Mei</div>
+      </div>
+      <div class="event-body">
+        <div class="event-name">Parade Budaya Sunda</div>
+        <div class="event-loc">📍 Jl. Asia Afrika</div>
+        <span class="event-type">Budaya</span>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-date-col">
+        <div class="event-day">12</div>
+        <div class="event-month">Mei</div>
+      </div>
+      <div class="event-body">
+        <div class="event-name">Bandung Blossom Market</div>
+        <div class="event-loc">📍 Cihideung Flower Market</div>
+        <span class="event-type">Taman</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews reveal">
+  <div class="section-label">Kata Wisatawan</div>
+  <div class="section-title">Ulasan Terbaru</div>
+  <div class="review-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Peta wisatanya sangat membantu! Semua informasi lengkap dan mudah diakses. Liburan ke Bandung jadi jauh lebih terencana dan menyenangkan."</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#2D5016;">AR</div>
+        <div><div class="reviewer-name">Andi Rahmat</div><div class="reviewer-city">Jakarta</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Marker peta berwarna per kategori sangat memudahkan navigasi. Langsung tau mana atraksi wisata, mana museum, mana pemandangan alam."</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#C4956A;">SW</div>
+        <div><div class="reviewer-name">Siti Wulandari</div><div class="reviewer-city">Surabaya</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <div class="review-text">"Fitur rute jalan dari lokasi saya ke destinasi sangat praktis. Tinggal klik dan langsung ada arah jalannya, gratis tanpa perlu API key."</div>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#8BA89C;">DP</div>
+        <div><div class="reviewer-name">Dika Pratama</div><div class="reviewer-city">Yogyakarta</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta reveal">
+  <h2>Siap Menjelajahi Bandung?</h2>
+  <p>Buka peta interaktif dan temukan destinasi wisata impianmu sekarang — gratis dan selalu lengkap.</p>
+  <div class="cta-actions">
+    <a href="index.html" class="btn-primary">🗺️ Buka Peta Interaktif</a>
+    <button class="btn-ghost" onclick="openModal('register')">Daftar Gratis</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">Wisata<span>Bandung</span></div>
+    <p class="footer-desc">Platform pemetaan wisata Kota Bandung yang lengkap, modern, dan mudah digunakan. Temukan pengalaman terbaik di Kota Kembang.</p>
+    <div class="footer-social">
+      <div class="social-btn">ig</div>
+      <div class="social-btn">tw</div>
+      <div class="social-btn">yt</div>
+      <div class="social-btn">fb</div>
+    </div>
+  </div>
+  <div class="footer-col">
+    <h4>Destinasi</h4>
+    <ul>
+      <li onclick="location.href='index.html?kategori=attraction'">Atraksi Wisata</li>
+      <li onclick="location.href='index.html?kategori=museum'">Museum & Sejarah</li>
+      <li onclick="location.href='index.html?kategori=viewpoint'">Pemandangan Alam</li>
+      <li onclick="location.href='index.html?kategori=theme_park'">Taman Hiburan</li>
+      <li onclick="location.href='index.html?kategori=zoo'">Kebun Binatang</li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Fitur</h4>
+    <ul>
+      <li onclick="location.href='index.html'">Peta Interaktif</li>
+      <li onclick="location.href='index.html'">Navigasi & Rute</li>
+      <li onclick="location.href='index.html'">Filter Destinasi</li>
+      <li onclick="location.href='index.html'">Foto & Rating</li>
+      <li onclick="location.href='admin/login.html'">Panel Admin</li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Informasi</h4>
+    <ul>
+      <li>Tentang Proyek</li>
+      <li>Kontak</li>
+      <li>Sumber Data OSM</li>
+      <li>Open Source</li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2025 WisataBandung. Dibuat untuk eksplorasi Kota Kembang.</span>
+  <span>Powered by Leaflet · OpenStreetMap · Google Places</span>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var categoryColors = {
+  attraction: '#FF6B6B',
+  museum: '#4ECDC4',
+  viewpoint: '#45B7D1',
+  camp_site: '#96CEB4',
+  picnic_site: '#FFEAA7',
+  theme_park: '#DDA0DD',
+  gallery: '#F8B500',
+  artwork: '#FF69B4',
+  zoo: '#9B59B6',
+  lainnya: '#95A5A6'
+};
+
+function makeIcon(color) {
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="20" height="27">'
+    + '<path fill="' + color + '" d="M12 0C5.383 0 0 5.383 0 12c0 7 12 20 12 20s12-13 12-20c0-6.617-5.383-12-12-12zm0 16c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"/>'
+    + '<circle cx="12" cy="12" r="2.5" fill="white" opacity="0.9"/>'
+    + '</svg>';
+  return L.icon({
+    iconUrl: 'data:image/svg+xml;base64,' + btoa(svg),
+    iconSize: [20, 27],
+    iconAnchor: [10, 27],
+    popupAnchor: [0, -28]
+  });
+}
+
+// Init preview map — fully interactive
+var previewMap = L.map('preview-map', {
+  center: [-6.90389, 107.61861],
+  zoom: 12,
+  zoomControl: true,
+  scrollWheelZoom: true,
+  dragging: true,
+  doubleClickZoom: true,
+  touchZoom: true,
+  attributionControl: false
+});
+
+// Smooth zoom animation already built into Leaflet
+previewMap.options.zoomAnimation = true;
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(previewMap);
+
+// Load wisata data and render markers
+fetch('get_wisata.php')
+  .then(r => r.json())
+  .then(data => {
+    if (!Array.isArray(data)) return;
+
+    // Update stats
+    document.getElementById('stat-total').textContent = data.length + '+';
+    var ratings = data.filter(d => d.rating && d.rating > 0).map(d => parseFloat(d.rating));
+    if (ratings.length > 0) {
+      var avg = (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1);
+      document.getElementById('stat-rating').textContent = avg;
+    }
+
+    // Render markers on preview map
+    data.forEach(function(d) {
+      var lat = parseFloat(d.latitude);
+      var lng = parseFloat(d.longitude);
+      if (!isFinite(lat) || !isFinite(lng)) return;
+
+      var color = categoryColors[d.kategori] || categoryColors.lainnya;
+      var marker = L.marker([lat, lng], { icon: makeIcon(color) }).addTo(previewMap);
+      marker.bindPopup(
+        '<b>' + (d.nama || 'Tidak diketahui') + '</b>'
+        + '<br><small style="color:#637083">' + (d.kategori || '') + '</small>'
+        + '<br><a href="index.html" style="color:#2D5016;font-weight:700;font-size:0.8rem;">Lihat di peta penuh →</a>'
+      );
+    });
+  })
+  .catch(() => {});
+
+// --- AUTH STATE ---
+function openModal(tab) {
+  document.getElementById('auth-modal').classList.add('open');
+  switchTab(tab || 'login');
+}
+function closeModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+document.getElementById('auth-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function switchTab(tab) {
+  document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+  document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-msg').className = 'modal-msg';
+  document.getElementById('register-msg').className = 'modal-msg';
+}
+
+
+function showMsg(id, text, type) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'modal-msg ' + type;
+}
+
+function doLogin() {
+  var username = document.getElementById('login-username').value.trim();
+  var password = document.getElementById('login-password').value;
+  if (!username || !password) { showMsg('login-msg', 'Username dan password harus diisi.', 'error'); return; }
+
+  fetch('auth_user.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action: 'login', username: username, password: password})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      closeModal();
+      updateNavAuth(data.name || username, data.role || 'user');
+      if (data.role === 'admin') {
+        // Tampilkan notifikasi kecil
+        var t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#2D5016;color:#fff;padding:0.75rem 1.2rem;border-radius:10px;font-size:0.88rem;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,0.2);z-index:9999;font-family:DM Sans,sans-serif;';
+        t.textContent = '🛡️ Login sebagai Administrator';
+        document.body.appendChild(t);
+        setTimeout(function() { t.remove(); }, 3000);
+      }
+    } else { showMsg('login-msg', data.message || 'Username atau password salah.', 'error'); }
+  })
+  .catch(() => showMsg('login-msg', 'Gagal terhubung ke server.', 'error'));
+}
+
+function doRegister() {
+  var name = document.getElementById('reg-name').value.trim();
+  var username = document.getElementById('reg-username').value.trim();
+  var password = document.getElementById('reg-password').value;
+  if (!name || !username || !password) { showMsg('register-msg', 'Semua kolom harus diisi.', 'error'); return; }
+  if (password.length < 6) { showMsg('register-msg', 'Password minimal 6 karakter.', 'error'); return; }
+
+  fetch('auth_user.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action: 'register', name, username, password})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showMsg('register-msg', 'Akun berhasil dibuat! Silakan masuk.', 'success');
+      setTimeout(() => switchTab('login'), 1500);
+    } else { showMsg('register-msg', data.message || 'Registrasi gagal.', 'error'); }
+  })
+  .catch(() => showMsg('register-msg', 'Gagal terhubung ke server.', 'error'));
+}
+
+function updateNavAuth(name, role) {
+  var area      = document.getElementById('nav-auth-area');
+  var initials  = name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+  var roleLabel = role === 'admin' ? 'Administrator' : 'Pengguna';
+  var avatarStyle = role === 'admin' ? 'background:var(--gold,#D4A853);color:var(--charcoal,#1E2520);' : '';
+  var adminItem = role === 'admin'
+    ? '<a class="nav-dropdown-item" href="admin/index.html">'
+      + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>'
+      + 'Panel Admin</a>'
+      + '<div class="nav-dropdown-divider"></div>'
+    : '';
+  area.innerHTML =
+    '<div class="nav-profile-wrap">'
+    + '<div class="nav-user-toggle" onclick="toggleProfileDropdown(event)">'
+    +   '<div class="nav-avatar" style="' + avatarStyle + '">' + initials + '</div>'
+    +   '<span class="nav-user-name">' + name + '</span>'
+    +   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'
+    + '</div>'
+    + '<div class="nav-profile-dropdown" id="nav-profile-dropdown">'
+    +   '<div class="nav-dropdown-header">'
+    +     '<div class="nav-avatar-lg" style="' + avatarStyle + '">' + initials + '</div>'
+    +     '<div><div class="nav-dropdown-name">' + name + '</div><div class="nav-dropdown-role">' + roleLabel + '</div></div>'
+    +   '</div>'
+    +   '<div class="nav-dropdown-divider"></div>'
+    +   adminItem
+    +   '<button class="nav-dropdown-item nav-dropdown-logout" onclick="doLogout()">'
+    +     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
+    +     'Keluar'
+    +   '</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  var d = document.getElementById('nav-profile-dropdown');
+  if (d) d.classList.toggle('open');
+}
+
+document.addEventListener('click', function() {
+  var d = document.getElementById('nav-profile-dropdown');
+  if (d) d.classList.remove('open');
+});
+
+function doLogout() {
+  fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'logout'})})
+    .finally(function() {
+      document.getElementById('nav-auth-area').innerHTML = '<button class="nav-login-btn" onclick="openModal(\'login\')">Masuk / Daftar</button>';
+    });
+}
+
+// Check session on load
+fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'check'})})
+  .then(r => r.json())
+  .then(data => { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
+  .catch(() => {});
+
+// Itinerary tabs
+document.querySelectorAll('.iter-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+  });
+});
+
+// Scroll-reveal via IntersectionObserver
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(function(el) {
+  observer.observe(el);
+});
+
+// Staggered card reveals
+['dest-grid', 'feat-grid', 'review-grid', 'events-grid'].forEach(function(gridId) {
+  var grid = document.getElementById(gridId);
+  if (!grid) return;
+  Array.from(grid.children).forEach(function(card, i) {
+    card.classList.add('reveal');
+    card.style.transitionDelay = (i * 0.07) + 's';
+    observer.observe(card);
+  });
+});
+
+// Nav shadow on scroll
+window.addEventListener('scroll', function() {
+  document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+// Smooth nav anchor links
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>

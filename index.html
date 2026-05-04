@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Bandung - Peta Wisata Interaktif</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Landing palette vars (used by nav + modal) ── */
+        :root {
+            --forest: #2D5016;
+            --earth:  #C4956A;
+            --cream:  #F7F3EE;
+            --charcoal: #1E2520;
+            --soft:   #EDE8E0;
+        }
+
+        /* ── Page layout: nav + map stacked ── */
+        html, body { height: 100%; margin: 0; }
+        body { display: flex; flex-direction: column; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .app-shell { flex: 1; min-height: 0; }
+
+        /* ── SITE NAV ── */
+        .site-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            background: #17324d;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            position: relative;
+            z-index: 2000;
+            flex-shrink: 0;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+        }
+        .site-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #fff;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .site-logo span { color: #f9d36a; font-style: italic; }
+        .site-nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .site-nav-links a {
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.65);
+            opacity: 1;
+            transition: color 0.2s;
+        }
+        .site-nav-links a:hover { color: rgba(255,255,255,0.95); }
+        .site-nav-links a.active { font-weight: 700; color: #f9d36a; }
+        .site-nav-right { display: flex; align-items: center; gap: 0.65rem; }
+        .nav-login-btn {
+            background: transparent;
+            color: rgba(255,255,255,0.9);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1.1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .nav-login-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.55); color: #fff; }
+        /* ── Profile dropdown (dark nav variant) ── */
+        .nav-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border: 1.5px solid rgba(255,255,255,0.35);
+            flex-shrink: 0;
+        }
+        .nav-profile-wrap { position: relative; }
+        .nav-user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.92);
+            padding: 0.28rem 0.6rem 0.28rem 0.35rem;
+            border-radius: 40px;
+            transition: background 0.18s;
+        }
+        .nav-user-toggle:hover { background: rgba(255,255,255,0.1); }
+        .nav-user-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-profile-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.1);
+            min-width: 210px;
+            padding: 0.5rem 0;
+            z-index: 3000;
+            border: 1px solid rgba(0,0,0,0.08);
+            animation: dropdownFadeIn 0.15s ease;
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: none; }
+        }
+        .nav-profile-dropdown.open { display: block; }
+        .nav-dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+        }
+        .nav-avatar-lg {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: #17324d;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .nav-dropdown-name { font-size: 0.85rem; font-weight: 700; color: #1E2520; }
+        .nav-dropdown-role { font-size: 0.72rem; color: rgba(30,37,32,0.45); margin-top: 2px; }
+        .nav-dropdown-divider { height: 1px; background: #eee; margin: 0.25rem 0; }
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            width: 100%;
+            padding: 0.62rem 1rem;
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: #1E2520;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            text-align: left;
+            transition: background 0.15s;
+        }
+        .nav-dropdown-item:hover { background: #f5f5f5; }
+        .nav-dropdown-logout { color: #c0392b; }
+        .nav-dropdown-logout:hover { background: rgba(192,57,43,0.06) !important; }
+        .nav-avatar-admin { background: #D4A853 !important; color: #1E2520 !important; font-weight: 800 !important; }
+
+        /* ── MODAL ── */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 420px;
+            margin: 1rem;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+            overflow: visible;
+            position: relative;
+            transform: translateY(24px) scale(0.97);
+            opacity: 0;
+            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease;
+        }
+        .modal-backdrop.open .modal-box { transform: none; opacity: 1; }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.08);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .modal-close-btn:hover { background: rgba(0,0,0,0.14); }
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #dce5ee;
+            border-radius: 18px 18px 0 0;
+            overflow: hidden;
+        }
+        .modal-tab {
+            flex: 1;
+            padding: 1rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            color: rgba(30,37,32,0.45);
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .modal-tab.active { color: var(--forest); border-bottom: 2.5px solid var(--forest); }
+        .modal-body { padding: 1.8rem; }
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--forest);
+            margin-bottom: 0.3rem;
+        }
+        .modal-sub { font-size: 0.84rem; color: rgba(30,37,32,0.5); margin-bottom: 1.4rem; }
+        .modal-panel { display: none; }
+        .modal-panel.active { display: block; }
+        .role-chooser {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.4rem;
+        }
+        .role-card {
+            border: 2px solid rgba(45,80,22,0.15);
+            border-radius: 12px;
+            padding: 1rem 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--soft);
+        }
+        .role-card:hover, .role-card.selected {
+            border-color: var(--forest);
+            background: rgba(45,80,22,0.06);
+        }
+        .role-card.selected { box-shadow: 0 0 0 3px rgba(45,80,22,0.12); }
+        .role-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+        .role-name { font-size: 0.82rem; font-weight: 700; color: var(--forest); }
+        .role-desc { font-size: 0.7rem; color: rgba(30,37,32,0.5); margin-top: 2px; }
+        .form-field { margin-bottom: 1rem; }
+        .form-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 5px;
+        }
+        .form-field input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid rgba(45,80,22,0.2);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .form-field input:focus { border-color: var(--forest); }
+        .modal-submit {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--forest);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            margin-top: 0.5rem;
+        }
+        .modal-submit:hover { background: #3a6b1f; }
+        .modal-msg {
+            font-size: 0.82rem;
+            padding: 0.65rem 0.8rem;
+            border-radius: 7px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .modal-msg.error { background: #fff1f1; color: #9b1c1c; display: block; }
+        .modal-msg.success { background: #f0faf3; color: #166534; display: block; }
+        .switch-text {
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(30,37,32,0.5);
+            margin-top: 1rem;
+        }
+        .switch-text a { color: var(--forest); font-weight: 700; cursor: pointer; text-decoration: none; }
+
+        /* ── Mobile nav ── */
+        @media (max-width: 767px) {
+            .site-nav { padding: 0.75rem 1rem; }
+            .site-nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SITE NAVBAR -->
+<nav class="site-nav">
+    <a href="landing.html" class="site-logo">Wisata<span>Bandung</span></a>
+    <ul class="site-nav-links">
+        <li><a href="index.html" class="active">Peta</a></li>
+        <li><a href="landing.html#destinations">Destinasi</a></li>
+        <li><a href="landing.html#itinerary">Itinerary</a></li>
+        <li><a href="landing.html#features">Fitur</a></li>
+        <li><a href="landing.html#events">Event</a></li>
+    </ul>
+    <div class="site-nav-right">
+        <div id="nav-auth-area">
+            <button class="nav-login-btn" onclick="openModal('login')">Masuk / Daftar</button>
+        </div>
+    </div>
+</nav>
+
+<main class="app-shell">
+    <aside class="sidebar-panel" id="sidebar">
+        <section class="brand-banner">
+            <span class="eyebrow">Bandung Explorer</span>
+            <h1>Temukan tempat seru di Bandung</h1>
+            <p>Pilih titik di peta, cari nama tempat, lalu lihat foto lokasi saat tersedia.</p>
+        </section>
+
+        <div class="stats-strip">
+            <div>
+                <strong id="total">...</strong>
+                <span>tempat tampil</span>
+            </div>
+            <div>
+                <strong id="category-label">Semua</strong>
+                <span>kategori</span>
+            </div>
+        </div>
+
+        <div class="control-stack">
+            <label for="search">Cari tempat</label>
+            <input type="text" id="search" placeholder="Museum, taman, kawah...">
+
+            <label for="filter">Kategori</label>
+            <select id="filter">
+                <option value="all">Semua Kategori</option>
+                <option value="attraction">Atraksi Wisata</option>
+                <option value="museum">Museum &amp; Sejarah</option>
+                <option value="viewpoint">Pemandangan</option>
+                <option value="camp_site">Camping</option>
+                <option value="picnic_site">Piknik</option>
+                <option value="theme_park">Taman Hiburan</option>
+                <option value="gallery">Galeri</option>
+                <option value="artwork">Seni Publik</option>
+                <option value="zoo">Kebun Binatang</option>
+                <option value="lainnya">Lainnya</option>
+            </select>
+
+            <button type="button" onclick="lokasiSaya()">Gunakan Lokasi Saya</button>
+        </div>
+
+        <div class="list-header">
+            <span>Rekomendasi terdekat</span>
+            <small id="photo-mode">Foto lokal aktif</small>
+        </div>
+        <div id="routing-info" style="display: none;">
+
+            <!-- Mini bar: hanya tampil saat floating (sidebar tertutup) -->
+            <div id="route-mini-bar" class="route-mini-bar" style="display:none;">
+                <div class="route-mini-icon" id="mini-turn-icon">↑</div>
+                <div class="route-mini-content">
+                    <div class="route-mini-text" id="mini-turn-text">Memuat rute...</div>
+                    <div class="route-mini-sub"><span id="mini-turn-dist"></span> <span class="route-mini-dest" id="mini-dest-label"></span></div>
+                </div>
+                <div class="route-mini-actions">
+                    <button class="route-mini-expand-btn" id="route-expand-btn" onclick="toggleRouteExpand()" title="Lihat semua langkah">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                        Semua
+                    </button>
+                    <button class="route-mini-close-btn" onclick="clearRoute()" title="Hapus rute">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Full panel: selalu tampil di sidebar, toggle di floating -->
+            <div id="route-full-panel">
+                <div class="route-card">
+                    <div class="route-card-header">
+                        <div class="route-header-left">
+                            <div class="route-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                            </div>
+                            <div>
+                                <div class="route-label">Rute Aktif</div>
+                                <div class="route-destination" id="routing-dest-name">Destinasi</div>
+                            </div>
+                        </div>
+                        <button class="route-close-btn" onclick="clearRoute()" title="Hapus rute">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <div class="route-stats">
+                        <div class="route-stat">
+                            <svg class="route-stat-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                            <span class="route-stat-val" id="routing-distance">—</span>
+                            <span class="route-stat-label">Jarak</span>
+                        </div>
+                        <div class="route-divider"></div>
+                        <div class="route-stat">
+                            <svg class="route-stat-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span class="route-stat-val" id="routing-duration">—</span>
+                            <span class="route-stat-label">Estimasi</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="route-steps" class="route-steps-list"></div>
+            </div>
+
+        </div>
+        <div id="sidebar-list" class="place-list"></div>
+    </aside>
+
+    <section class="map-wrap">
+        <button class="sidebar-expand-btn" id="expand-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+            <svg id="expand-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="map-badge">
+            <strong>Peta wisata</strong>
+            <span>Klik marker untuk detail</span>
+        </div>
+        <div id="map"></div>
+    </section>
+</main>
+
+<!-- AUTH MODAL -->
+<div class="modal-backdrop" id="auth-modal">
+    <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeModal()">✕</button>
+        <div class="modal-tabs">
+            <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Masuk</button>
+            <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Daftar</button>
+        </div>
+        <div class="modal-body">
+            <!-- LOGIN PANEL -->
+            <div class="modal-panel active" id="panel-login">
+                <div class="modal-title">Selamat datang</div>
+                <div class="modal-sub">Masuk ke akun Anda</div>
+                <div id="login-msg" class="modal-msg"></div>
+                <div class="form-field">
+                    <label>Username</label>
+                    <input type="text" id="login-username" placeholder="Masukkan username" autocomplete="username">
+                </div>
+                <div class="form-field">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Masukkan password" autocomplete="current-password">
+                </div>
+                <button class="modal-submit" onclick="doLogin()">Masuk</button>
+                <div class="switch-text">Belum punya akun? <a onclick="switchTab('register')">Daftar sekarang</a></div>
+            </div>
+            <!-- REGISTER PANEL -->
+            <div class="modal-panel" id="panel-register">
+                <div class="modal-title">Buat akun baru</div>
+                <div class="modal-sub">Daftar sebagai pengguna untuk menyimpan favorit</div>
+                <div id="register-msg" class="modal-msg"></div>
+                <div class="form-field">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="reg-name" placeholder="Nama lengkap Anda">
+                </div>
+                <div class="form-field">
+                    <label>Username</label>
+                    <input type="text" id="reg-username" placeholder="Buat username unik">
+                </div>
+                <div class="form-field">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" placeholder="Min. 6 karakter">
+                </div>
+                <button class="modal-submit" onclick="doRegister()">Daftar Sekarang</button>
+                <div class="switch-text">Sudah punya akun? <a onclick="switchTab('login')">Masuk di sini</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="script.js"></script>
+<script>
+    // ── LOGIN STATE ──
+    window.isLoggedIn = false;
+
+    // ── TOAST ──
+    function showToast(msg, icon) {
+        var t = document.getElementById('toast-notif');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'toast-notif';
+            t.className = 'toast-notif';
+            document.body.appendChild(t);
+        }
+        t.innerHTML = (icon ? '<span>' + icon + '</span>' : '') + msg;
+        t.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3200);
+    }
+
+    // ── SIDEBAR TOGGLE ──
+    var sidebarCollapsed = false;
+
+    var routeExpanded = false;
+
+    function positionRoutingInfo() {
+        var ri = document.getElementById('routing-info');
+        if (!ri || ri.style.display === 'none') return;
+        var sidebar = document.getElementById('sidebar');
+        var sidebarList = document.getElementById('sidebar-list');
+        var mapWrap = document.querySelector('.map-wrap');
+
+        if (sidebarCollapsed) {
+            if (ri.parentElement !== mapWrap) {
+                mapWrap.appendChild(ri);
+            }
+            ri.classList.add('route-panel-floating');
+            // Default: tampilkan mini bar saja
+            document.getElementById('route-mini-bar').style.display = 'flex';
+            document.getElementById('route-full-panel').style.display = routeExpanded ? 'block' : 'none';
+            updateExpandBtn();
+        } else {
+            if (ri.parentElement !== sidebar) {
+                sidebar.insertBefore(ri, sidebarList);
+            }
+            ri.classList.remove('route-panel-floating');
+            document.getElementById('route-mini-bar').style.display = 'none';
+            document.getElementById('route-full-panel').style.display = 'block';
+            routeExpanded = false;
+        }
+    }
+    window.positionRoutingInfo = positionRoutingInfo;
+
+    function toggleRouteExpand() {
+        routeExpanded = !routeExpanded;
+        document.getElementById('route-full-panel').style.display = routeExpanded ? 'block' : 'none';
+        updateExpandBtn();
+    }
+
+    function updateExpandBtn() {
+        var btn = document.getElementById('route-expand-btn');
+        if (!btn) return;
+        if (routeExpanded) {
+            btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg> Tutup';
+        } else {
+            btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg> Semua';
+        }
+    }
+
+    window.updateMiniBar = function(icon, text, dist, dest) {
+        document.getElementById('mini-turn-icon').textContent = icon;
+        document.getElementById('mini-turn-text').textContent = text;
+        document.getElementById('mini-turn-dist').textContent = dist;
+        document.getElementById('mini-dest-label').textContent = '· ' + dest;
+    };
+
+    function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var icon = document.getElementById('expand-btn-icon');
+        if (!sidebar) return;
+
+        sidebarCollapsed = !sidebarCollapsed;
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
+
+        // Flip chevron: ‹ saat sidebar terbuka, › saat tersembunyi
+        if (icon) {
+            icon.querySelector('path').setAttribute('d',
+                sidebarCollapsed ? 'M9 18l6-6-6-6' : 'M15 18l-6-6 6-6'
+            );
+        }
+
+        positionRoutingInfo();
+
+        setTimeout(function() {
+            if (typeof map !== 'undefined') map.invalidateSize({ animate: true });
+        }, 420);
+    }
+
+    // ── MODAL ──
+    function openModal(tab) {
+        document.getElementById('auth-modal').classList.add('open');
+        switchTab(tab || 'login');
+    }
+    function closeModal() {
+        document.getElementById('auth-modal').classList.remove('open');
+    }
+    document.getElementById('auth-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    function switchTab(tab) {
+        document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+        document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+        document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+        document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+        document.getElementById('login-msg').className = 'modal-msg';
+        document.getElementById('register-msg').className = 'modal-msg';
+    }
+
+    function showMsg(id, text, type) {
+        var el = document.getElementById(id);
+        el.textContent = text;
+        el.className = 'modal-msg ' + type;
+    }
+
+    function doLogin() {
+        var username = document.getElementById('login-username').value.trim();
+        var password = document.getElementById('login-password').value;
+        if (!username || !password) { showMsg('login-msg', 'Username dan password harus diisi.', 'error'); return; }
+
+        fetch('auth_user.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'login', username: username, password: password})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                closeModal();
+                updateNavAuth(data.name || username, data.role || 'user');
+                if (data.role === 'admin') {
+                    showToast('Login sebagai Administrator', '🛡️');
+                }
+            } else {
+                showMsg('login-msg', data.message || 'Username atau password salah.', 'error');
+            }
+        })
+        .catch(function() { showMsg('login-msg', 'Gagal terhubung ke server.', 'error'); });
+    }
+
+    function doRegister() {
+        var name = document.getElementById('reg-name').value.trim();
+        var username = document.getElementById('reg-username').value.trim();
+        var password = document.getElementById('reg-password').value;
+        if (!name || !username || !password) { showMsg('register-msg', 'Semua kolom harus diisi.', 'error'); return; }
+        if (password.length < 6) { showMsg('register-msg', 'Password minimal 6 karakter.', 'error'); return; }
+
+        fetch('auth_user.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'register', name: name, username: username, password: password})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                showMsg('register-msg', 'Akun berhasil dibuat! Silakan masuk.', 'success');
+                setTimeout(function() { switchTab('login'); }, 1500);
+            } else { showMsg('register-msg', data.message || 'Registrasi gagal.', 'error'); }
+        })
+        .catch(function() { showMsg('register-msg', 'Gagal terhubung ke server.', 'error'); });
+    }
+
+    function updateNavAuth(name, role) {
+        window.isLoggedIn = true;
+        window.isAdmin    = (role === 'admin');
+        var area     = document.getElementById('nav-auth-area');
+        var initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+        var roleLabel  = role === 'admin' ? 'Administrator' : 'Pengguna';
+        var avatarCls  = role === 'admin' ? 'nav-avatar nav-avatar-admin' : 'nav-avatar';
+        var avatarLgCls= role === 'admin' ? 'nav-avatar-lg nav-avatar-admin' : 'nav-avatar-lg';
+        var adminItem  = role === 'admin'
+            ? '<a class="nav-dropdown-item" href="admin/index.html">'
+              + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>'
+              + 'Panel Admin</a>'
+              + '<div class="nav-dropdown-divider"></div>'
+            : '';
+        area.innerHTML =
+            '<div class="nav-profile-wrap">'
+            + '<div class="nav-user-toggle" onclick="toggleProfileDropdown(event)">'
+            +   '<div class="' + avatarCls + '">' + initials + '</div>'
+            +   '<span class="nav-user-name">' + name + '</span>'
+            +   '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'
+            + '</div>'
+            + '<div class="nav-profile-dropdown" id="nav-profile-dropdown">'
+            +   '<div class="nav-dropdown-header">'
+            +     '<div class="' + avatarLgCls + '">' + initials + '</div>'
+            +     '<div><div class="nav-dropdown-name">' + name + '</div><div class="nav-dropdown-role">' + roleLabel + '</div></div>'
+            +   '</div>'
+            +   '<div class="nav-dropdown-divider"></div>'
+            +   adminItem
+            +   '<button class="nav-dropdown-item nav-dropdown-logout" onclick="doLogout()">'
+            +     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
+            +     'Keluar'
+            +   '</button>'
+            + '</div>'
+            + '</div>';
+    }
+
+    function toggleProfileDropdown(e) {
+        if (e) e.stopPropagation();
+        var d = document.getElementById('nav-profile-dropdown');
+        if (d) d.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function() {
+        var d = document.getElementById('nav-profile-dropdown');
+        if (d) d.classList.remove('open');
+    });
+
+    function doLogout() {
+        fetch('auth_user.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'logout'})
+        })
+        .finally(function() {
+            window.isLoggedIn = false;
+            clearRoute();
+            document.getElementById('nav-auth-area').innerHTML = '<button class="nav-login-btn" onclick="openModal(\'login\')">Masuk / Daftar</button>';
+        });
+    }
+
+    // Check session on load
+    fetch('auth_user.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'check'})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
+    .catch(function() {});
+</script>
+</body>
+</html>

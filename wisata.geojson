@@ -1,0 +1,3390 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-04-06T10:01:10Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/535296011",
+        "alt_name": "Stasiun Lebakjero",
+        "ele": "818",
+        "name": "Lebakjero",
+        "name:en": "Lebakjero",
+        "name:id": "Lebakjero",
+        "network": "KAI",
+        "network:wikidata": "Q2745027",
+        "operator": "PT Kereta Api Indonesia",
+        "operator:wikidata": "Q2745027",
+        "public_transport": "station",
+        "railway": "station",
+        "railway:ref": "LBJ",
+        "tourism": "attraction",
+        "train": "yes",
+        "wikidata": "Q2708881",
+        "wikipedia": "id:Stasiun Lebakjero"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.8939791,
+          -7.0536592
+        ]
+      },
+      "id": "node/535296011"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1014721911",
+        "historic": "monument",
+        "name": "Bandung Lautan Api",
+        "name:en": "Bandung Sea of Fire",
+        "tourism": "artwork",
+        "wikidata": "Q2754428",
+        "wikipedia": "en:Bandung Sea of Fire"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6049198,
+          -6.9338478
+        ]
+      },
+      "id": "node/1014721911"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1116346945",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6249651,
+          -6.7625006
+        ]
+      },
+      "id": "node/1116346945"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1116346985",
+        "name": "Hot Springs",
+        "opening_hours": "24/7",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6259079,
+          -6.7614313
+        ]
+      },
+      "id": "node/1116346985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1229557441",
+        "alt_name": "Halte Leuwigoong",
+        "ele": "617",
+        "name": "Leuwigoong",
+        "name:en": "Leuwigoong",
+        "network": "KAI Commuter",
+        "network:wikidata": "Q12501611",
+        "operator": "PT Kereta Api Indonesia",
+        "operator:website": "https://www.kai.id",
+        "operator:wikidata": "Q2745027",
+        "public_transport": "station",
+        "railway": "halt",
+        "railway:ref": "LO",
+        "tourism": "attraction",
+        "train": "yes",
+        "wikidata": "Q19741083",
+        "wikipedia": "id:Halte Leuwigoong"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9581854,
+          -7.1033308
+        ]
+      },
+      "id": "node/1229557441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1708347961",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6567441,
+          -6.831723
+        ]
+      },
+      "id": "node/1708347961"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1746708561",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6187144,
+          -6.7595457
+        ]
+      },
+      "id": "node/1746708561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1798427749",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7759685,
+          -6.9298148
+        ]
+      },
+      "id": "node/1798427749"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1956969150",
+        "addr:housenumber": "38",
+        "addr:street": "Jalan Lembong",
+        "description": "Army museum",
+        "fee": "no",
+        "name": "Museum Siliwangi",
+        "opening_hours": "Mo-Th 08:00-13:00; Fr 08:00-10:00; Sa 08:00-12:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6110914,
+          -6.9171828
+        ]
+      },
+      "id": "node/1956969150"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948282",
+        "name": "titik ukur gas vulkanik 1",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6177072,
+          -6.7623625
+        ]
+      },
+      "id": "node/2186948282"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948283",
+        "name": "titik ukur gas vulkanik 2",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6176077,
+          -6.7615862
+        ]
+      },
+      "id": "node/2186948283"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948284",
+        "name": "titik ukur gas vulaknik 3",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6188595,
+          -6.7599791
+        ]
+      },
+      "id": "node/2186948284"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948285",
+        "name": "titik ukur gas vulkanik 4",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6185877,
+          -6.7585916
+        ]
+      },
+      "id": "node/2186948285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948286",
+        "name": "titik ukur gas vulkanik 5",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6181293,
+          -6.7578037
+        ]
+      },
+      "id": "node/2186948286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948287",
+        "name": "titik ukur gas vulkanik 6",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6102204,
+          -6.7584378
+        ]
+      },
+      "id": "node/2186948287"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2186948288",
+        "name": "titik ukur gas vulkanik 7",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6109411,
+          -6.7565669
+        ]
+      },
+      "id": "node/2186948288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2361299579",
+        "name": "Situ Cangkuang",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9193021,
+          -7.1011174
+        ]
+      },
+      "id": "node/2361299579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043323",
+        "name": "Bivak III",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5761582,
+          -6.7457096
+        ]
+      },
+      "id": "node/2670043323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043325",
+        "name": "Bivak IV",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5841094,
+          -6.7424031
+        ]
+      },
+      "id": "node/2670043325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043327",
+        "name": "Dopper baru",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5834056,
+          -6.7394254
+        ]
+      },
+      "id": "node/2670043327"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043328",
+        "name": "Cicaruk",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5873756,
+          -6.7361358
+        ]
+      },
+      "id": "node/2670043328"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043330",
+        "name": "Bivak",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.582078,
+          -6.7421885
+        ]
+      },
+      "id": "node/2670043330"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2670043543",
+        "name": "Bivak VI",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.574397,
+          -6.7448868
+        ]
+      },
+      "id": "node/2670043543"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3052390925",
+        "name": "Gunung Tangkuban Parahu",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6175131,
+          -6.7616566
+        ]
+      },
+      "id": "node/3052390925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3348067546",
+        "addr:housenumber": "8",
+        "addr:street": "Jalan Inggit Ganarsih",
+        "description": "Museum about Sukarno's ex-wife",
+        "name": "Rumah Bersejarah Inggit Garnasih",
+        "opening_hours": "Mo-Su 07:00-16:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6024885,
+          -6.9314629
+        ]
+      },
+      "id": "node/3348067546"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3664019619",
+        "name": "Makam Cut Nyak Dien",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9164737,
+          -6.8632164
+        ]
+      },
+      "id": "node/3664019619"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3664022072",
+        "name": "Rumah Pengasingan Cut Nyak Dien",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9188398,
+          -6.8591397
+        ]
+      },
+      "id": "node/3664022072"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3664042561",
+        "name": "Pangeran Kornel",
+        "operator": "makam",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.921424,
+          -6.852971
+        ]
+      },
+      "id": "node/3664042561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3754824465",
+        "name": "Kopi Aroma",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6062699,
+          -6.9174718
+        ]
+      },
+      "id": "node/3754824465"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3815207521",
+        "addr:city": "Bandung",
+        "addr:postcode": "40197",
+        "addr:street": "Kp. Ciharegem Puncak",
+        "name": "Tebing Keraton",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6638952,
+          -6.8348584
+        ]
+      },
+      "id": "node/3815207521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3932360757",
+        "name": "Stone Garden",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4381247,
+          -6.8247319
+        ]
+      },
+      "id": "node/3932360757"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3932368974",
+        "name": "Gua Pawon",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4362947,
+          -6.8236107
+        ]
+      },
+      "id": "node/3932368974"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4247874332",
+        "name": "Curug Bugbrug",
+        "natural": "cliff",
+        "tourism": "attraction",
+        "waterway": "waterfall"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5801987,
+          -6.7922202
+        ]
+      },
+      "id": "node/4247874332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4261974592",
+        "addr:city": "Bandung",
+        "addr:housenumber": "#KM20",
+        "addr:postcode": "41281",
+        "addr:street": "Jalan Raya Lembang - Subang",
+        "name": "Tangkuban Perahu",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6361233,
+          -6.7742798
+        ]
+      },
+      "id": "node/4261974592"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4262315119",
+        "addr:city": "Bandung",
+        "addr:housenumber": "#KM32",
+        "addr:postcode": "40973",
+        "addr:street": "Jalan Raya Ciwidey - Rancabali",
+        "name": "Situ Patengan",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3590194,
+          -7.1637986
+        ]
+      },
+      "id": "node/4262315119"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4262417104",
+        "addr:city": "Bandung",
+        "addr:housenumber": "#KM3,8",
+        "addr:postcode": "40154",
+        "addr:street": "Jalan Sersan Bajuri",
+        "name": "Kampung Gajah Wonderland",
+        "tourism": "theme_park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5965635,
+          -6.8295078
+        ]
+      },
+      "id": "node/4262417104"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4267773749",
+        "addr:city": "Bandung",
+        "addr:housenumber": "#KM6",
+        "addr:postcode": "40391",
+        "addr:street": "Jalan Maribaya Timur",
+        "name": "The Lodge Maribaya",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.688434,
+          -6.8288811
+        ]
+      },
+      "id": "node/4267773749"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4274475790",
+        "name": "Curug Cijalu",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5903684,
+          -6.7100786
+        ]
+      },
+      "id": "node/4274475790"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4329454377",
+        "addr:city": "Bandung",
+        "addr:housenumber": "58",
+        "addr:street": "Jl. Pahlawan , Neglasari, Cibeunying Kaler",
+        "name": "Galeri Cinde",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6346884,
+          -6.8965886
+        ]
+      },
+      "id": "node/4329454377"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4338249203",
+        "building": "yes",
+        "name": "Iris Garden",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6262382,
+          -6.9633866
+        ]
+      },
+      "id": "node/4338249203"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4412879096",
+        "name": "Charred Forest",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.61735,
+          -6.7621104
+        ]
+      },
+      "id": "node/4412879096"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4412879097",
+        "name": "De Ranch",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.62646,
+          -6.8159994
+        ]
+      },
+      "id": "node/4412879097"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4412879696",
+        "name": "Kawah Ratu",
+        "name:en": "Ratu Crater",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6155575,
+          -6.7583792
+        ]
+      },
+      "id": "node/4412879696"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4451042091",
+        "name": "Egioto.com",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5775872,
+          -6.8672308
+        ]
+      },
+      "id": "node/4451042091"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4551687323",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6584286,
+          -6.834307
+        ]
+      },
+      "id": "node/4551687323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4551687324",
+        "direction": "90",
+        "name": "Curug Omas",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6580337,
+          -6.8343728
+        ]
+      },
+      "id": "node/4551687324"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4553213462",
+        "name": "Museum Ir.H. Juanda",
+        "name:en": "Ir.H.Juanda",
+        "opening_hours": "Mo-Su 08:00-20:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6291737,
+          -6.8576071
+        ]
+      },
+      "id": "node/4553213462"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4553224690",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.741752,
+          -6.8755554
+        ]
+      },
+      "id": "node/4553224690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4561512372",
+        "name": "Hand",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5716226,
+          -6.8779691
+        ]
+      },
+      "id": "node/4561512372"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4625757227",
+        "addr:housenumber": "293",
+        "addr:street": "Jalan Setiabudhi",
+        "name": "Amazing Art World",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "phone": "+62 222018280",
+        "tourism": "museum",
+        "website": "https://m.facebook.com/AmazingArtWorld.Bandung/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5963601,
+          -6.8516724
+        ]
+      },
+      "id": "node/4625757227"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4757471021",
+        "name": "Kolam renang Tirtamulya",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5250567,
+          -6.8606633
+        ]
+      },
+      "id": "node/4757471021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4989624117",
+        "name": "Situ Wanayasa",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5553485,
+          -6.6773971
+        ]
+      },
+      "id": "node/4989624117"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5075162064",
+        "name": "Airplane",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5764378,
+          -6.9874859
+        ]
+      },
+      "id": "node/5075162064"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5075162907",
+        "name": "Airplane",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5688951,
+          -6.9763855
+        ]
+      },
+      "id": "node/5075162907"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5075259652",
+        "name": "Pos Gatur Ciwalengke",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7515157,
+          -7.0506389
+        ]
+      },
+      "id": "node/5075259652"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5178031251",
+        "historic": "memorial",
+        "inscription": "PASTOOR\nH.C.VERBRAAK.\n1835 – 1918.\nAALMOEZENIER\n1874 – 1881\nATJEH\n1874 – 1907",
+        "memorial": "statue",
+        "name": "Pastoor H.C. Verbraak",
+        "start_date": "1922",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6141983,
+          -6.9089699
+        ]
+      },
+      "id": "node/5178031251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5188407891",
+        "name": "Seni Abadi",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6056955,
+          -6.9042507
+        ]
+      },
+      "id": "node/5188407891"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5188422242",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5980466,
+          -6.9123888
+        ]
+      },
+      "id": "node/5188422242"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5190254354",
+        "name": "Tank",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6172358,
+          -6.909356
+        ]
+      },
+      "id": "node/5190254354"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5211465121",
+        "name": "Kolam Renang Kampung Sawah",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5510167,
+          -7.0335483
+        ]
+      },
+      "id": "node/5211465121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5312537881",
+        "fee": "no",
+        "name": "Pintu Masuk Forest Walk Babakan Siliwangi",
+        "opening_hours": "24/7",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6097305,
+          -6.8852505
+        ]
+      },
+      "id": "node/5312537881"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5378010334",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4011047,
+          -7.1621568
+        ]
+      },
+      "id": "node/5378010334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5378010335",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3988074,
+          -7.1597461
+        ]
+      },
+      "id": "node/5378010335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5503920859",
+        "name": "Sumur Bandung",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6085001,
+          -6.9207697
+        ]
+      },
+      "id": "node/5503920859"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5503924615",
+        "name": "Taman Satwa Cikembulan\n\nKebun Binatang Cikembulan",
+        "tourism": "zoo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9155195,
+          -7.0841178
+        ]
+      },
+      "id": "node/5503924615"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5506699714",
+        "addr:housenumber": "15",
+        "addr:street": "Jalan Sirnagalih",
+        "facebook": "https://m.facebook.com/bandungsciencecenter",
+        "fee": "yes",
+        "name": "Bandung Science Center",
+        "opening_hours": "Mo-Su 09:00-17:00",
+        "phone": "+62222060412",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5947081,
+          -6.8773023
+        ]
+      },
+      "id": "node/5506699714"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5554026676",
+        "name": "Dinosaur",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6206805,
+          -6.9015347
+        ]
+      },
+      "id": "node/5554026676"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5554374177",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6027399,
+          -6.9043877
+        ]
+      },
+      "id": "node/5554374177"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5554688585",
+        "addr:housenumber": "22",
+        "addr:street": "Jalan Diponegoro",
+        "fee": "yes",
+        "name": "Museum Gedung Sate",
+        "opening_hours": "Tu-Su 09:30-16:00",
+        "phone": "+62224267753",
+        "tourism": "museum",
+        "website": "http://museumgedungsate.jabarprov.go.id",
+        "wheelchair": "yes",
+        "wikidata": "Q108991304"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6190825,
+          -6.9025816
+        ]
+      },
+      "id": "node/5554688585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5555926121",
+        "name": "Tea plantations",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3797677,
+          -7.1496115
+        ]
+      },
+      "id": "node/5555926121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5586548849",
+        "addr:city": "Bandung",
+        "addr:housenumber": "73",
+        "addr:street": "Jalan Cilaki",
+        "fee": "no",
+        "name": "Museum Pos Indonesia",
+        "name:en": "Indonesia Postal Museum",
+        "opening_hours": "Mo-Fr 08:00-16:00; Sa 09:00-13:00",
+        "tourism": "museum",
+        "wikidata": "Q10986546",
+        "wikimedia_commons": "File:Kantor Pusat Pos Indonesia.JPG",
+        "wikipedia": "id:Museum Pos"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6198013,
+          -6.9020925
+        ]
+      },
+      "id": "node/5586548849"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5595533943",
+        "name": "Kampung Gajah",
+        "tourism": "theme_park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5965431,
+          -6.8295623
+        ]
+      },
+      "id": "node/5595533943"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5638762921",
+        "name": "Jalan Sukamaju",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7061898,
+          -6.9238106
+        ]
+      },
+      "id": "node/5638762921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5654460921",
+        "name": "Flyover Pelangi Antapani",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6437018,
+          -6.9137166
+        ]
+      },
+      "id": "node/5654460921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5686426821",
+        "name": "Shoes and bags shopping street",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5940721,
+          -6.9492258
+        ]
+      },
+      "id": "node/5686426821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5695856821",
+        "name": "bumi uwa Roni",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7451359,
+          -7.067868
+        ]
+      },
+      "id": "node/5695856821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5752129921",
+        "name": "Tea Plantations",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6512691,
+          -6.7549629
+        ]
+      },
+      "id": "node/5752129921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5778956253",
+        "name": "Gedung Denzibang",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6450405,
+          -6.9400217
+        ]
+      },
+      "id": "node/5778956253"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5808405554",
+        "name": "Tree Top Adventure Park",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6499872,
+          -6.7821577
+        ]
+      },
+      "id": "node/5808405554"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5824553653",
+        "name": "Perumahan Sukaasih",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6860279,
+          -6.907019
+        ]
+      },
+      "id": "node/5824553653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5834168689",
+        "addr:postcode": "40391",
+        "name": "Maribaja Natural Hot Spring Resort",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6548873,
+          -6.8305355
+        ]
+      },
+      "id": "node/5834168689"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5885293835",
+        "name": "Hall of Fame Jawa Barat",
+        "name:en": "Hall of Fame West Java",
+        "opening_hours": "Mo-Sa 08:00-17:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6632081,
+          -6.9348098
+        ]
+      },
+      "id": "node/5885293835"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5902886485",
+        "name": "kawah Cibuni Rengganis",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3746848,
+          -7.1739727
+        ]
+      },
+      "id": "node/5902886485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5947613985",
+        "name": "MOUNTAIN BREEZE",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6111944,
+          -7.0182819
+        ]
+      },
+      "id": "node/5947613985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5947614387",
+        "name": "Komplek Tirta Regency",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6052798,
+          -7.0195834
+        ]
+      },
+      "id": "node/5947614387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5947614389",
+        "name": "Gunung Batu",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6181375,
+          -7.008882
+        ]
+      },
+      "id": "node/5947614389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5948020885",
+        "name": "Desa Langonsari",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6086312,
+          -7.0204266
+        ]
+      },
+      "id": "node/5948020885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6108901110",
+        "name": "Camp cibanteng",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7680689,
+          -6.8354416
+        ]
+      },
+      "id": "node/6108901110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6123051585",
+        "name": "Jalan Cipaera",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6242637,
+          -6.9216966
+        ]
+      },
+      "id": "node/6123051585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6149684552",
+        "description": "Road closed for cars and street full of food, music, dance and other activities.",
+        "name": "Dago Car Free Day",
+        "opening_hours": "Su 06:00-10:00",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6128252,
+          -6.8982253
+        ]
+      },
+      "id": "node/6149684552"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6177872385",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6347639,
+          -6.9142867
+        ]
+      },
+      "id": "node/6177872385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6220294485",
+        "name": "sapan (kompl. SESKOAD)",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7061578,
+          -6.9918186
+        ]
+      },
+      "id": "node/6220294485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6265263186",
+        "name": "Jalan Majalengka Dalam",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6304563,
+          -6.919637
+        ]
+      },
+      "id": "node/6265263186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6334753555",
+        "name": "Monumen Kubus",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6104652,
+          -6.8933348
+        ]
+      },
+      "id": "node/6334753555"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6342441385",
+        "name": "Jalan Sukasari II",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6207279,
+          -6.8923537
+        ]
+      },
+      "id": "node/6342441385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6418849587",
+        "name": "Rumah Miring",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6321737,
+          -6.8437773
+        ]
+      },
+      "id": "node/6418849587"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6418849594",
+        "name": "Pusat Konservasi Elang Kamojang",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7999159,
+          -7.1681482
+        ]
+      },
+      "id": "node/6418849594"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6588761008",
+        "name": "Natural Volcanic Hot Springs",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3760268,
+          -7.1722336
+        ]
+      },
+      "id": "node/6588761008"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6708843085",
+        "name": "Verve Leather",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5946982,
+          -6.8810172
+        ]
+      },
+      "id": "node/6708843085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6714107763",
+        "addr:housenumber": "45B",
+        "addr:street": "Jalan Diponegoro",
+        "fee": "no",
+        "name": "Museum Perbendaharaan",
+        "name:en": "Treasury museum",
+        "opening_hours": "Mo, Sa, Su 09:00-16:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6228648,
+          -6.9006473
+        ]
+      },
+      "id": "node/6714107763"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6725758915",
+        "addr:housenumber": "39a",
+        "addr:street": "Jalan Sunda",
+        "name": "Zerotoys Museum Mainan",
+        "name:en": "Zerotoys Toy Museum",
+        "opening_hours": "Mo-We, Fr-Su 11:00-20:00",
+        "tourism": "museum",
+        "website": "https://m.facebook.com/zerotoys"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6176886,
+          -6.9199749
+        ]
+      },
+      "id": "node/6725758915"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6765849550",
+        "artwork_type": "statue",
+        "material": "wood",
+        "name": "Monumen Trowulan",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5556926,
+          -6.9171872
+        ]
+      },
+      "id": "node/6765849550"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6765849551",
+        "artwork_type": "statue",
+        "material": "wood",
+        "name": "Monumen Pharmindo",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.555647,
+          -6.9172476
+        ]
+      },
+      "id": "node/6765849551"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7083339722",
+        "fee": "no",
+        "name": "Bandung Planning Gallery",
+        "opening_hours": "Mo-Sa 09:00-16:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6098121,
+          -6.9103103
+        ]
+      },
+      "id": "node/7083339722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7123740885",
+        "name": "Pondok Pesantren Al-Falah",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.393003,
+          -6.6451574
+        ]
+      },
+      "id": "node/7123740885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7246694685",
+        "amenity": "place_of_worship",
+        "name": "Mesjid Al-Hidayah",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6205837,
+          -6.8893846
+        ]
+      },
+      "id": "node/7246694685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7276735685",
+        "name": "Happy Fam, Ciwidey",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4382301,
+          -7.1146462
+        ]
+      },
+      "id": "node/7276735685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7291289485",
+        "name": "D'Deuland",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6222215,
+          -6.8430581
+        ]
+      },
+      "id": "node/7291289485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7959513585",
+        "name": "Warung Gombong Teh Andra",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6215938,
+          -6.8886001
+        ]
+      },
+      "id": "node/7959513585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8093054817",
+        "name": "Jalan Sudimara",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7029219,
+          -6.9016281
+        ]
+      },
+      "id": "node/8093054817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8666383117",
+        "name": "TPU LEBAL MAJA",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7884928,
+          -6.9095805
+        ]
+      },
+      "id": "node/8666383117"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9211265528",
+        "addr:street": "Kolonel Masturi",
+        "email": "lembangparkzoo@gmail.com",
+        "name": "Lembang Park & Zoo",
+        "phone": "+62 22 2785168",
+        "tourism": "zoo",
+        "website": "https://lembangparkzoo.com",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5913571,
+          -6.8054528
+        ]
+      },
+      "id": "node/9211265528"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9332119646",
+        "access": "yes",
+        "addr:city": "Subang",
+        "addr:housenumber": "Jl Riung Rangga Komplek Grand Canyon",
+        "addr:postcode": "41281",
+        "addr:street": "Raya Lembang-Subang",
+        "capacity": "200",
+        "fee": "yes",
+        "name": "Bale Opat Camping Ciater",
+        "payment:cash": "yes",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6580466,
+          -6.712626
+        ]
+      },
+      "id": "node/9332119646"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9371519223",
+        "direction": "315",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7351582,
+          -6.7788507
+        ]
+      },
+      "id": "node/9371519223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9933910373",
+        "name": "Panda",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5872205,
+          -6.8939851
+        ]
+      },
+      "id": "node/9933910373"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9936558297",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6094923,
+          -6.8994803
+        ]
+      },
+      "id": "node/9936558297"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9938445753",
+        "name": "Kampung Korea Bandung",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6406431,
+          -6.9155688
+        ]
+      },
+      "id": "node/9938445753"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9938925375",
+        "name": "Kiara Artha Park sign",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6416053,
+          -6.9160566
+        ]
+      },
+      "id": "node/9938925375"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10047168681",
+        "artwork_subject": "Mas Soetardjo Kertohadikusumo",
+        "artwork_type": "bust",
+        "material": "bronze",
+        "name": "Mas Soetardjo Kertohadikusumo",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6109914,
+          -6.9215236
+        ]
+      },
+      "id": "node/10047168681"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10047168682",
+        "artwork_subject": "Soekarno",
+        "artwork_type": "bust",
+        "material": "bronze",
+        "name": "Soekarno",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6109606,
+          -6.9215289
+        ]
+      },
+      "id": "node/10047168682"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10047168683",
+        "artwork_subject": "Raden Agung Wiranatakusumah II",
+        "artwork_type": "bust",
+        "material": "bronze",
+        "name": "R. A. Wiranatakusumah II",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6110753,
+          -6.9215422
+        ]
+      },
+      "id": "node/10047168683"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10047168684",
+        "artwork_subject": "Herman Willem Daendels",
+        "artwork_type": "bust",
+        "material": "bronze",
+        "name": "H. W. Daendels",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6110525,
+          -6.9215276
+        ]
+      },
+      "id": "node/10047168684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10250487310",
+        "name": "The Goodlife Cabin",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5838339,
+          -6.6811632
+        ]
+      },
+      "id": "node/10250487310"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10280227881",
+        "addr:city": "Bandung",
+        "addr:housenumber": "5",
+        "addr:postcode": "40292",
+        "addr:street": "Jalan Aria Utama",
+        "name": "Museum Nike Ardilla",
+        "phone": "+6281572115999",
+        "tourism": "museum",
+        "wikidata": "Q115794539"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6725146,
+          -6.9405148
+        ]
+      },
+      "id": "node/10280227881"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10280251596",
+        "addr:city": "Bandung",
+        "addr:housenumber": "37",
+        "addr:postcode": "40211",
+        "addr:street": "Jalan Nana Rohana",
+        "name": "Museum Kebudayaan Tionghoa",
+        "tourism": "museum",
+        "wikidata": "Q115794648"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5773807,
+          -6.9217089
+        ]
+      },
+      "id": "node/10280251596"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10284195908",
+        "name": "Sanggar Olah Seni Babakan Siliwangi",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6105402,
+          -6.8848947
+        ]
+      },
+      "id": "node/10284195908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10284202116",
+        "contact:instagram": "https://www.instagram.com/galeri_soemardja/?hl=en",
+        "name": "Galeri Soermardja",
+        "tourism": "gallery",
+        "wikidata": "Q65212157"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6115175,
+          -6.8924546
+        ]
+      },
+      "id": "node/10284202116"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10650943701",
+        "name": "Pineus Tilu",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5453337,
+          -7.1814041
+        ]
+      },
+      "id": "node/10650943701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10653924700",
+        "addr:city": "Bandung",
+        "addr:postcode": "40132",
+        "addr:street": "Jl. Tamansari, Lb. Siliwangi, Kec. Coblong",
+        "name": "Galeri Kebun Seni Tamansari Bandung",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6078554,
+          -6.8887947
+        ]
+      },
+      "id": "node/10653924700"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10656979386",
+        "addr:city": "Bandung",
+        "addr:housenumber": "386",
+        "addr:postcode": "40115",
+        "addr:street": "Jalan Insinyur Haji Juanda",
+        "name": "Gloya by Krida Nusantara",
+        "tourism": "gallery",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.612598,
+          -6.9010128
+        ]
+      },
+      "id": "node/10656979386"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10793588346",
+        "inscription": "\"Dan Bandung bagiku bukan cuma masalah geografis, lebih jauh dari itu melibatkan perasaan, yang bersamaku ketika sunyi\" -Pidi Baiq",
+        "name": "Kutipan Pidi Baiq",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6079663,
+          -6.9211786
+        ]
+      },
+      "id": "node/10793588346"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10793588347",
+        "inscription": "\"Bumi Pasundan lahir ketika Tuhan sedang tersenyum\" -M.A.W. Brouwer",
+        "name": "Kutipan M.A.W. Brouwer",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6079412,
+          -6.9213235
+        ]
+      },
+      "id": "node/10793588347"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10828875365",
+        "direction": "345;W;195",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.403259,
+          -7.166029
+        ]
+      },
+      "id": "node/10828875365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11005677505",
+        "name": "lembang fault",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6361185,
+          -6.8302444
+        ]
+      },
+      "id": "node/11005677505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11009505105",
+        "name": "Gunung Putri parking",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6336923,
+          -6.8004173
+        ]
+      },
+      "id": "node/11009505105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11048805968",
+        "direction": "S",
+        "name": "Gedung Sate",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6187721,
+          -6.9014986
+        ]
+      },
+      "id": "node/11048805968"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11052617162",
+        "name": "I love Bandung sign",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6298688,
+          -6.9063307
+        ]
+      },
+      "id": "node/11052617162"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11056182123",
+        "name": "Fairy Garden by The Lodge",
+        "tourism": "theme_park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6886132,
+          -6.8233175
+        ]
+      },
+      "id": "node/11056182123"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11064992945",
+        "name": "Lengkong Night Street Food",
+        "opening_hours": "Mo-Su 18:00-00:00",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6134721,
+          -6.9232638
+        ]
+      },
+      "id": "node/11064992945"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11112518098",
+        "name": "Museum Herbarium dan Zoologi ITB",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.771293,
+          -6.9320057
+        ]
+      },
+      "id": "node/11112518098"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11212167250",
+        "name": "Sunan Ibu",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.400428,
+          -7.168436
+        ]
+      },
+      "id": "node/11212167250"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11361840518",
+        "direction": "135",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4968665,
+          -6.8423247
+        ]
+      },
+      "id": "node/11361840518"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11415319631",
+        "min_age": "18",
+        "name": "Saritem Redlight Disrtict",
+        "name:ja": "サリテム置屋街",
+        "name:ko": "매음굴 집중 지역",
+        "name:zh": "妓院集中区域",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5976408,
+          -6.9179729
+        ]
+      },
+      "id": "node/11415319631"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11539070161",
+        "name": "Atrium Cibadag",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6986145,
+          -6.9552652
+        ]
+      },
+      "id": "node/11539070161"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11539070162",
+        "name": "Atrium Cileutik",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6982601,
+          -6.9544364
+        ]
+      },
+      "id": "node/11539070162"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11539070163",
+        "name": "Atrium Ciunik",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.697333,
+          -6.9558207
+        ]
+      },
+      "id": "node/11539070163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11865789569",
+        "name": "Kebun Teh Ciater - Subang",
+        "name:en": "Asstro Highlands",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6368993,
+          -6.7720193
+        ]
+      },
+      "id": "node/11865789569"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12007366062",
+        "artwork_type": "statue",
+        "material": "marble",
+        "name": "Little Cupid",
+        "start_date": "1933",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5943164,
+          -6.8607873
+        ]
+      },
+      "id": "node/12007366062"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12015613211",
+        "addr:housenumber": "100",
+        "addr:street": "Jalan Bukit Pakar Timur",
+        "name": "Selasar Sunaryo Art Space",
+        "opening_hours": "Tu-Su 10:00-17:00",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6365204,
+          -6.8586315
+        ]
+      },
+      "id": "node/12015613211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12051527325",
+        "direction": "80",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047704,
+          -6.7609997
+        ]
+      },
+      "id": "node/12051527325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12056482189",
+        "name": "Kawah Upas",
+        "name:en": "Upas Crater",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6099904,
+          -6.7593176
+        ]
+      },
+      "id": "node/12056482189"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12064456186",
+        "name": "PTDI Factory tour Bandros start",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.58486,
+          -6.9018405
+        ]
+      },
+      "id": "node/12064456186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12066217918",
+        "name": "The Lodge Maribaya",
+        "tourism": "theme_park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6878408,
+          -6.8292707
+        ]
+      },
+      "id": "node/12066217918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12069204979",
+        "name": "Wot Batu",
+        "tourism": "gallery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6366148,
+          -6.8585391
+        ]
+      },
+      "id": "node/12069204979"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12090565556",
+        "name": "Dunia Antariksa",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5958408,
+          -6.8877461
+        ]
+      },
+      "id": "node/12090565556"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12163069283",
+        "name": "Sanghyang Kenit",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3478097,
+          -6.8598247
+        ]
+      },
+      "id": "node/12163069283"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12180637296",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6482831,
+          -6.8438777
+        ]
+      },
+      "id": "node/12180637296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12180637363",
+        "name": "Batu Batik",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6528393,
+          -6.8408239
+        ]
+      },
+      "id": "node/12180637363"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12180637399",
+        "direction": "350",
+        "name": "Curug Omas",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6582476,
+          -6.8348084
+        ]
+      },
+      "id": "node/12180637399"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12231991252",
+        "amenity": "bench",
+        "armrest": "no",
+        "backrest": "no",
+        "heating": "no",
+        "lit": "no",
+        "material": "stone",
+        "seats": "10",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6372351,
+          -7.1022086
+        ]
+      },
+      "id": "node/12231991252"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12231991253",
+        "amenity": "bench",
+        "armrest": "no",
+        "backrest": "no",
+        "heating": "no",
+        "lit": "no",
+        "material": "stone",
+        "seats": "10",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6371946,
+          -7.1022328
+        ]
+      },
+      "id": "node/12231991253"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12231991318",
+        "direction": "350",
+        "name": "Puncak Pasirkuda",
+        "natural": "peak",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6305434,
+          -7.1104935
+        ]
+      },
+      "id": "node/12231991318"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12231991323",
+        "direction": "330",
+        "name": "Batu Susun",
+        "natural": "rock",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6332746,
+          -7.109316
+        ]
+      },
+      "id": "node/12231991323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12235054057",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6212793,
+          -7.0274902
+        ]
+      },
+      "id": "node/12235054057"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12237499773",
+        "addr:district": "Kabupaten Bandung Barat",
+        "addr:street": "Kidangpananjung",
+        "addr:subdistrict": "Cililin",
+        "addr:suburb": "Kidang Pananjung",
+        "name": "Camping Ground Pinus Pananjung",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4823483,
+          -6.9737162
+        ]
+      },
+      "id": "node/12237499773"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12247981297",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.555076,
+          -6.7924215
+        ]
+      },
+      "id": "node/12247981297"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248019543",
+        "direction": "15",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5563945,
+          -6.7731782
+        ]
+      },
+      "id": "node/12248019543"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248019544",
+        "name": "Area Camp Puncak Burangrang",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5562106,
+          -6.7734019
+        ]
+      },
+      "id": "node/12248019544"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248019751",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5582852,
+          -6.7869965
+        ]
+      },
+      "id": "node/12248019751"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248019801",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5588486,
+          -6.7854727
+        ]
+      },
+      "id": "node/12248019801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248034986",
+        "direction": "195",
+        "tourism": "viewpoint"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5566503,
+          -6.7873022
+        ]
+      },
+      "id": "node/12248034986"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248034987",
+        "covered": "no",
+        "fireplace": "no",
+        "name": "Pos 2",
+        "openfire": "no",
+        "surface": "ground",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5566628,
+          -6.7853681
+        ]
+      },
+      "id": "node/12248034987"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248034989",
+        "covered": "no",
+        "fireplace": "no",
+        "name": "Pos 3",
+        "openfire": "no",
+        "surface": "ground",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5562758,
+          -6.7825582
+        ]
+      },
+      "id": "node/12248034989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12248034990",
+        "covered": "no",
+        "fireplace": "no",
+        "name": "Pos 4",
+        "openfire": "no",
+        "surface": "ground",
+        "tourism": "picnic_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5567973,
+          -6.7789597
+        ]
+      },
+      "id": "node/12248034990"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12250517470",
+        "name": "Panyawangan",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6037676,
+          -6.7663149
+        ]
+      },
+      "id": "node/12250517470"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12250524334",
+        "leisure": "picnic_site",
+        "name": "Area Perkemahan Trek 11",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5871445,
+          -6.7788226
+        ]
+      },
+      "id": "node/12250524334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12424655993",
+        "name": "Glamping Legog",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4181071,
+          -7.1174424
+        ]
+      },
+      "id": "node/12424655993"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12424655997",
+        "name": "Bumi Perkemahan Rancaupas",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3931062,
+          -7.1379039
+        ]
+      },
+      "id": "node/12424655997"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12424656189",
+        "name": "Penangkaran Rusa",
+        "tourism": "zoo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3926341,
+          -7.1369458
+        ]
+      },
+      "id": "node/12424656189"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12424656257",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.3492219,
+          -7.121655
+        ]
+      },
+      "id": "node/12424656257"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12917292001",
+        "name": "Situ cigandawesi",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5160944,
+          -7.0901598
+        ]
+      },
+      "id": "node/12917292001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13018779879",
+        "name": "Kabupaten Bandung Barat",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4334009,
+          -6.7020153
+        ]
+      },
+      "id": "node/13018779879"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13042314420",
+        "fee": "no",
+        "name": "Museum Kavaleri",
+        "opening_hours": "Tu-Su 10:00-15:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6302176,
+          -6.9254976
+        ]
+      },
+      "id": "node/13042314420"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13320300601",
+        "name": "TAMAN LEMBAH DEWATA",
+        "tourism": "theme_park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6428718,
+          -6.8115695
+        ]
+      },
+      "id": "node/13320300601"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13535911147",
+        "craft": "pottery",
+        "name": "Lost in Clay",
+        "tourism": "attraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6107019,
+          -6.884874
+        ]
+      },
+      "id": "node/13535911147"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13625047228",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6025777,
+          -6.9145985
+        ]
+      },
+      "id": "node/13625047228"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13650694532",
+        "fee": "no",
+        "museum": "history",
+        "name": "Galeri Rasulullah",
+        "opening_hours": "We-Su 09:00-15:00",
+        "tourism": "museum"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.7035885,
+          -6.9481559
+        ]
+      },
+      "id": "node/13650694532"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13684173283",
+        "backcountry": "yes",
+        "group_only": "yes",
+        "name": "Camping Ground Sari Ater",
+        "tourism": "camp_site"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6676026,
+          -6.7330291
+        ]
+      },
+      "id": "node/13684173283"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561592",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6048641,
+          -6.9345793
+        ]
+      },
+      "id": "node/13704561592"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561604",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047017,
+          -6.9366486
+        ]
+      },
+      "id": "node/13704561604"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561605",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047392,
+          -6.9361587
+        ]
+      },
+      "id": "node/13704561605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561606",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047714,
+          -6.9358658
+        ]
+      },
+      "id": "node/13704561606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561607",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047379,
+          -6.9356288
+        ]
+      },
+      "id": "node/13704561607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561608",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047915,
+          -6.9356421
+        ]
+      },
+      "id": "node/13704561608"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561609",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047567,
+          -6.93532
+        ]
+      },
+      "id": "node/13704561609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561610",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6048183,
+          -6.9353413
+        ]
+      },
+      "id": "node/13704561610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561611",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.604868,
+          -6.9351682
+        ]
+      },
+      "id": "node/13704561611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13704561612",
+        "artwork_type": "installation",
+        "tourism": "artwork"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6047513,
+          -6.9350404
+        ]
+      },
+      "id": "node/13704561612"
+    }
+  ]
+}

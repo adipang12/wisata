@@ -1,0 +1,1185 @@
+:root {
+    --ink: #17324d;
+    --muted: #637083;
+    --line: #dce5ee;
+    --panel: #ffffff;
+    --wash: #f3f8fb;
+    --teal: #008c8c;
+    --green: #2f9b63;
+    --coral: #e15b4f;
+    --sun: #f1b84b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--wash);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    padding: 10px;
+    gap: 10px;
+    background: #17324d;
+}
+
+.sidebar-panel {
+    position: relative;
+    z-index: 1000;
+    width: 390px;
+    min-width: 390px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px;
+    background:
+        linear-gradient(180deg, rgba(243, 248, 251, 0.92), rgba(255, 255, 255, 0.98)),
+        url("images/2.jpg") center top / cover;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+    transition: width 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                border-radius 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.sidebar-panel.collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+/* Sidebar top bar — back + close */
+.sidebar-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px 5px 8px;
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: background 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+.back-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+.sidebar-close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(4px);
+    flex-shrink: 0;
+}
+.sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: scale(1.1);
+}
+
+/* Floating expand button (shown when sidebar is hidden) */
+.sidebar-expand-btn {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    z-index: 1100;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--ink);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(23, 50, 77, 0.35);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.sidebar-expand-btn:hover {
+    background: var(--teal);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.brand-banner {
+    min-height: 188px;
+    padding: 20px;
+    color: white;
+    background:
+        linear-gradient(180deg, rgba(23, 50, 77, 0.22), rgba(23, 50, 77, 0.72)),
+        url("images/3.jpg") center / cover;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.eyebrow {
+    width: fit-content;
+    padding: 5px 8px;
+    color: #17324d;
+    background: #f9d36a;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.brand-banner h1 {
+    margin: 14px 0 10px;
+    font-size: 1.72rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    overflow-wrap: break-word;
+}
+
+.brand-banner p {
+    max-width: 30ch;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.stats-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.stats-strip div,
+.control-stack,
+.place-card,
+.map-badge {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(220, 229, 238, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(23, 50, 77, 0.08);
+}
+
+.stats-strip div {
+    padding: 12px;
+}
+
+.stats-strip strong {
+    display: block;
+    font-size: 1.15rem;
+}
+
+.stats-strip span {
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.control-stack {
+    padding: 14px;
+}
+
+.control-stack label {
+    display: block;
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.2px;
+}
+
+.control-stack input,
+.control-stack select {
+    width: 100%;
+    height: 44px;
+    margin: 0 0 12px;
+    padding: 0 14px;
+    color: var(--ink);
+    background: #f8fbfd;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+}
+
+.control-stack input::placeholder {
+    color: var(--muted);
+}
+
+.control-stack input:hover,
+.control-stack select:hover {
+    border-color: rgba(0, 140, 140, 0.5);
+    background: #ffffff;
+}
+
+.control-stack input:focus,
+.control-stack select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(0, 140, 140, 0.12), inset 0 0 0 1px var(--teal);
+    background: #ffffff;
+}
+
+.control-stack button {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 18px;
+    color: white;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    border: 0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0, 140, 140, 0.2);
+    transition: all 220ms ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.control-stack button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 140, 140, 0.28);
+}
+
+.control-stack button:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(0, 140, 140, 0.18);
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 18px 2px 10px;
+}
+
+.list-header span {
+    font-weight: 850;
+}
+
+.list-header small {
+    color: var(--teal);
+    font-size: 0.75rem;
+    font-weight: 750;
+}
+
+.place-list {
+    display: grid;
+    gap: 10px;
+}
+
+.place-card {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    padding: 12px 12px 12px 10px;
+    cursor: pointer;
+    transition: all 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid var(--line);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(220, 229, 238, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(23, 50, 77, 0.06);
+}
+
+.place-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(23, 50, 77, 0.15);
+    border-color: rgba(220, 229, 238, 1);
+}
+
+.place-card:active {
+    transform: translateY(-1px);
+}
+
+.place-card img {
+    width: 76px;
+    height: 76px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(23, 50, 77, 0.12);
+    transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.place-card:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(23, 50, 77, 0.16);
+}
+
+.place-card h5 {
+    margin: 3px 0 6px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+}
+
+.meta-line,
+.photo-credit {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.80rem;
+    line-height: 1.4;
+}
+
+.maps-link {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--teal);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.maps-link:hover {
+    text-decoration: underline;
+}
+
+.error-state {
+    margin: 0;
+    padding: 12px;
+    color: #9b1c1c;
+    background: #fff1f1;
+    border: 1px solid #f5b8b8;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.category-pill {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 8px;
+    padding: 5px 10px;
+    color: #7a3f00;
+    background: rgba(241, 184, 75, 0.28);
+    border: 1px solid rgba(241, 184, 75, 0.5);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: all 200ms ease;
+}
+
+.place-card:hover .category-pill {
+    background: rgba(241, 184, 75, 0.35);
+    border-color: rgba(241, 184, 75, 0.7);
+}
+
+/* ── Route Card ── */
+#routing-info {
+    padding: 0 4px;
+    margin: 4px 0 8px;
+}
+.route-card {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0, 140, 140, 0.2), 0 2px 8px rgba(0,0,0,0.06);
+    margin: 0;
+    border: 1px solid rgba(0, 140, 140, 0.15);
+}
+.route-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    color: white;
+    gap: 10px;
+}
+.route-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.route-icon-wrap {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.route-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    opacity: 0.82;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+.route-destination {
+    font-size: 0.9rem;
+    font-weight: 700;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+.route-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.route-close-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.1);
+}
+.route-stats {
+    display: flex;
+    background: #fff;
+}
+.route-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    gap: 2px;
+}
+.route-stat-icon {
+    color: var(--teal);
+    margin-bottom: 2px;
+}
+.route-stat-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+}
+.route-stat-label {
+    font-size: 0.62rem;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+.route-divider {
+    width: 1px;
+    background: var(--line);
+    margin: 8px 0;
+}
+
+/* ── Toast notification ── */
+.toast-notif {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: var(--ink);
+    color: #fff;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 500;
+    z-index: 9999;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.toast-notif.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.map-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.map-badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 900;
+    padding: 12px 14px;
+}
+
+.map-badge strong,
+.map-badge span {
+    display: block;
+}
+
+.map-badge span {
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+/* ── Popup card override ── */
+.wisata-popup .leaflet-popup-content-wrapper {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(23, 50, 77, 0.24);
+    border: none;
+    width: 290px !important;
+}
+.wisata-popup .leaflet-popup-content {
+    margin: 0 !important;
+    width: 290px !important;
+    font-size: 0.9rem;
+}
+.wisata-popup .leaflet-popup-tip {
+    background: #fff;
+}
+
+/* Card image */
+.wp-img-wrap {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: #e8eef4;
+}
+.wp-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    margin: 0;
+    max-height: none;
+    border-radius: 0;
+    transition: transform 0.4s ease;
+}
+.wisata-popup:hover .wp-img-wrap img {
+    transform: scale(1.04);
+}
+.wp-cat-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.52);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+}
+
+/* Card body */
+.wp-content {
+    padding: 14px 16px 16px;
+}
+.wp-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+.wp-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 3px;
+}
+.wp-star-icon { color: #f1b84b; font-size: 0.88rem; }
+.wp-credit {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 0 0 10px;
+    line-height: 1.4;
+    min-height: 0;
+}
+.wp-maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.74rem;
+    color: var(--teal);
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: opacity 0.2s;
+}
+.wp-maps-link:hover { opacity: 0.75; text-decoration: underline; }
+.wp-route-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: transform 220ms ease, box-shadow 220ms ease;
+    box-shadow: 0 4px 14px rgba(0, 140, 140, 0.22);
+}
+.wp-route-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(0, 140, 140, 0.32);
+}
+.wp-route-btn:active { transform: translateY(0); }
+
+/* Sidebar card route button */
+.sidebar-route-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 7px 10px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.sidebar-route-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(0, 140, 140, 0.25);
+}
+
+.leaflet-popup-tip {
+    background: white;
+}
+
+/* ── User location marker (merah + pulse) ── */
+.user-marker-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user-marker-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(225, 91, 79, 0.28);
+    animation: user-pulse 2s ease-out infinite;
+}
+.user-marker-pin {
+    width: 18px;
+    height: 18px;
+    background: #e15b4f;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(225, 91, 79, 0.55);
+    position: relative;
+    z-index: 1;
+}
+@keyframes user-pulse {
+    0%   { transform: scale(0.5); opacity: 0.8; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ── Destination marker (teal pin + label) ── */
+.dest-marker-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.dest-marker-pin {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #008c8c, #2f9b63);
+    border: 3px solid #fff;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 3px 12px rgba(0, 140, 140, 0.5);
+}
+.dest-marker-label {
+    background: #17324d;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Route steps list (in sidebar) ── */
+.route-steps-list {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(23, 50, 77, 0.07);
+    margin-bottom: 12px;
+}
+.route-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(220, 229, 238, 0.7);
+    transition: background 0.15s;
+}
+.route-step:hover { background: #f3f8fb; }
+.route-step-last { border-bottom: none; }
+.route-step-icon {
+    font-size: 1rem;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 140, 140, 0.1);
+    border-radius: 50%;
+    color: var(--teal);
+    font-weight: 700;
+}
+.route-step-body { flex: 1; min-width: 0; }
+.route-step-text {
+    font-size: 0.78rem;
+    color: var(--ink);
+    line-height: 1.4;
+    font-weight: 500;
+}
+.route-step-dist {
+    font-size: 0.68rem;
+    color: var(--teal);
+    font-weight: 700;
+    margin-top: 3px;
+    background: rgba(0, 140, 140, 0.1);
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+
+/* ── Floating route panel (saat sidebar disembunyikan) ── */
+#routing-info.route-panel-floating {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 1200;
+    padding: 0;
+    margin: 0;
+}
+
+/* Full panel inside floating */
+#routing-info.route-panel-floating #route-full-panel {
+    max-height: 52vh;
+    overflow-y: auto;
+    border-radius: 0 0 16px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #dce5ee transparent;
+}
+#routing-info.route-panel-floating #route-full-panel::-webkit-scrollbar { width: 4px; }
+#routing-info.route-panel-floating #route-full-panel::-webkit-scrollbar-thumb { background: #dce5ee; border-radius: 4px; }
+#routing-info.route-panel-floating .route-card { border-radius: 0; margin-bottom: 0; box-shadow: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
+#routing-info.route-panel-floating .route-steps-list { border-radius: 0 0 16px 16px; margin-bottom: 0; box-shadow: none; }
+
+/* ── Mini nav bar (Google Maps style) ── */
+.route-mini-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    background: linear-gradient(135deg, #17324d 0%, #1a4a6e 100%);
+    color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
+    cursor: default;
+}
+.route-mini-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    background: rgba(0, 140, 140, 0.35);
+    border: 2px solid rgba(0, 140, 140, 0.6);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+.route-mini-content {
+    flex: 1;
+    min-width: 0;
+}
+.route-mini-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+.route-mini-sub {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.62);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.route-mini-dest {
+    color: rgba(255, 255, 255, 0.45);
+}
+.route-mini-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.route-mini-expand-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 140, 140, 0.3);
+    border: 1px solid rgba(0, 140, 140, 0.5);
+    color: #fff;
+    cursor: pointer;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    transition: background 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.route-mini-expand-btn:hover { background: rgba(0, 140, 140, 0.5); }
+.route-mini-close-btn {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.route-mini-close-btn:hover { background: rgba(225, 91, 79, 0.5); color: #fff; border-color: transparent; }
+
+/* ── Hide LRM's built-in directions panel (we render our own) ── */
+.leaflet-routing-container { display: none !important; }
+
+/* ── Leaflet Routing Machine panel — floating card style ── */
+.leaflet-routing-container {
+    position: absolute !important;
+    right: 14px !important;
+    bottom: 28px !important;
+    top: auto !important;
+    left: auto !important;
+    width: 300px !important;
+    max-width: calc(100vw - 28px) !important;
+    max-height: 52vh !important;
+    overflow-y: auto !important;
+    background: #fff !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 40px rgba(23, 50, 77, 0.2) !important;
+    border: 1px solid rgba(220, 229, 238, 0.9) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 800 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif !important;
+}
+
+/* Hide the default header's close button (we use our own route card) */
+.leaflet-routing-container h2 {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #17324d !important;
+    padding: 12px 14px 8px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #dce5ee !important;
+    background: #f3f8fb !important;
+    border-radius: 14px 14px 0 0 !important;
+    letter-spacing: 0.2px !important;
+}
+
+.leaflet-routing-container h3 {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    color: #637083 !important;
+    padding: 6px 14px !important;
+    margin: 0 !important;
+    background: rgba(0, 140, 140, 0.06) !important;
+    border-bottom: 1px solid #dce5ee !important;
+}
+
+.leaflet-routing-alt {
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.leaflet-routing-alt table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+.leaflet-routing-alt tr {
+    border-bottom: 1px solid rgba(220, 229, 238, 0.6) !important;
+    transition: background 0.15s ease !important;
+}
+
+.leaflet-routing-alt tr:last-child {
+    border-bottom: none !important;
+}
+
+.leaflet-routing-alt tr:hover {
+    background: #f3f8fb !important;
+}
+
+.leaflet-routing-alt td {
+    padding: 9px 10px 9px 6px !important;
+    font-size: 0.76rem !important;
+    color: #17324d !important;
+    vertical-align: middle !important;
+    line-height: 1.4 !important;
+}
+
+.leaflet-routing-alt td:first-child {
+    width: 32px !important;
+    text-align: center !important;
+    padding-left: 10px !important;
+    color: #008c8c !important;
+}
+
+/* Distance badge in route steps */
+.leaflet-routing-alt td span {
+    display: inline-block !important;
+    background: rgba(0,140,140,0.1) !important;
+    color: #008c8c !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    border-radius: 10px !important;
+    margin-left: 4px !important;
+    white-space: nowrap !important;
+}
+
+/* Scrollbar inside routing panel */
+.leaflet-routing-container::-webkit-scrollbar { width: 4px; }
+.leaflet-routing-container::-webkit-scrollbar-track { background: transparent; }
+.leaflet-routing-container::-webkit-scrollbar-thumb { background: #dce5ee; border-radius: 4px; }
+.leaflet-routing-container::-webkit-scrollbar-thumb:hover { background: #b0bec5; }
+
+@media (max-width: 767px) {
+    .leaflet-routing-container {
+        right: 8px !important;
+        bottom: 12px !important;
+        width: calc(100vw - 16px) !important;
+        max-height: 38vh !important;
+        border-radius: 10px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    :root {
+        font-size: 14px;
+    }
+
+    .app-shell {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+        padding: 0;
+        gap: 0;
+        background: var(--wash);
+    }
+
+    .sidebar-panel {
+        order: 1;
+        width: 100%;
+        min-width: 0;
+        height: 55vh;
+        max-height: 55vh;
+        border-radius: 0;
+        border-bottom: 2px solid var(--line);
+        padding: 12px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: none;
+    }
+
+    .brand-banner {
+        min-height: 110px;
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .brand-banner h1 {
+        max-width: 15ch;
+        font-size: 1.35rem;
+        margin: 10px 0 8px;
+    }
+
+    .brand-banner p {
+        max-width: 28ch;
+        font-size: 0.85rem;
+    }
+
+    .eyebrow {
+        font-size: 0.65rem;
+    }
+
+    .stats-strip {
+        gap: 8px;
+        margin: 8px 0;
+    }
+
+    .stats-strip div {
+        padding: 10px;
+    }
+
+    .stats-strip strong {
+        font-size: 1.05rem;
+    }
+
+    .control-stack {
+        padding: 12px;
+        margin: 0 0 8px;
+    }
+
+    .control-stack label {
+        margin: 0 0 6px;
+    }
+
+    .control-stack input,
+    .control-stack select,
+    .control-stack button {
+        height: 42px;
+        min-height: 42px;
+        font-size: 1rem;
+    }
+
+    .list-header {
+        margin-top: 12px;
+        font-size: 0.9rem;
+    }
+
+    .place-list {
+        padding-bottom: 8px;
+    }
+
+    .place-card {
+        gap: 10px;
+        padding: 10px 10px 10px 8px;
+        grid-template-columns: 66px 1fr;
+    }
+
+    .place-card img {
+        width: 66px;
+        height: 66px;
+    }
+
+    .place-card h5 {
+        font-size: 0.92rem;
+    }
+
+    .map-wrap {
+        order: 2;
+        height: 45vh;
+        min-height: 45vh;
+        border-radius: 0;
+    }
+
+    #map {
+        height: 45vh;
+    }
+
+    .map-badge {
+        display: none;
+    }
+}

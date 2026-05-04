@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Explore Bandung</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: none; }
+        }
+        .kat-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e8f0fe;
+            color: #17324d;
+        }
+
+        /* ── MAP PICKER ─────────────────────────────── */
+        .map-picker-wrap {
+            margin-top: 20px;
+            max-width: 700px;
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .map-picker-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--wash);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+            border: none;
+            width: 100%;
+            font-family: inherit;
+        }
+        .map-picker-toggle:hover { background: #e4eff6; }
+        .map-picker-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .map-picker-toggle-left svg { color: var(--teal); }
+        .mp-chevron { transition: transform 0.22s; color: var(--muted); }
+        .mp-chevron.open { transform: rotate(180deg); }
+
+        .map-picker-body {
+            display: none;
+            padding: 16px 18px 20px;
+            border-top: 1px solid var(--line);
+        }
+        .map-picker-body.open { display: block; }
+
+        .map-picker-hint {
+            font-size: 0.84rem;
+            color: var(--muted);
+            margin: 0 0 12px;
+        }
+        .map-picker-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .btn-locate {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--teal);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-locate:hover { background: #007070; transform: translateY(-1px); }
+        .btn-locate:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+        .btn-clear-marker {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: var(--wash);
+            color: var(--muted);
+            border: 1.5px solid var(--line);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-clear-marker:hover { border-color: var(--coral); color: var(--coral); }
+
+        #admin-map-picker {
+            height: 380px;
+            border-radius: 10px;
+            border: 1.5px solid var(--line);
+            background: #e8f0fe;
+        }
+        .coords-result {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #f0faf3;
+            border: 1.5px solid #c3e6cb;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: #1d5e2a;
+            font-weight: 500;
+        }
+        .coords-result.show { display: flex; }
+        .coords-result-vals { font-weight: 700; }
+        .coords-fill-note { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p id="admin-username">Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="dashboard">📊 Dashboard</a>
+                <a href="#" class="nav-item" data-tab="wisata-list">📍 Daftar Wisata</a>
+                <a href="#" class="nav-item" data-tab="add-wisata">➕ Tambah Wisata</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-button" onclick="doLogout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <div class="content-header">
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-wisata">0</div>
+                        <div class="stat-label">Total Wisata</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-categories">0</div>
+                        <div class="stat-label">Kategori</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="with-ratings">0</div>
+                        <div class="stat-label">Dengan Rating</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="avg-rating">0</div>
+                        <div class="stat-label">Rating Rata-rata</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wisata List Tab -->
+            <section id="wisata-list" class="tab-content">
+                <div class="content-header">
+                    <h1>Daftar Wisata</h1>
+                    <input type="text" id="search-wisata" class="search-input" placeholder="Cari wisata...">
+                </div>
+                <div class="table-responsive">
+                    <table class="wisata-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Kategori</th>
+                                <th>Rating</th>
+                                <th>Lokasi (Lat, Lng)</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wisata-tbody">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Add Wisata Tab -->
+            <section id="add-wisata" class="tab-content">
+                <div class="content-header">
+                    <h1>Tambah Wisata Baru</h1>
+                </div>
+                <form id="add-wisata-form" class="wisata-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nama">Nama Wisata *</label>
+                            <input type="text" id="nama" name="nama" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="kategori">Kategori *</label>
+                            <select id="kategori" name="kategori" required>
+                                <option value="">Pilih kategori</option>
+                                <option value="attraction">Atraksi Wisata</option>
+                                <option value="museum">Museum & Sejarah</option>
+                                <option value="viewpoint">Pemandangan</option>
+                                <option value="camp_site">Camping</option>
+                                <option value="picnic_site">Piknik</option>
+                                <option value="theme_park">Taman Hiburan</option>
+                                <option value="gallery">Galeri</option>
+                                <option value="artwork">Seni Publik</option>
+                                <option value="zoo">Kebun Binatang</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="latitude">Latitude *</label>
+                            <input type="number" id="latitude" name="latitude" step="0.0001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude *</label>
+                            <input type="number" id="longitude" name="longitude" step="0.0001" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rating">Rating (0-5)</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="review">Deskripsi</label>
+                            <textarea id="review" name="review" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Simpan Wisata</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+
+                    <div id="form-message" class="form-message" style="display: none;"></div>
+                </form>
+
+                <!-- MAP PICKER ─────────────────────────────────────────── -->
+                <div class="map-picker-wrap">
+                    <button type="button" class="map-picker-toggle" onclick="toggleMapPicker()" id="map-picker-toggle">
+                        <span class="map-picker-toggle-left">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="2" y1="12" x2="22" y2="12"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                            Pilih Lokasi via Peta
+                        </span>
+                        <svg class="mp-chevron" id="mp-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+
+                    <div class="map-picker-body" id="map-picker-body">
+                        <p class="map-picker-hint">
+                            Klik pada peta untuk menentukan koordinat. Marker bisa digeser untuk presisi lebih akurat.
+                            Koordinat akan otomatis terisi di form di atas.
+                        </p>
+                        <div class="map-picker-actions">
+                            <button type="button" class="btn-locate" id="btn-locate" onclick="useMyLocation()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>
+                                </svg>
+                                Gunakan Lokasi Saya
+                            </button>
+                            <button type="button" class="btn-clear-marker" id="btn-clear-marker" onclick="clearPickerMarker()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                Hapus Pin
+                            </button>
+                        </div>
+                        <div id="admin-map-picker"></div>
+                        <div class="coords-result" id="coords-result">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                                <circle cx="12" cy="9" r="2.5"/>
+                            </svg>
+                            <span>Pin pada: <span class="coords-result-vals" id="picked-coords">—</span></span>
+                            <span class="coords-fill-note">✓ Koordinat sudah terisi di form</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Wisata</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-form" class="wisata-form">
+                <input type="hidden" id="edit-id" name="id">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-nama">Nama Wisata *</label>
+                        <input type="text" id="edit-nama" name="nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-kategori">Kategori *</label>
+                        <select id="edit-kategori" name="kategori" required>
+                            <option value="attraction">Atraksi Wisata</option>
+                            <option value="museum">Museum & Sejarah</option>
+                            <option value="viewpoint">Pemandangan</option>
+                            <option value="camp_site">Camping</option>
+                            <option value="picnic_site">Piknik</option>
+                            <option value="theme_park">Taman Hiburan</option>
+                            <option value="gallery">Galeri</option>
+                            <option value="artwork">Seni Publik</option>
+                            <option value="zoo">Kebun Binatang</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-latitude">Latitude *</label>
+                        <input type="number" id="edit-latitude" name="latitude" step="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-longitude">Longitude *</label>
+                        <input type="number" id="edit-longitude" name="longitude" step="0.0001" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-rating">Rating (0-5)</label>
+                        <input type="number" id="edit-rating" name="rating" min="0" max="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-review">Deskripsi</label>
+                        <textarea id="edit-review" name="review" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
