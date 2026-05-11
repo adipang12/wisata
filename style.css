@@ -1131,6 +1131,7 @@ body {
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
         user-select: none;
+        touch-action: none; /* kita handle manual */
     }
     .sheet-handle-bar {
         width: 40px;
@@ -1138,6 +1139,14 @@ body {
         background: rgba(0,0,0,0.18);
         border-radius: 2px;
         margin-bottom: 10px;
+    }
+
+    /* Prevent pull-to-refresh saat sidebar terbuka */
+    .sidebar-panel {
+        overscroll-behavior: contain;
+    }
+    .sidebar-panel.sheet-open {
+        overscroll-behavior-y: contain;
     }
     /* Judul mini saat collapsed */
     .sheet-collapsed-hint {

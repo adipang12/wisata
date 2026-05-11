@@ -775,52 +775,103 @@
     .then(function(data) { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
     .catch(function() {});
 
-// ── Mobile Bottom Sheet ──────────────────────────────────────
+// ── Mobile Bottom Sheet (dengan proper swipe, anti pull-to-refresh) ─────
 (function() {
     var isMobile = function() { return window.innerWidth <= 767; };
     var sidebar  = document.getElementById('sidebar');
+    var handle   = document.getElementById('sheet-handle');
     if (!sidebar) return;
 
+    var isOpen  = false;
+    var startY  = 0;
+    var currentY = 0;
+    var dragging = false;
+
+    function openSheet() {
+        isOpen = true;
+        sidebar.classList.add('sheet-open');
+        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+    }
+    function closeSheet() {
+        isOpen = false;
+        sidebar.classList.remove('sheet-open');
+        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+    }
     function toggleMobileSheet() {
         if (!isMobile()) return;
-        sidebar.classList.toggle('sheet-open');
-        // Invalidate map size agar tiles reload dengan benar
-        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+        isOpen ? closeSheet() : openSheet();
     }
     window.toggleMobileSheet = toggleMobileSheet;
 
-    // Auto-expand saat marker diklik atau rute AI aktif
+    // ── Touch drag pada handle ──────────────────────────────
+    if (handle) {
+        handle.addEventListener('touchstart', function(e) {
+            if (!isMobile()) return;
+            startY   = e.touches[0].clientY;
+            currentY = startY;
+            dragging = true;
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', function(e) {
+            if (!dragging || !isMobile()) return;
+            currentY = e.touches[0].clientY;
+            var dy = currentY - startY;
+            // Blokir pull-to-refresh saat drag ke bawah
+            if (dy > 0) e.preventDefault();
+        }, { passive: false }); // passive:false agar bisa preventDefault
+
+        handle.addEventListener('touchend', function(e) {
+            if (!dragging || !isMobile()) return;
+            dragging = false;
+            var dy = e.changedTouches[0].clientY - startY;
+            if (dy < -40)       openSheet();   // swipe ke atas = buka
+            else if (dy > 40)   closeSheet();  // swipe ke bawah = tutup
+            else                toggleMobileSheet(); // tap kecil = toggle
+        }, { passive: true });
+    }
+
+    // ── Blokir pull-to-refresh di seluruh sidebar ───────────
+    sidebar.addEventListener('touchmove', function(e) {
+        if (!isMobile()) return;
+        if (!isOpen) {
+            // Sheet tertutup: blokir semua scroll (supaya tidak trigger refresh)
+            e.preventDefault();
+            return;
+        }
+        // Sheet terbuka: izinkan scroll konten internal, blokir hanya di ujung atas
+        if (sidebar.scrollTop <= 0 && e.touches[0].clientY > startY) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    sidebar.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    // ── Auto-expand saat AI route digambar ─────────────────
     var _origDrawAI = window.drawAIRoute;
     if (_origDrawAI) {
         window.drawAIRoute = function(places) {
             _origDrawAI(places);
-            if (isMobile()) sidebar.classList.add('sheet-open');
+            if (isMobile()) openSheet();
         };
     }
 
-    // Touch drag untuk tarik sheet
-    var startY = 0, startOpen = false;
-    var handle = document.getElementById('sheet-handle');
-    if (handle) {
-        handle.addEventListener('touchstart', function(e) {
-            startY    = e.touches[0].clientY;
-            startOpen = sidebar.classList.contains('sheet-open');
-        }, { passive: true });
-        handle.addEventListener('touchend', function(e) {
-            var dy = e.changedTouches[0].clientY - startY;
-            if (dy < -30)       sidebar.classList.add('sheet-open');    // tarik ke atas = buka
-            else if (dy > 30)   sidebar.classList.remove('sheet-open'); // tarik ke bawah = tutup
-            else                toggleMobileSheet();                     // tap = toggle
-            setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
-        }, { passive: true });
-    }
-
-    // Tutup sheet saat user tap di peta
+    // ── Tutup sheet saat tap di peta ───────────────────────
     if (window.map) {
         map.on('click', function() {
-            if (isMobile()) sidebar.classList.remove('sheet-open');
+            if (isMobile() && isOpen) closeSheet();
         });
     }
+
+    // ── Blokir pull-to-refresh secara global saat sheet aktif ──
+    document.body.addEventListener('touchmove', function(e) {
+        if (!isMobile()) return;
+        // Hanya blokir jika sentuhan berasal dari area sidebar
+        var path = e.composedPath ? e.composedPath() : [];
+        var onSidebar = path.some(function(el) { return el === sidebar; });
+        if (onSidebar && !isOpen) e.preventDefault();
+    }, { passive: false });
 })();
 </script>
 </body>
