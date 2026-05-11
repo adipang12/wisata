@@ -2184,6 +2184,9 @@ function doLogout() {
   fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'logout'})})
     .finally(function() {
       document.getElementById('nav-auth-area').innerHTML = '<button class="nav-login-btn" onclick="openModal(\'login\')">Masuk / Daftar</button>';
+      // Tampilkan kembali tombol Daftar Gratis di CTA
+      var ctaBtn = document.getElementById('cta-register-btn');
+      if (ctaBtn) ctaBtn.style.display = '';
     });
 }
 
