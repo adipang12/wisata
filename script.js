@@ -498,7 +498,7 @@ function makeAIIcon(i, color) {
 var DAY_COLORS = ['#e74c3c','#2980b9','#27ae60','#8e44ad','#e67e22'];
 
 function drawAIRoute(places) {
-    clearAIRoute();
+    clearAIRoute(false); // false = jangan hapus localStorage saat redraw
 
     // Sembunyikan semua marker wisata biasa
     if (map.hasLayer(layerGroup)) map.removeLayer(layerGroup);
@@ -586,7 +586,7 @@ function drawAIRoute(places) {
     }
 }
 
-function clearAIRoute() {
+function clearAIRoute(clearStorage) {
     aiRouteMarkers.forEach(function(m) { map.removeLayer(m); });
     aiRouteMarkers = [];
     if (aiRoutingControl) {
@@ -596,7 +596,8 @@ function clearAIRoute() {
     }
     var panel = document.getElementById('ai-route-panel');
     if (panel) panel.style.display = 'none';
-    localStorage.removeItem('wb_ai_session');
+    // Hanya hapus localStorage jika user klik "Hapus" (clearStorage !== false)
+    if (clearStorage !== false) localStorage.removeItem('wb_ai_session');
     if (!map.hasLayer(layerGroup)) map.addLayer(layerGroup);
 }
 
@@ -676,10 +677,15 @@ function submitAIPlannerMap() {
 (function () {
     var raw = localStorage.getItem('wb_ai_session');
     if (!raw) return;
-    try {
-        var data = JSON.parse(raw);
-        if (data.places && data.places.length > 0) {
-            setTimeout(function() { drawAIRoute(data.places); }, 800);
-        }
-    } catch(e) {}
+    var session;
+    try { session = JSON.parse(raw); } catch(e) { return; }
+    if (!session || !session.places || session.places.length === 0) return;
+
+    var withCoords = session.places.filter(function(p) { return p.latitude && p.longitude; });
+    if (withCoords.length < 1) return;
+
+    // Tunggu map siap, lalu gambar rute
+    map.whenReady(function() {
+        setTimeout(function() { drawAIRoute(session.places); }, 400);
+    });
 })();
