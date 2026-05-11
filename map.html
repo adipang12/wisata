@@ -206,7 +206,7 @@
 
         /* ── MODAL ── */
         .modal-backdrop {
-            display: none;
+            display: flex;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.45);
@@ -214,8 +214,16 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(3px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.28s ease, visibility 0.28s ease, backdrop-filter 0.28s ease;
         }
-        .modal-backdrop.open { display: flex; }
+        .modal-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
         .modal-box {
             background: #fff;
             border-radius: 18px;
@@ -225,11 +233,15 @@
             box-shadow: 0 24px 64px rgba(0,0,0,0.25);
             overflow: visible;
             position: relative;
-            transform: translateY(24px) scale(0.97);
+            transform: translateY(32px) scale(0.95);
             opacity: 0;
-            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease;
+            transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.28s ease;
         }
-        .modal-backdrop.open .modal-box { transform: none; opacity: 1; }
+        .modal-backdrop.open .modal-box {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
         .modal-close-btn {
             position: absolute;
             top: 1rem; right: 1rem;
@@ -857,7 +869,17 @@
         switchTab(tab || 'login');
     }
     function closeModal() {
-        document.getElementById('auth-modal').classList.remove('open');
+        var modal = document.getElementById('auth-modal');
+        var box   = modal.querySelector('.modal-box');
+        box.style.transition = 'transform 0.22s ease-in, opacity 0.18s ease-in';
+        box.style.transform  = 'translateY(24px) scale(0.96)';
+        box.style.opacity    = '0';
+        setTimeout(function() {
+            modal.classList.remove('open');
+            box.style.transition = '';
+            box.style.transform  = '';
+            box.style.opacity    = '';
+        }, 200);
     }
     document.getElementById('auth-modal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
