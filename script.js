@@ -15,6 +15,8 @@ var destinationMarker = null;
 var categoryLabels = {
     all: 'Semua',
     attraction: 'Atraksi',
+    kuliner: 'Kuliner',
+    belanja: 'Belanja',
     museum: 'Museum',
     viewpoint: 'Pemandangan',
     camp_site: 'Camping',
@@ -28,6 +30,8 @@ var categoryLabels = {
 
 var categoryColors = {
     attraction: '#FF6B6B',
+    kuliner: '#FF9F43',
+    belanja: '#A29BFE',
     museum: '#4ECDC4',
     viewpoint: '#45B7D1',
     camp_site: '#96CEB4',
@@ -491,66 +495,93 @@ function makeAIIcon(i, color) {
     });
 }
 
+var DAY_COLORS = ['#e74c3c','#2980b9','#27ae60','#8e44ad','#e67e22'];
+
 function drawAIRoute(places) {
     clearAIRoute();
 
-    // Sembunyikan semua marker wisata biasa agar rute AI lebih jelas
+    // Sembunyikan semua marker wisata biasa
     if (map.hasLayer(layerGroup)) map.removeLayer(layerGroup);
 
     var withCoords = places.filter(function(p) { return p.latitude && p.longitude; });
-    if (withCoords.length < 2) return;
+    if (withCoords.length < 1) return;
 
-    // Marker bernomor per stop
+    // Kelompokkan per hari
+    var byDay = {};
     withCoords.forEach(function(p, i) {
-        var color  = AI_COLORS[i % AI_COLORS.length];
-        var marker = L.marker([p.latitude, p.longitude], { icon: makeAIIcon(i, color), zIndexOffset: 500 })
+        var d = p.hari || 1;
+        if (!byDay[d]) byDay[d] = [];
+        byDay[d].push(Object.assign({}, p, { _idx: i }));
+    });
+
+    // Marker bernomor per stop (warna berdasarkan hari)
+    withCoords.forEach(function(p, i) {
+        var dayColor = DAY_COLORS[((p.hari || 1) - 1) % DAY_COLORS.length];
+        var marker = L.marker([p.latitude, p.longitude], { icon: makeAIIcon(i, dayColor), zIndexOffset: 500 })
             .addTo(map)
             .bindPopup(
-                '<div style="min-width:160px"><b style="color:' + color + ';">Stop ' + (i+1) + ' — ' + p.jam + '</b><br>' +
+                '<div style="min-width:160px"><b style="color:' + dayColor + ';">Hari ' + (p.hari||1) + ' · ' + p.jam + '</b><br>' +
                 p.nama + (p.kategori ? '<br><small style="opacity:.7">' + p.kategori + '</small>' : '') + '</div>'
             );
         aiRouteMarkers.push(marker);
     });
 
-    // OSRM routing — ikut jalan asli
-    var waypoints = withCoords.map(function(p) { return L.latLng(p.latitude, p.longitude); });
-
-    aiRoutingControl = L.Routing.control({
-        waypoints          : waypoints,
-        routeWhileDragging : false,
-        addWaypoints       : false,
-        draggableWaypoints : false,
-        fitSelectedRoutes  : true,
-        show               : false,
-        lineOptions: {
-            styles: [{ color: '#C4956A', weight: 5, opacity: 0.9 }],
-            extendToWaypoints   : true,
-            missingRouteTolerance: 0,
-        },
-        createMarker: function() { return null; },
-        router: L.Routing.osrmv1({
-            serviceUrl: 'https://router.project-osrm.org/route/v1',
-            profile   : 'driving',
-        }),
-    }).addTo(map);
-
-    // Sembunyikan container turn-by-turn bawaan
-    aiRoutingControl.on('routesfound', function() {
-        var c = aiRoutingControl.getContainer();
-        if (c) c.style.display = 'none';
+    // Gambar rute OSRM per hari dengan warna berbeda
+    var days = Object.keys(byDay).sort(function(a,b){ return a-b; });
+    days.forEach(function(day) {
+        var pts = byDay[day];
+        if (pts.length < 2) return;
+        var waypoints = pts.map(function(p) { return L.latLng(p.latitude, p.longitude); });
+        var lineColor = DAY_COLORS[(parseInt(day) - 1) % DAY_COLORS.length];
+        var ctrl = L.Routing.control({
+            waypoints          : waypoints,
+            routeWhileDragging : false,
+            addWaypoints       : false,
+            draggableWaypoints : false,
+            fitSelectedRoutes  : days.length === 1,
+            show               : false,
+            lineOptions: {
+                styles: [{ color: lineColor, weight: 5, opacity: 0.85 }],
+                extendToWaypoints    : true,
+                missingRouteTolerance: 0,
+            },
+            createMarker: function() { return null; },
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile   : 'driving',
+            }),
+        }).addTo(map);
+        ctrl.on('routesfound', function() {
+            var c = ctrl.getContainer();
+            if (c) c.style.display = 'none';
+        });
+        // simpan agar bisa di-clear
+        if (!aiRoutingControl) aiRoutingControl = [];
+        if (Array.isArray(aiRoutingControl)) aiRoutingControl.push(ctrl);
     });
 
-    // Panel sidebar
+    // Fit bounds semua stops
+    if (withCoords.length > 0) {
+        var bounds = L.latLngBounds(withCoords.map(function(p){ return [p.latitude, p.longitude]; }));
+        map.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+    // Panel sidebar — kelompokkan per hari
     var panel = document.getElementById('ai-route-panel');
     var stops = document.getElementById('ai-route-stops');
     if (panel && stops) {
-        stops.innerHTML = withCoords.map(function(p, i) {
-            var color = AI_COLORS[i % AI_COLORS.length];
-            return '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;">' +
-                '<span style="background:' + color + ';color:#fff;width:20px;height:20px;border-radius:50%;' +
-                'display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">' +
-                (i+1) + '</span><span><b>' + p.jam + '</b> ' + p.nama + '</span></div>';
-        }).join('');
+        var html = '';
+        days.forEach(function(day) {
+            var dc = DAY_COLORS[(parseInt(day)-1) % DAY_COLORS.length];
+            html += '<div style="font-size:0.7rem;font-weight:700;opacity:0.75;margin:8px 0 3px;letter-spacing:0.5px;color:' + dc + ';">📅 HARI ' + day + '</div>';
+            byDay[day].forEach(function(p) {
+                html += '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;">' +
+                    '<span style="background:' + dc + ';color:#fff;width:20px;height:20px;border-radius:50%;' +
+                    'display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">' +
+                    (p._idx + 1) + '</span><span style="font-size:0.8rem;"><b>' + p.jam + '</b> ' + p.nama + '</span></div>';
+            });
+        });
+        stops.innerHTML = html;
         panel.style.display = 'block';
     }
 }
@@ -559,15 +590,86 @@ function clearAIRoute() {
     aiRouteMarkers.forEach(function(m) { map.removeLayer(m); });
     aiRouteMarkers = [];
     if (aiRoutingControl) {
-        try { map.removeControl(aiRoutingControl); } catch(e) {}
+        var list = Array.isArray(aiRoutingControl) ? aiRoutingControl : [aiRoutingControl];
+        list.forEach(function(ctrl) { try { map.removeControl(ctrl); } catch(e) {} });
         aiRoutingControl = null;
     }
     var panel = document.getElementById('ai-route-panel');
     if (panel) panel.style.display = 'none';
     sessionStorage.removeItem('ai_route');
-
-    // Tampilkan kembali semua marker wisata
     if (!map.hasLayer(layerGroup)) map.addLayer(layerGroup);
+}
+
+// ── AI Planner Modal (langsung di peta) ──────────────────────────────────
+var _mapDurasi = 1;
+var _mapMinat  = ['Alam'];
+var _mapBudget = 'Sedang';
+var _mapOrang  = 2;
+
+function openAIPlannerModal() {
+    var m = document.getElementById('ai-planner-modal');
+    if (m) { m.style.display = 'flex'; }
+}
+function closeAIPlannerModal() {
+    var m = document.getElementById('ai-planner-modal');
+    if (m) m.style.display = 'none';
+    var res = document.getElementById('map-ai-result');
+    if (res) res.style.display = 'none';
+}
+function selectMapChip(type, val, el) {
+    var container = el.parentElement;
+    container.querySelectorAll('.map-chip').forEach(function(c) { c.classList.remove('active'); });
+    el.classList.add('active');
+    if (type === 'durasi') _mapDurasi = val;
+    if (type === 'budget') _mapBudget = val;
+    if (type === 'orang') _mapOrang = val;
+}
+function toggleMapMinat(val, el) {
+    var idx = _mapMinat.indexOf(val);
+    if (idx === -1) { _mapMinat.push(val); el.classList.add('active'); }
+    else { _mapMinat.splice(idx, 1); el.classList.remove('active'); }
+    if (_mapMinat.length === 0) { _mapMinat.push(val); el.classList.add('active'); }
+}
+function parseMarkdownSimple(md) {
+    return md
+        .replace(/^## (.+)$/gm,  '<h2 style="color:#C4956A;margin:12px 0 4px;font-size:1rem;">$1</h2>')
+        .replace(/^### (.+)$/gm, '<h3 style="color:#a8c97a;margin:10px 0 3px;font-size:0.9rem;">$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+        .replace(/\*(.+?)\*/g, '<i>$1</i>')
+        .replace(/^- (.+)$/gm, '<div style="padding:2px 0 2px 10px;border-left:2px solid #C4956A40;">$1</div>')
+        .replace(/^---$/gm, '<hr style="border-color:#ffffff20;margin:8px 0;">')
+        .replace(/\n/g, '<br>');
+}
+function submitAIPlannerMap() {
+    var btn = document.getElementById('map-ai-submit-btn');
+    var loading = document.getElementById('map-ai-loading');
+    var result  = document.getElementById('map-ai-result');
+    btn.disabled = true;
+    loading.style.display = 'block';
+    if (result) result.style.display = 'none';
+
+    fetch('ai_planner.php', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ durasi: _mapDurasi, minat: _mapMinat, budget: _mapBudget, orang: _mapOrang }),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.error) throw new Error(data.error);
+        if (result) {
+            result.innerHTML = parseMarkdownSimple(data.result);
+            result.style.display = 'block';
+        }
+        sessionStorage.setItem('ai_route', JSON.stringify({ places: data.places, durasi: data.durasi, result: data.result }));
+        drawAIRoute(data.places);
+    })
+    .catch(function(err) {
+        if (result) { result.innerHTML = '⚠️ ' + (err.message || 'Terjadi kesalahan.'); result.style.display = 'block'; }
+    })
+    .finally(function() {
+        btn.disabled = false;
+        loading.style.display = 'none';
+    });
 }
 
 // Load AI route dari sessionStorage saat halaman dibuka

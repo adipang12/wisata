@@ -21,6 +21,18 @@ $orang  = intval($input['orang'] ?? 2);
 
 if ($durasi < 1 || $durasi > 3) $durasi = 1;
 
+// Daftar tempat yang ADA di database (untuk membantu AI memakai nama persis)
+$db_places_hint = "
+TEMPAT WISATA tersedia di sistem kami (gunakan nama PERSIS seperti ini):
+Alam & Pemandangan: Tangkuban Perahu, Kawah Putih, Tebing Keraton, Bukit Moko, Bukit Bintang Bandung, Puncak Bintang, Situ Lembang, Curug Cimahi, Curug Malela, Stone Garden Citatah, The Lodge Maribaya, Sari Ater Hot Spring, Ciwidey Valley Hot Spring
+Wisata Kota: Gedung Sate, Gedung Merdeka, Alun Alun Bandung, Jalan Braga, Jalan Cihampelas
+Hiburan: Trans Studio Bandung, De Ranch Lembang, Dusun Bambu, Floating Market Lembang, Resto Kampung Daun, The Peak Resort, The Valley Bistro Cafe
+Museum: Museum Geologi, Museum Konfrensi Asia Afrika
+Seni & Budaya: Saung Angklung Udjo
+Kuliner Ikonik: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Cafe D Pakar, Floating Market Lembang, Dusun Bambu, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia
+Belanja: Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
+";
+
 $prompt = "Kamu adalah pemandu wisata profesional Bandung, Indonesia.
 
 Buatkan itinerary wisata Bandung yang detail dan menarik dengan ketentuan berikut:
@@ -28,6 +40,9 @@ Buatkan itinerary wisata Bandung yang detail dan menarik dengan ketentuan beriku
 - Jumlah orang: $orang orang
 - Minat: $minat
 - Budget: $budget
+
+PENTING: Utamakan nama tempat dari daftar berikut karena sudah ada di sistem peta kami:
+$db_places_hint
 
 Format WAJIB (gunakan format ini persis, dengan emoji):
 
@@ -59,7 +74,7 @@ Format WAJIB (gunakan format ini persis, dengan emoji):
 - [3-4 tips praktis yang relevan]
 
 ### 🚗 Transportasi
-- [rekomendasi transportasi sesuai budget]
+- [rekomendasi transportasi sesuai budget dan jumlah orang]
 
 Setelah itinerary, WAJIB tambahkan blok berikut (format JSON tepat, jangan diubah):
 
@@ -70,7 +85,7 @@ Setelah itinerary, WAJIB tambahkan blok berikut (format JSON tepat, jangan diuba
 ]
 ##END_PLACES##
 
-Gunakan tempat wisata nyata di Bandung yang populer. Gunakan Bahasa Indonesia yang ramah.";
+Gunakan nama tempat PERSIS seperti di daftar jika tersedia. Gunakan Bahasa Indonesia yang ramah dan antusias.";
 
 $apiKey = defined('GROQ_API_KEY') ? GROQ_API_KEY : '';
 
