@@ -1285,6 +1285,23 @@ function openAIPlannerModal() {
   document.getElementById('ai-plan-modal').classList.add('open');
   document.getElementById('ap-loading').style.display = 'none';
   document.body.style.overflow = 'hidden';
+
+  // Restore session sebelumnya jika result belum tampil
+  var result    = document.getElementById('ap-result');
+  var bottomBar = document.getElementById('ap-bottom-bar');
+  if (result && result.style.display !== 'block') {
+    var raw = localStorage.getItem('wb_ai_session');
+    if (raw) {
+      try {
+        var saved = JSON.parse(raw);
+        if (saved.aiStops && saved.aiStops.length > 0) {
+          renderAPTimeline(saved.places || []);
+          result.style.display    = 'block';
+          bottomBar.style.display = 'block';
+        }
+      } catch(e) {}
+    }
+  }
 }
 function closeAIPlannerModal() {
   document.getElementById('ai-plan-modal').classList.remove('open');
@@ -1355,10 +1372,15 @@ function submitAIPlanMap() {
     // Render timeline
     if (places.length > 0) renderAPTimeline(places);
 
-    // Gambar rute di peta
+    // Gambar rute di peta + simpan ke localStorage (persist lintas halaman)
     if (withCoords.length >= 1) {
-      sessionStorage.setItem('ai_route', JSON.stringify({
-        places: places, durasi: data.durasi, result: data.result
+      localStorage.setItem('wb_ai_session', JSON.stringify({
+        places  : places,
+        durasi  : data.durasi,
+        result  : data.result,
+        aiStops : places.map(function(p) {
+          return { time: p.jam||'', name: p.nama||'', desc: p.kategori||'' };
+        }),
       }));
       drawAIRoute(places);
     }

@@ -596,7 +596,7 @@ function clearAIRoute() {
     }
     var panel = document.getElementById('ai-route-panel');
     if (panel) panel.style.display = 'none';
-    sessionStorage.removeItem('ai_route');
+    localStorage.removeItem('wb_ai_session');
     if (!map.hasLayer(layerGroup)) map.addLayer(layerGroup);
 }
 
@@ -672,11 +672,9 @@ function submitAIPlannerMap() {
     });
 }
 
-// Load AI route dari sessionStorage saat halaman dibuka
+// ── Auto-restore AI route dari localStorage (lintas halaman) ──────────────
 (function () {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('ai_route') !== '1') return;
-    var raw = sessionStorage.getItem('ai_route');
+    var raw = localStorage.getItem('wb_ai_session');
     if (!raw) return;
     try {
         var data = JSON.parse(raw);
