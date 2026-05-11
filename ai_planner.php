@@ -131,6 +131,26 @@ if (preg_match('/##PLACES_JSON##\s*([\s\S]*?)\s*##END_PLACES##/i', $fullText, $m
     if (is_array($decoded)) $placesRaw = $decoded;
 }
 
+// ── Geocode via Nominatim (OpenStreetMap) ─────────────────────────────────
+function nominatimGeocode($name) {
+    $q   = urlencode($name . ', Bandung, Jawa Barat, Indonesia');
+    $url = "https://nominatim.openstreetmap.org/search?q={$q}&format=json&limit=1&bounded=1&viewbox=107.4,−6.7,107.8,−7.1";
+    $ch  = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['User-Agent: WisataBandung/1.0 (contact@wisatabandung.com)'],
+        CURLOPT_TIMEOUT        => 5,
+    ]);
+    $res  = curl_exec($ch);
+    curl_close($ch);
+    if (!$res) return null;
+    $data = json_decode($res, true);
+    if (!empty($data[0]['lat'])) {
+        return ['lat' => (float)$data[0]['lat'], 'lng' => (float)$data[0]['lon']];
+    }
+    return null;
+}
+
 // ── Cari koordinat dari database ─────────────────────────────────────────
 $places = [];
 if (!$conn->connect_error && count($placesRaw) > 0) {
@@ -162,13 +182,14 @@ if (!$conn->connect_error && count($placesRaw) > 0) {
                 'kategori'  => $row['kategori'],
             ];
         } else {
-            // Tempat tidak ada di DB, tetap masukkan tanpa koordinat
+            // Tempat tidak ada di DB → coba geocode via Nominatim (gratis)
+            $coords = nominatimGeocode($nama);
             $places[] = [
                 'jam'      => $p['jam']  ?? '',
                 'hari'     => intval($p['hari'] ?? 1),
                 'nama'     => $nama,
-                'latitude' => null,
-                'longitude'=> null,
+                'latitude' => $coords ? $coords['lat'] : null,
+                'longitude'=> $coords ? $coords['lng'] : null,
                 'kategori' => '',
             ];
         }

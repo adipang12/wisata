@@ -477,56 +477,76 @@ function clearRoute() {
 }
 
 // ── AI ROUTE ─────────────────────────────────────────────────────────────
-var aiRouteMarkers = [];
-var aiRouteLine    = null;
+var aiRouteMarkers   = [];
+var aiRoutingControl = null;
+var AI_COLORS = ['#e74c3c','#e67e22','#f39c12','#27ae60','#2980b9','#8e44ad','#16a085','#e91e63'];
+
+function makeAIIcon(i, color) {
+    return L.divIcon({
+        className: '',
+        html: '<div style="background:' + color + ';color:#fff;width:30px;height:30px;border-radius:50%;' +
+              'display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;' +
+              'border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.45);">' + (i + 1) + '</div>',
+        iconSize: [30, 30], iconAnchor: [15, 15],
+    });
+}
 
 function drawAIRoute(places) {
     clearAIRoute();
 
     var withCoords = places.filter(function(p) { return p.latitude && p.longitude; });
-    if (withCoords.length < 1) return;
+    if (withCoords.length < 2) return;
 
-    var colors = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#1abc9c','#e91e63'];
-    var latlngs = [];
-
+    // Marker bernomor per stop
     withCoords.forEach(function(p, i) {
-        var lat = p.latitude, lng = p.longitude;
-        latlngs.push([lat, lng]);
-
-        var color = colors[i % colors.length];
-        var icon  = L.divIcon({
-            className: '',
-            html: '<div style="background:' + color + ';color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);">' + (i + 1) + '</div>',
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
-        });
-
-        var marker = L.marker([lat, lng], { icon: icon })
+        var color  = AI_COLORS[i % AI_COLORS.length];
+        var marker = L.marker([p.latitude, p.longitude], { icon: makeAIIcon(i, color), zIndexOffset: 500 })
             .addTo(map)
-            .bindPopup('<strong>' + p.jam + '</strong> — ' + p.nama + (p.kategori ? ' <small>(' + p.kategori + ')</small>' : ''));
+            .bindPopup(
+                '<div style="min-width:160px"><b style="color:' + color + ';">Stop ' + (i+1) + ' — ' + p.jam + '</b><br>' +
+                p.nama + (p.kategori ? '<br><small style="opacity:.7">' + p.kategori + '</small>' : '') + '</div>'
+            );
         aiRouteMarkers.push(marker);
     });
 
-    // Garis antar tempat
-    aiRouteLine = L.polyline(latlngs, {
-        color: '#C4956A',
-        weight: 3,
-        opacity: 0.8,
-        dashArray: '8, 6',
+    // OSRM routing — ikut jalan asli
+    var waypoints = withCoords.map(function(p) { return L.latLng(p.latitude, p.longitude); });
+
+    aiRoutingControl = L.Routing.control({
+        waypoints          : waypoints,
+        routeWhileDragging : false,
+        addWaypoints       : false,
+        draggableWaypoints : false,
+        fitSelectedRoutes  : true,
+        show               : false,
+        lineOptions: {
+            styles: [{ color: '#C4956A', weight: 5, opacity: 0.9 }],
+            extendToWaypoints   : true,
+            missingRouteTolerance: 0,
+        },
+        createMarker: function() { return null; },
+        router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile   : 'driving',
+        }),
     }).addTo(map);
 
-    // Fit bounds
-    map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] });
+    // Sembunyikan container turn-by-turn bawaan
+    aiRoutingControl.on('routesfound', function() {
+        var c = aiRoutingControl.getContainer();
+        if (c) c.style.display = 'none';
+    });
 
-    // Tampilkan panel
+    // Panel sidebar
     var panel = document.getElementById('ai-route-panel');
     var stops = document.getElementById('ai-route-stops');
     if (panel && stops) {
         stops.innerHTML = withCoords.map(function(p, i) {
-            var color = colors[i % colors.length];
-            return '<div style="display:flex;align-items:center;gap:6px;">' +
-                '<span style="background:' + color + ';color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + (i + 1) + '</span>' +
-                '<span><b>' + p.jam + '</b> ' + p.nama + '</span></div>';
+            var color = AI_COLORS[i % AI_COLORS.length];
+            return '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;">' +
+                '<span style="background:' + color + ';color:#fff;width:20px;height:20px;border-radius:50%;' +
+                'display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">' +
+                (i+1) + '</span><span><b>' + p.jam + '</b> ' + p.nama + '</span></div>';
         }).join('');
         panel.style.display = 'block';
     }
@@ -535,7 +555,10 @@ function drawAIRoute(places) {
 function clearAIRoute() {
     aiRouteMarkers.forEach(function(m) { map.removeLayer(m); });
     aiRouteMarkers = [];
-    if (aiRouteLine) { map.removeLayer(aiRouteLine); aiRouteLine = null; }
+    if (aiRoutingControl) {
+        try { map.removeControl(aiRoutingControl); } catch(e) {}
+        aiRoutingControl = null;
+    }
     var panel = document.getElementById('ai-route-panel');
     if (panel) panel.style.display = 'none';
     sessionStorage.removeItem('ai_route');
