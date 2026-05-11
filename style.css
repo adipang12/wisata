@@ -1109,16 +1109,16 @@ body {
         overflow: hidden;
         z-index: 2000;
         box-shadow: 0 -6px 32px rgba(0,0,0,0.22);
-        transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
-        transform: translateY(calc(100% - 156px)); /* collapsed: 156px terlihat */
+        /* transform & transition dikelola sepenuhnya oleh JavaScript */
+        transform: translateY(9999px); /* hidden dulu, JS akan set posisi benar */
         display: flex;
         flex-direction: column;
         background: var(--panel, #fff);
         -webkit-overflow-scrolling: touch;
     }
     .sidebar-panel.sheet-open {
-        transform: translateY(0);
         overflow-y: auto;
+        /* transform dikelola JS */
     }
 
     /* ── Handle tarik (drag bar) ── */

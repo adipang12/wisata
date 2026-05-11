@@ -775,103 +775,141 @@
     .then(function(data) { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
     .catch(function() {});
 
-// ── Mobile Bottom Sheet (dengan proper swipe, anti pull-to-refresh) ─────
-(function() {
-    var isMobile = function() { return window.innerWidth <= 767; };
-    var sidebar  = document.getElementById('sidebar');
-    var handle   = document.getElementById('sheet-handle');
+// ── Mobile Bottom Sheet — real-time finger tracking ──────────────────────
+(function () {
+    function isMobile() { return window.innerWidth <= 767; }
+
+    var sidebar = document.getElementById('sidebar');
+    var handle  = document.getElementById('sheet-handle');
     if (!sidebar) return;
 
-    var isOpen  = false;
-    var startY  = 0;
-    var currentY = 0;
-    var dragging = false;
+    /* Tinggi collapsed (jarak translateY saat tertutup) */
+    var PEEK = 156; // piksel panel yang terlihat saat collapsed
+    function closedY() { return sidebar.offsetHeight - PEEK; }
 
-    function openSheet() {
-        isOpen = true;
-        sidebar.classList.add('sheet-open');
-        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+    var isOpen       = false;
+    var dragging     = false;
+    var startTouchY  = 0;
+    var startTransY  = 0;  // nilai translateY saat jari menyentuh
+    var lastTouchY   = 0;
+    var lastTime     = 0;
+    var velocity     = 0;  // px/ms, positif = ke bawah
+
+    /* ── Ambil nilai translateY saat ini (px) ── */
+    function getCurrentY() {
+        var t = window.getComputedStyle(sidebar).transform;
+        if (!t || t === 'none') return isOpen ? 0 : closedY();
+        var m = t.match(/matrix.*\((.+)\)/);
+        if (m) return parseFloat(m[1].split(',').pop());
+        return isOpen ? 0 : closedY();
     }
-    function closeSheet() {
-        isOpen = false;
-        sidebar.classList.remove('sheet-open');
-        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+
+    /* ── Set posisi langsung tanpa animasi ── */
+    function setY(y) {
+        sidebar.style.transition = 'none';
+        sidebar.style.transform  = 'translateY(' + y + 'px)';
     }
+
+    /* ── Snap ke posisi akhir dengan animasi ── */
+    function snapTo(open) {
+        isOpen = open;
+        sidebar.style.transition = 'transform 0.32s cubic-bezier(0.32,0.72,0,1)';
+        sidebar.style.transform  = open ? 'translateY(0px)' : 'translateY(' + closedY() + 'px)';
+        sidebar.classList.toggle('sheet-open', open);
+        setTimeout(function () { if (window.map) map.invalidateSize(); }, 350);
+    }
+
+    /* ── Inisialisasi posisi di mobile ── */
+    function initPos() {
+        if (isMobile()) {
+            sidebar.style.transition = 'none';
+            sidebar.style.transform  = 'translateY(' + closedY() + 'px)';
+        }
+    }
+    initPos();
+    window.addEventListener('resize', initPos);
+
+    /* ── Expose untuk onclick handle ── */
     function toggleMobileSheet() {
         if (!isMobile()) return;
-        isOpen ? closeSheet() : openSheet();
+        snapTo(!isOpen);
     }
     window.toggleMobileSheet = toggleMobileSheet;
 
-    // ── Touch drag pada handle ──────────────────────────────
+    /* ══ TOUCH EVENTS pada HANDLE ════════════════════════════ */
     if (handle) {
-        handle.addEventListener('touchstart', function(e) {
+        handle.addEventListener('touchstart', function (e) {
             if (!isMobile()) return;
-            startY   = e.touches[0].clientY;
-            currentY = startY;
-            dragging = true;
+            dragging    = true;
+            startTouchY = e.touches[0].clientY;
+            lastTouchY  = startTouchY;
+            lastTime    = Date.now();
+            velocity    = 0;
+            startTransY = getCurrentY();
+            sidebar.style.transition = 'none'; // matikan animasi selama drag
         }, { passive: true });
 
-        handle.addEventListener('touchmove', function(e) {
+        handle.addEventListener('touchmove', function (e) {
             if (!dragging || !isMobile()) return;
-            currentY = e.touches[0].clientY;
-            var dy = currentY - startY;
-            // Blokir pull-to-refresh saat drag ke bawah
-            if (dy > 0) e.preventDefault();
-        }, { passive: false }); // passive:false agar bisa preventDefault
+            e.preventDefault(); // cegah pull-to-refresh & scroll halaman
 
-        handle.addEventListener('touchend', function(e) {
+            var cy  = e.touches[0].clientY;
+            var now = Date.now();
+            velocity   = (cy - lastTouchY) / Math.max(1, now - lastTime);
+            lastTouchY = cy;
+            lastTime   = now;
+
+            var newY = startTransY + (cy - startTouchY);
+            /* Clamp: tidak boleh lebih kecil dari 0 (terbuka penuh)
+               dan tidak lebih besar dari closedY (tertutup penuh) */
+            newY = Math.max(0, Math.min(closedY(), newY));
+            sidebar.style.transform = 'translateY(' + newY + 'px)';
+        }, { passive: false }); // passive:false WAJIB agar preventDefault bekerja
+
+        handle.addEventListener('touchend', function (e) {
             if (!dragging || !isMobile()) return;
             dragging = false;
-            var dy = e.changedTouches[0].clientY - startY;
-            if (dy < -40)       openSheet();   // swipe ke atas = buka
-            else if (dy > 40)   closeSheet();  // swipe ke bawah = tutup
-            else                toggleMobileSheet(); // tap kecil = toggle
+            var finalY   = getCurrentY();
+            var midPoint = closedY() / 2;
+            /* Snap berdasarkan kecepatan atau posisi tengah */
+            if (velocity < -0.4 || finalY < midPoint) snapTo(true);
+            else                                       snapTo(false);
         }, { passive: true });
     }
 
-    // ── Blokir pull-to-refresh di seluruh sidebar ───────────
-    sidebar.addEventListener('touchmove', function(e) {
+    /* ══ TOUCH EVENTS pada SIDEBAR (cegah pull-to-refresh) ═══ */
+    sidebar.addEventListener('touchstart', function (e) {
+        if (!isMobile()) return;
+        startTouchY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sidebar.addEventListener('touchmove', function (e) {
         if (!isMobile()) return;
         if (!isOpen) {
-            // Sheet tertutup: blokir semua scroll (supaya tidak trigger refresh)
+            /* Sheet tertutup: blokir semua gesture agar tidak trigger refresh */
             e.preventDefault();
             return;
         }
-        // Sheet terbuka: izinkan scroll konten internal, blokir hanya di ujung atas
-        if (sidebar.scrollTop <= 0 && e.touches[0].clientY > startY) {
-            e.preventDefault();
-        }
+        /* Sheet terbuka: blokir pull-to-refresh hanya saat konten di paling atas */
+        var dy = e.touches[0].clientY - startTouchY;
+        if (sidebar.scrollTop <= 0 && dy > 0) e.preventDefault();
     }, { passive: false });
 
-    sidebar.addEventListener('touchstart', function(e) {
-        startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    // ── Auto-expand saat AI route digambar ─────────────────
-    var _origDrawAI = window.drawAIRoute;
-    if (_origDrawAI) {
-        window.drawAIRoute = function(places) {
-            _origDrawAI(places);
-            if (isMobile()) openSheet();
+    /* ══ Auto-expand saat AI route aktif ════════════════════ */
+    var _origDraw = window.drawAIRoute;
+    if (_origDraw) {
+        window.drawAIRoute = function (places) {
+            _origDraw(places);
+            if (isMobile()) snapTo(true);
         };
     }
 
-    // ── Tutup sheet saat tap di peta ───────────────────────
+    /* ══ Tutup sheet saat tap di area peta ══════════════════ */
     if (window.map) {
-        map.on('click', function() {
-            if (isMobile() && isOpen) closeSheet();
+        map.on('click', function () {
+            if (isMobile() && isOpen) snapTo(false);
         });
     }
-
-    // ── Blokir pull-to-refresh secara global saat sheet aktif ──
-    document.body.addEventListener('touchmove', function(e) {
-        if (!isMobile()) return;
-        // Hanya blokir jika sentuhan berasal dari area sidebar
-        var path = e.composedPath ? e.composedPath() : [];
-        var onSidebar = path.some(function(el) { return el === sidebar; });
-        if (onSidebar && !isOpen) e.preventDefault();
-    }, { passive: false });
 })();
 </script>
 </body>
