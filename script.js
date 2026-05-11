@@ -236,6 +236,8 @@ function updatePhotoElements(record, data) {
 
     if (data.source === 'google') {
         document.getElementById("photo-mode").textContent = 'Foto & rating Google aktif';
+    } else if (data.source === 'wikipedia') {
+        document.getElementById("photo-mode").textContent = 'Foto Wikipedia aktif';
     } else if (data.source === 'wikimedia') {
         document.getElementById("photo-mode").textContent = 'Foto Wikimedia aktif';
     }

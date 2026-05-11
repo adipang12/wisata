@@ -247,17 +247,85 @@ function wikimediaPhoto($name, $lat, $lng) {
     return null;
 }
 
+// ── Wikipedia API: foto utama artikel (lebih akurat dari Wikimedia Commons) ──
+function wikipediaPhoto($name, $lat, $lng) {
+    if ($name === '' || $name === 'Tidak diketahui') {
+        return null;
+    }
+
+    $wikiOptions = [
+        'http' => [
+            'timeout' => 8,
+            'header' => "User-Agent: WebGIS-ExploreBandung/1.0 (ariski@localhost)\r\n"
+        ]
+    ];
+
+    // Coba Wikipedia Bahasa Indonesia dulu, lalu English
+    $langs = [
+        ['lang' => 'id', 'query' => $name . ' Bandung'],
+        ['lang' => 'en', 'query' => $name . ' Bandung Indonesia'],
+    ];
+
+    foreach ($langs as $attempt) {
+        $searchUrl = 'https://' . $attempt['lang'] . '.wikipedia.org/w/api.php'
+            . '?action=query'
+            . '&generator=search'
+            . '&gsrsearch='  . rawurlencode($attempt['query'])
+            . '&gsrlimit=3'
+            . '&prop=pageimages'
+            . '&pithumbsize=800'
+            . '&piprop=thumbnail|original'
+            . '&format=json';
+
+        $data  = fetchJson($searchUrl, $wikiOptions);
+        $pages = $data['query']['pages'] ?? [];
+
+        foreach ($pages as $page) {
+            // Pilih gambar resolusi tertinggi yang tersedia
+            $thumb = $page['original']['source'] ?? $page['thumbnail']['source'] ?? null;
+            $w     = $page['original']['width']  ?? $page['thumbnail']['width']  ?? 0;
+            $h     = $page['original']['height'] ?? $page['thumbnail']['height'] ?? 0;
+
+            if (!$thumb) continue;
+            // Wajib landscape atau square
+            if ($h > 0 && $w > 0 && $w < $h * 0.85) continue;
+            // Minimum ukuran
+            if ($w > 0 && $w < 200) continue;
+
+            // Jika hanya tersedia thumbnail kecil, pakai URL yang sudah di-resize 800px
+            if (!isset($page['original']['source']) && $thumb) {
+                // Naikkan resolusi thumbnail Wikipedia: ganti angka resize-nya
+                $thumb = preg_replace('/\/\d+px-/', '/800px-', $thumb);
+            }
+
+            $attribution = 'Wikipedia (' . strtoupper($attempt['lang']) . ')';
+            return makePlaceInfo($thumb, 'wikipedia', $attribution);
+        }
+    }
+
+    return null;
+}
+
 $cached = readPlaceCache($name, $lat, $lng);
 if ($cached) {
     respondPlaceInfo($cached);
 }
 
+// 1. Google Places (foto + detail lengkap — butuh API key)
 $google = googlePlaceInfo($name, $lat, $lng, $fallbackPhoto);
 if ($google) {
     writePlaceCache($name, $lat, $lng, $google);
     respondPlaceInfo($google);
 }
 
+// 2. Wikipedia (foto utama artikel, gratis, lebih akurat dari Wikimedia Commons)
+$wikipedia = wikipediaPhoto($name, $lat, $lng);
+if ($wikipedia) {
+    writePlaceCache($name, $lat, $lng, $wikipedia);
+    respondPlaceInfo($wikipedia);
+}
+
+// 3. Wikimedia Commons (fallback terakhir)
 if (defined('ENABLE_WIKIMEDIA_FALLBACK') && ENABLE_WIKIMEDIA_FALLBACK) {
     $wikimedia = wikimediaPhoto($name, $lat, $lng);
     if ($wikimedia) {
