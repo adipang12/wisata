@@ -38,15 +38,20 @@ function respondPlaceInfo($info) {
     exit;
 }
 
-function makePlaceInfo($photo, $source, $attribution = '', $rating = null, $userRatingCount = null, $placeName = '', $googleMapsUri = '') {
+function makePlaceInfo($photo, $source, $attribution = '', $rating = null, $userRatingCount = null, $placeName = '', $googleMapsUri = '', $address = '', $phone = '', $website = '', $openNow = null, $hours = []) {
     return [
-        'photo' => $photo,
-        'source' => $source,
-        'attribution' => $attribution,
-        'rating' => $rating,
-        'userRatingCount' => $userRatingCount,
-        'placeName' => $placeName,
-        'googleMapsUri' => $googleMapsUri
+        'photo'          => $photo,
+        'source'         => $source,
+        'attribution'    => $attribution,
+        'rating'         => $rating,
+        'userRatingCount'=> $userRatingCount,
+        'placeName'      => $placeName,
+        'googleMapsUri'  => $googleMapsUri,
+        'address'        => $address,
+        'phone'          => $phone,
+        'website'        => $website,
+        'openNow'        => $openNow,
+        'hours'          => $hours,
     ];
 }
 
@@ -122,7 +127,7 @@ function googlePlaceInfo($name, $lat, $lng, $fallbackPhoto) {
             'header' => [
                 'Content-Type: application/json',
                 'X-Goog-Api-Key: ' . GOOGLE_MAPS_API_KEY,
-                'X-Goog-FieldMask: places.displayName,places.photos,places.rating,places.userRatingCount,places.googleMapsUri',
+                'X-Goog-FieldMask: places.displayName,places.photos,places.rating,places.userRatingCount,places.googleMapsUri,places.formattedAddress,places.internationalPhoneNumber,places.websiteUri,places.regularOpeningHours',
                 'User-Agent: WebGIS-ExploreBandung/1.0'
             ],
             'content' => json_encode($body),
@@ -149,6 +154,9 @@ function googlePlaceInfo($name, $lat, $lng, $fallbackPhoto) {
         return $item['displayName'] ?? '';
     }, is_array($attributions) ? $attributions : []));
 
+    $openNow = $place['regularOpeningHours']['openNow'] ?? null;
+    $weekdayDescriptions = $place['regularOpeningHours']['weekdayDescriptions'] ?? [];
+
     return makePlaceInfo(
         $photoUrl,
         'google',
@@ -156,12 +164,16 @@ function googlePlaceInfo($name, $lat, $lng, $fallbackPhoto) {
         isset($place['rating']) ? (float) $place['rating'] : null,
         isset($place['userRatingCount']) ? (int) $place['userRatingCount'] : null,
         $place['displayName']['text'] ?? '',
-        $place['googleMapsUri'] ?? ''
+        $place['googleMapsUri'] ?? '',
+        $place['formattedAddress'] ?? '',
+        $place['internationalPhoneNumber'] ?? '',
+        $place['websiteUri'] ?? '',
+        $openNow,
+        $weekdayDescriptions
     );
 }
 
 function wikimediaPhoto($name, $lat, $lng) {
-    // Standar opsi HTTP untuk Wikimedia (Wajib pakai User-Agent)
     $wikiOptions = [
         'http' => [
             'timeout' => 8,
@@ -169,66 +181,62 @@ function wikimediaPhoto($name, $lat, $lng) {
         ]
     ];
 
-    if ($lat !== false && $lat !== null && $lng !== false && $lng !== null) {
-        $geoUrl = 'https://commons.wikimedia.org/w/api.php?action=query'
-            . '&generator=geosearch'
-            . '&ggscoord=' . rawurlencode($lat . '|' . $lng)
-            . '&ggsradius=1200'
-            . '&ggsnamespace=6'
-            . '&ggslimit=1'
+    // 1. Cari by nama dulu (lebih akurat, foto sesuai tempat)
+    if ($name !== '' && $name !== 'Tidak diketahui') {
+        $searchUrl = 'https://commons.wikimedia.org/w/api.php?action=query'
+            . '&generator=search'
+            . '&gsrsearch=' . rawurlencode($name . ' Bandung Indonesia')
+            . '&gsrnamespace=6'
+            . '&gsrlimit=5'
             . '&prop=imageinfo'
-            . '&iiprop=url'
+            . '&iiprop=url|mime|size'
             . '&iiurlwidth=600'
             . '&format=json';
-            
-        $geoData = fetchJson($geoUrl, $wikiOptions);
-        $pages = $geoData['query']['pages'] ?? [];
+
+        $searchData = fetchJson($searchUrl, $wikiOptions);
+        $pages = $searchData['query']['pages'] ?? [];
 
         foreach ($pages as $page) {
+            $mime = $page['imageinfo'][0]['mime'] ?? '';
+            // Skip SVG, portrait-only images (terlalu kecil width vs height)
+            if (strpos($mime, 'svg') !== false) continue;
+            $w = $page['imageinfo'][0]['width'] ?? 0;
+            $h = $page['imageinfo'][0]['height'] ?? 0;
+            // Skip gambar portrait (foto orang) — landscape lebih cocok untuk tempat
+            if ($h > 0 && $w > 0 && $h > $w * 1.5) continue;
             $thumb = $page['imageinfo'][0]['thumburl'] ?? $page['imageinfo'][0]['url'] ?? null;
             if ($thumb) {
-                return [
-                    'photo' => $thumb,
-                    'source' => 'wikimedia',
-                    'attribution' => 'Wikimedia Commons',
-                    'rating' => null,
-                    'userRatingCount' => null,
-                    'placeName' => '',
-                    'googleMapsUri' => ''
-                ];
+                return makePlaceInfo($thumb, 'wikimedia', 'Wikimedia Commons');
             }
         }
     }
 
-    if ($name === '' || $name === 'Tidak diketahui') {
-        return null;
-    }
+    // 2. Fallback: geo-search by koordinat (radius lebih kecil, lebih spesifik)
+    if ($lat !== false && $lat !== null && $lng !== false && $lng !== null) {
+        $geoUrl = 'https://commons.wikimedia.org/w/api.php?action=query'
+            . '&generator=geosearch'
+            . '&ggscoord=' . rawurlencode($lat . '|' . $lng)
+            . '&ggsradius=500'
+            . '&ggsnamespace=6'
+            . '&ggslimit=5'
+            . '&prop=imageinfo'
+            . '&iiprop=url|mime|size'
+            . '&iiurlwidth=600'
+            . '&format=json';
 
-    $searchUrl = 'https://commons.wikimedia.org/w/api.php?action=query'
-        . '&generator=search'
-        . '&gsrsearch=' . rawurlencode($name . ' Bandung')
-        . '&gsrnamespace=6'
-        . '&gsrlimit=1'
-        . '&prop=imageinfo'
-        . '&iiprop=url'
-        . '&iiurlwidth=600'
-        . '&format=json';
-        
-    $searchData = fetchJson($searchUrl, $wikiOptions);
-    $pages = $searchData['query']['pages'] ?? [];
+        $geoData = fetchJson($geoUrl, $wikiOptions);
+        $pages = $geoData['query']['pages'] ?? [];
 
-    foreach ($pages as $page) {
-        $thumb = $page['imageinfo'][0]['thumburl'] ?? $page['imageinfo'][0]['url'] ?? null;
-        if ($thumb) {
-            return [
-                'photo' => $thumb,
-                'source' => 'wikimedia',
-                'attribution' => 'Wikimedia Commons',
-                'rating' => null,
-                'userRatingCount' => null,
-                'placeName' => '',
-                'googleMapsUri' => ''
-            ];
+        foreach ($pages as $page) {
+            $mime = $page['imageinfo'][0]['mime'] ?? '';
+            if (strpos($mime, 'svg') !== false) continue;
+            $w = $page['imageinfo'][0]['width'] ?? 0;
+            $h = $page['imageinfo'][0]['height'] ?? 0;
+            if ($h > 0 && $w > 0 && $h > $w * 1.5) continue;
+            $thumb = $page['imageinfo'][0]['thumburl'] ?? $page['imageinfo'][0]['url'] ?? null;
+            if ($thumb) {
+                return makePlaceInfo($thumb, 'wikimedia', 'Wikimedia Commons');
+            }
         }
     }
 

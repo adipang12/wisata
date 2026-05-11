@@ -744,6 +744,50 @@ body {
     line-height: 1.4;
     min-height: 0;
 }
+
+/* Status buka/tutup badge di gambar */
+.wp-open-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+}
+
+/* Deskripsi singkat tempat */
+.wp-desc {
+    font-size: 0.78rem;
+    color: rgba(30,37,32,0.62);
+    line-height: 1.55;
+    margin: 4px 0 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Detail row: alamat, telepon, website, jam */
+.wp-details {
+    margin: 0 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.wp-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.74rem;
+    color: rgba(30,37,32,0.7);
+    line-height: 1.45;
+}
+.wp-detail-icon {
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
 .wp-maps-link {
     display: inline-flex;
     align-items: center;

@@ -180,6 +180,40 @@ function updatePhotoElements(record, data) {
             link.hidden = false;
         });
     }
+
+    // Status buka/tutup
+    if (data.openNow !== null && data.openNow !== undefined) {
+        document.querySelectorAll(`[data-open-key="${key}"]`).forEach(el => {
+            el.textContent = data.openNow ? '● Buka' : '● Tutup';
+            el.style.background = data.openNow ? 'rgba(34,197,94,0.9)' : 'rgba(239,68,68,0.9)';
+            el.style.display = '';
+        });
+    }
+
+    // Detail alamat, telepon, website, jam
+    document.querySelectorAll(`[data-details-key="${key}"]`).forEach(el => {
+        let html = '';
+        if (data.address) {
+            html += `<div class="wp-detail-row"><span class="wp-detail-icon">📍</span><span>${escapeHTML(data.address)}</span></div>`;
+        }
+        if (data.phone) {
+            html += `<div class="wp-detail-row"><span class="wp-detail-icon">📞</span><a href="tel:${escapeHTML(data.phone)}" style="color:inherit;">${escapeHTML(data.phone)}</a></div>`;
+        }
+        if (data.website) {
+            const shortUrl = data.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+            html += `<div class="wp-detail-row"><span class="wp-detail-icon">🌐</span><a href="${escapeHTML(data.website)}" target="_blank" rel="noopener" style="color:#2D5016;">${escapeHTML(shortUrl)}</a></div>`;
+        }
+        if (data.hours && data.hours.length > 0) {
+            const today = new Date().getDay();
+            const dayIdx = today === 0 ? 6 : today - 1;
+            const todayHours = data.hours[dayIdx] || data.hours[0] || '';
+            if (todayHours) {
+                html += `<div class="wp-detail-row"><span class="wp-detail-icon">🕐</span><span>${escapeHTML(todayHours)}</span></div>`;
+            }
+        }
+        el.innerHTML = html;
+    });
+
     if (data.source === 'google') {
         document.getElementById("photo-mode").textContent = 'Foto & rating Google aktif';
     } else if (data.source === 'wikimedia') {
@@ -335,10 +369,12 @@ function renderUI(data) {
         let marker = L.marker([lat, lon], {icon: createColoredMarkerIcon(markerColor)}).addTo(layerGroup);
         // Simpan untuk akses via ?place= URL param
         _markersByName[namaRaw.toLowerCase()] = { marker, lat, lon, d };
+        let reviewText = d.review ? escapeHTML(d.review).substring(0, 120) + (d.review.length > 120 ? '…' : '') : '';
         marker.bindPopup(`
             <div class="wp-img-wrap">
                 <img src="${photo}" alt="${nama}" data-photo-key="${photoKey}">
                 <span class="wp-cat-badge">${escapeHTML(getCategoryLabel(d.kategori))}</span>
+                <span class="wp-open-badge" data-open-key="${photoKey}" style="display:none;"></span>
             </div>
             <div class="wp-content">
                 <div class="wp-title">${nama}</div>
@@ -346,6 +382,8 @@ function renderUI(data) {
                     <span class="wp-star-icon">★</span>
                     <span data-rating-key="${photoKey}">Rating ${rating}</span>
                 </div>
+                ${reviewText ? `<p class="wp-desc">${reviewText}</p>` : ''}
+                <div class="wp-details" data-details-key="${photoKey}"></div>
                 <p class="wp-credit" data-credit-key="${photoKey}"></p>
                 <a class="wp-maps-link" data-maps-key="${photoKey}" target="_blank" rel="noopener" hidden>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -356,7 +394,7 @@ function renderUI(data) {
                     Arah Jalan
                 </button>
             </div>
-        `, { maxWidth: 290, minWidth: 290, className: 'wisata-popup' });
+        `, { maxWidth: 300, minWidth: 300, className: 'wisata-popup' });
         marker.on('click', () => {
             fetchRealPhoto(d).then(realPhoto => updatePhotoElements(d, realPhoto));
         });
