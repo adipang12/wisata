@@ -62,24 +62,22 @@ Format WAJIB (gunakan format ini persis, dengan emoji):
 
 Gunakan tempat wisata nyata di Bandung. Sesuaikan rekomendasi dengan minat dan budget yang diminta. Gunakan Bahasa Indonesia yang ramah dan informatif.";
 
-$apiKey = defined('GEMINI_API_KEY') ? GEMINI_API_KEY : '';
+$apiKey = defined('GROQ_API_KEY') ? GROQ_API_KEY : '';
 
 if (empty($apiKey)) {
     http_response_code(500);
-    echo json_encode(['error' => 'Gemini API key belum dikonfigurasi di config.php']);
+    echo json_encode(['error' => 'Groq API key belum dikonfigurasi di config.php']);
     exit;
 }
 
-$url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . urlencode($apiKey);
-
+$url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
-    'contents' => [
-        ['parts' => [['text' => $prompt]]]
+    'model'       => 'llama-3.3-70b-versatile',
+    'messages'    => [
+        ['role' => 'user', 'content' => $prompt]
     ],
-    'generationConfig' => [
-        'temperature'     => 0.8,
-        'maxOutputTokens' => 2048,
-    ]
+    'temperature' => 0.8,
+    'max_tokens'  => 2048,
 ]);
 
 $ch = curl_init($url);
@@ -87,7 +85,10 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $body,
-    CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+    CURLOPT_HTTPHEADER     => [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiKey,
+    ],
     CURLOPT_TIMEOUT        => 30,
 ]);
 
@@ -104,7 +105,7 @@ if ($response === false || $httpCode !== 200) {
 }
 
 $data = json_decode($response, true);
-$text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+$text = $data['choices'][0]['message']['content'] ?? null;
 
 if (!$text) {
     http_response_code(500);
