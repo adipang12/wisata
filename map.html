@@ -912,5 +912,342 @@
     }
 })();
 </script>
+
+<!-- ══════════════════════════════════════════════════════════
+     AI PLANNER MODAL
+     ══════════════════════════════════════════════════════════ -->
+<style>
+/* Modal overlay */
+#ai-plan-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  overflow-y: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: center;
+}
+#ai-plan-modal.open { display: flex; }
+
+.ap-box {
+  background: #1a2e1a;
+  color: #f0ebe3;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  padding: 24px 20px 28px;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.ap-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: rgba(255,255,255,0.12);
+  border: none; color: #fff;
+  border-radius: 50%; width: 34px; height: 34px;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.ap-close:hover { background: rgba(255,255,255,0.22); }
+
+.ap-title { font-size: 1.25rem; font-weight: 800; margin: 0 0 4px; }
+.ap-sub   { font-size: 0.82rem; opacity: 0.65; margin: 0 0 20px; }
+
+.ap-label {
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.6px; text-transform: uppercase;
+  opacity: 0.7; margin: 14px 0 7px;
+}
+.ap-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 4px; }
+.ap-chip {
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: transparent; color: #f0ebe3;
+  border-radius: 30px; padding: 6px 14px;
+  font-size: 0.82rem; cursor: pointer;
+  transition: all .18s; white-space: nowrap;
+  font-family: inherit;
+}
+.ap-chip.active {
+  background: #C4956A; border-color: #C4956A; color: #fff; font-weight: 700;
+}
+.ap-select {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: #f0ebe3;
+  font-size: 0.9rem; cursor: pointer; font-family: inherit;
+}
+.ap-select option { background: #1a2e1a; }
+
+.ap-submit {
+  width: 100%; margin-top: 20px;
+  background: linear-gradient(135deg, #2D5016, #C4956A);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.ap-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Loading */
+.ap-loading {
+  display: none; text-align: center; padding: 16px 0;
+  font-size: 0.88rem; opacity: 0.7;
+}
+.ap-spinner {
+  width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: #C4956A; border-radius: 50%;
+  animation: ap-spin 0.8s linear infinite; margin: 0 auto 8px;
+}
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+
+/* Result & timeline */
+.ap-result { display: none; margin-top: 20px; }
+.ap-result-badge {
+  font-size: 0.72rem; font-weight: 700; color: #C4956A;
+  letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px;
+}
+.ap-timeline { margin: 0; padding: 0; }
+.ap-trow {
+  display: flex; gap: 10px; align-items: flex-start; padding: 6px 0;
+}
+.ap-time {
+  font-size: 0.75rem; font-weight: 700; color: #C4956A;
+  min-width: 42px; padding-top: 2px; flex-shrink: 0;
+}
+.ap-dot-col {
+  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0; width: 14px;
+}
+.ap-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #C4956A; border: 2px solid #fff; flex-shrink: 0;
+  margin-top: 4px;
+}
+.ap-line {
+  width: 2px; flex: 1; min-height: 20px;
+  background: rgba(196,149,106,0.3); margin: 2px 0;
+}
+.ap-tname { font-size: 0.9rem; font-weight: 600; line-height: 1.3; }
+.ap-tdesc { font-size: 0.78rem; opacity: 0.65; margin-top: 2px; line-height: 1.4; }
+.ap-day-label {
+  font-size: 0.7rem; font-weight: 800; color: #a8d080;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  margin: 14px 0 4px; padding: 3px 8px;
+  background: rgba(168,208,128,0.15); border-radius: 4px;
+  display: inline-block;
+}
+
+.ap-actions { display: flex; gap: 10px; margin-top: 18px; }
+.ap-btn-map {
+  flex: 1; background: #2980b9; color: #fff;
+  border: none; border-radius: 10px; padding: 12px;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer; text-align: center;
+  text-decoration: none; display: block;
+}
+.ap-btn-close {
+  background: rgba(255,255,255,0.12); color: #f0ebe3;
+  border: none; border-radius: 10px; padding: 12px 16px;
+  font-size: 0.9rem; cursor: pointer;
+}
+</style>
+
+<div id="ai-plan-modal">
+  <div class="ap-box">
+    <button class="ap-close" onclick="closeAIPlannerModal()">✕</button>
+    <div class="ap-title">✨ AI Trip Planner</div>
+    <div class="ap-sub">Ceritakan preferensimu — AI rancangkan rutenya langsung di peta!</div>
+
+    <!-- Durasi -->
+    <div class="ap-label">⏱ Durasi</div>
+    <div class="ap-chips" id="ap-durasi">
+      <button class="ap-chip active" data-val="1">1 Hari</button>
+      <button class="ap-chip" data-val="2">2 Hari</button>
+      <button class="ap-chip" data-val="3">3 Hari</button>
+    </div>
+
+    <!-- Jumlah orang -->
+    <div class="ap-label">👥 Jumlah Orang</div>
+    <select class="ap-select" id="ap-orang">
+      <option value="1">1 Orang</option>
+      <option value="2" selected>2 Orang</option>
+      <option value="3">3–4 Orang</option>
+      <option value="5">5+ Orang (Rombongan)</option>
+    </select>
+
+    <!-- Minat -->
+    <div class="ap-label">🎯 Minat (bisa pilih lebih dari satu)</div>
+    <div class="ap-chips" id="ap-minat">
+      <button class="ap-chip active" data-val="Alam">🌿 Alam</button>
+      <button class="ap-chip active" data-val="Kuliner">🍜 Kuliner</button>
+      <button class="ap-chip" data-val="Budaya">🏛️ Budaya</button>
+      <button class="ap-chip" data-val="Belanja">🛍️ Belanja</button>
+      <button class="ap-chip" data-val="Seni">🎨 Seni</button>
+      <button class="ap-chip" data-val="Petualangan">🏔️ Petualangan</button>
+    </div>
+
+    <!-- Budget -->
+    <div class="ap-label">💰 Budget</div>
+    <div class="ap-chips" id="ap-budget">
+      <button class="ap-chip" data-val="Hemat">🟢 Hemat</button>
+      <button class="ap-chip active" data-val="Sedang">🟡 Sedang</button>
+      <button class="ap-chip" data-val="Premium">🔴 Premium</button>
+    </div>
+
+    <button class="ap-submit" id="ap-submit" onclick="submitAIPlanMap()">✨ Buat Rencana & Tampilkan Rute</button>
+
+    <div class="ap-loading" id="ap-loading">
+      <div class="ap-spinner"></div>
+      AI sedang merancang itinerary untukmu…
+    </div>
+
+    <!-- Hasil timeline -->
+    <div class="ap-result" id="ap-result">
+      <div class="ap-result-badge">✨ Itinerary AI Planner</div>
+      <div class="ap-timeline" id="ap-timeline"></div>
+      <div class="ap-actions">
+        <a class="ap-btn-map" id="ap-map-link" href="map.html?ai_route=1">🗺️ Lihat Rute Lengkap</a>
+        <button class="ap-btn-close" onclick="closeAIPlannerModal()">✕ Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Chip helpers ─────────────────────────────────────────────
+function apChipSingle(groupId, val, el) {
+  document.querySelectorAll('#' + groupId + ' .ap-chip').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+}
+function apChipMulti(el) {
+  el.classList.toggle('active');
+  var group = el.parentElement;
+  if (!group.querySelector('.ap-chip.active')) el.classList.add('active');
+}
+
+document.getElementById('ap-durasi').addEventListener('click', function(e) {
+  var c = e.target.closest('.ap-chip'); if (c) apChipSingle('ap-durasi', c.dataset.val, c);
+});
+document.getElementById('ap-budget').addEventListener('click', function(e) {
+  var c = e.target.closest('.ap-chip'); if (c) apChipSingle('ap-budget', c.dataset.val, c);
+});
+document.getElementById('ap-minat').addEventListener('click', function(e) {
+  var c = e.target.closest('.ap-chip'); if (c) apChipMulti(c);
+});
+
+function apGetVal(id) {
+  var el = document.querySelector('#' + id + ' .ap-chip.active');
+  return el ? el.dataset.val : '';
+}
+function apGetVals(id) {
+  return Array.from(document.querySelectorAll('#' + id + ' .ap-chip.active')).map(function(c) { return c.dataset.val; });
+}
+
+// ── Modal open/close ─────────────────────────────────────────
+function openAIPlannerModal() {
+  document.getElementById('ai-plan-modal').classList.add('open');
+  document.getElementById('ap-result').style.display = 'none';
+  document.getElementById('ap-loading').style.display = 'none';
+}
+function closeAIPlannerModal() {
+  document.getElementById('ai-plan-modal').classList.remove('open');
+}
+// Klik di luar box = tutup
+document.getElementById('ai-plan-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAIPlannerModal();
+});
+
+// ── Render timeline di modal ─────────────────────────────────
+function renderAPTimeline(places) {
+  var tl    = document.getElementById('ap-timeline');
+  var byDay = {};
+  places.forEach(function(p, i) {
+    var d = p.hari || 1;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(Object.assign({}, p, { _i: i }));
+  });
+  var html  = '';
+  var days  = Object.keys(byDay).sort(function(a,b){return a-b;});
+  var multi = days.length > 1;
+  days.forEach(function(day) {
+    if (multi) html += '<div class="ap-day-label">📅 Hari ' + day + '</div>';
+    var pts = byDay[day];
+    pts.forEach(function(p, idx) {
+      var isLast = idx === pts.length - 1 && parseInt(day) === parseInt(days[days.length - 1]);
+      html += '<div class="ap-trow">'
+        + '<div class="ap-time">' + (p.jam || '') + '</div>'
+        + '<div class="ap-dot-col"><div class="ap-dot"></div>' + (isLast ? '' : '<div class="ap-line"></div>') + '</div>'
+        + '<div><div class="ap-tname">' + (p.nama || '') + '</div>'
+        + (p.kategori ? '<div class="ap-tdesc">' + p.kategori + '</div>' : '')
+        + '</div></div>';
+    });
+  });
+  tl.innerHTML = html;
+}
+
+// ── Submit AI Planner ────────────────────────────────────────
+function submitAIPlanMap() {
+  var submitBtn = document.getElementById('ap-submit');
+  var loading   = document.getElementById('ap-loading');
+  var result    = document.getElementById('ap-result');
+
+  submitBtn.disabled    = true;
+  loading.style.display = 'block';
+  result.style.display  = 'none';
+
+  fetch('ai_planner.php', {
+    method : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body   : JSON.stringify({
+      durasi : parseInt(apGetVal('ap-durasi')) || 1,
+      minat  : apGetVals('ap-minat'),
+      budget : apGetVal('ap-budget'),
+      orang  : parseInt(document.getElementById('ap-orang').value) || 2,
+    }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.error) throw new Error(data.error);
+
+    var places = data.places || [];
+    var withCoords = places.filter(function(p) { return p.latitude && p.longitude; });
+
+    // Render timeline
+    if (places.length > 0) renderAPTimeline(places);
+
+    // Gambar rute di peta
+    if (withCoords.length >= 1) {
+      sessionStorage.setItem('ai_route', JSON.stringify({
+        places: places, durasi: data.durasi, result: data.result
+      }));
+      drawAIRoute(places);
+    }
+
+    // Link ke halaman map dengan rute
+    var link = document.getElementById('ap-map-link');
+    if (withCoords.length < 1) {
+      link.style.display = 'none';
+    } else {
+      link.href = 'map.html?ai_route=1';
+      link.style.display = 'block';
+    }
+
+    result.style.display  = 'block';
+    loading.style.display = 'none';
+  })
+  .catch(function(err) {
+    document.getElementById('ap-timeline').innerHTML =
+      '<div style="color:#e74c3c;padding:12px 0;">⚠️ ' + (err.message || 'Terjadi kesalahan.') + '</div>';
+    result.style.display  = 'block';
+    loading.style.display = 'none';
+  })
+  .finally(function() { submitBtn.disabled = false; });
+}
+</script>
 </body>
 </html>
