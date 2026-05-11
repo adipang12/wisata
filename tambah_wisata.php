@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "wisata_bandung");
+require_once __DIR__ . '/db.php';
 $message = "";
 
 if ($conn->connect_error) {

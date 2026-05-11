@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost","root","","wisata_bandung");
+require_once __DIR__ . '/db.php';
 
 if ($conn->connect_error) {
   die("Koneksi database gagal: " . $conn->connect_error);

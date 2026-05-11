@@ -37,7 +37,7 @@ function geojsonFallback($path) {
 }
 
 $data = [];
-$conn = @new mysqli("localhost", "root", "", "wisata_bandung");
+require_once __DIR__ . '/db.php';
 
 if (!$conn->connect_error) {
     $result = $conn->query("SELECT * FROM wisata");

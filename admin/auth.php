@@ -2,7 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 
-$conn = @new mysqli("localhost", "root", "", "wisata_bandung");
+require_once __DIR__ . '/../db.php';
 
 if ($conn->connect_error) {
     http_response_code(500);

@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 $input  = json_decode(file_get_contents('php://input'), true);
 $action = $input['action'] ?? '';
 
-$conn = @new mysqli("localhost", "root", "", "wisata_bandung");
+require_once __DIR__ . '/db.php';
 
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Database tidak tersedia']);

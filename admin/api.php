@@ -10,7 +10,7 @@ if (empty($_SESSION['admin_logged_in'])) {
 }
 
 // ── DB ─────────────────────────────────────────────────────────────────────
-$conn = @new mysqli("localhost", "root", "", "wisata_bandung");
+require_once __DIR__ . '/../db.php';
 if ($conn->connect_error) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Database tidak tersedia']);
