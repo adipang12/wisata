@@ -713,10 +713,18 @@ function drawAIRoute(places, startCoords) {
     var stops = document.getElementById('ai-route-stops');
     if (panel && stops) {
         var html = '';
+        // Jika ada titik awal/home, tampilkan sebagai header
+        if (startCoords && startCoords.name) {
+            html += '<div style="display:flex;align-items:center;gap:7px;padding:3px 0 6px;">'
+                + '<span style="background:#27ae60;color:#fff;width:20px;height:20px;border-radius:50%;'
+                + 'display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">🏠</span>'
+                + '<span style="font-size:0.8rem;opacity:0.8;">' + startCoords.name + '</span></div>';
+        }
         days.forEach(function(day) {
             var dc = DAY_COLORS[(parseInt(day)-1) % DAY_COLORS.length];
             html += '<div style="font-size:0.7rem;font-weight:700;opacity:0.75;margin:8px 0 3px;letter-spacing:0.5px;color:' + dc + ';">📅 HARI ' + day + '</div>';
             byDay[day].forEach(function(p) {
+                if (p._isHome) return; // skip titik awal dari loop stops
                 html += '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;">' +
                     '<span style="background:' + dc + ';color:#fff;width:20px;height:20px;border-radius:50%;' +
                     'display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">' +

@@ -243,12 +243,15 @@ if (empty($apiKey)) {
     exit;
 }
 
+// Token cukup: 1 hari ~1800 token, 2 hari ~3200, 3 hari ~4500
+$max_tokens = [1 => 2500, 2 => 3800, 3 => 5500][$durasi] ?? 2500;
+
 $url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
     'model'       => 'llama-3.1-8b-instant',   // 500K TPD vs 100K TPD llama-3.3-70b
     'messages'    => [['role' => 'user', 'content' => $prompt]],
-    'temperature' => 0.8,
-    'max_tokens'  => 2500,
+    'temperature' => 0.7,
+    'max_tokens'  => $max_tokens,
 ]);
 
 $ch = curl_init($url);
