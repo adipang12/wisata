@@ -211,6 +211,13 @@ fetch('get_wisata.php')
 
     allData = data;
     applyFilters();
+
+    // Gambar rute AI setelah semua marker selesai dimuat (tidak ada race condition)
+    if (window._pendingAIRestore) {
+        var places = window._pendingAIRestore;
+        window._pendingAIRestore = null;
+        setTimeout(function() { drawAIRoute(places); }, 150);
+    }
 })
 .catch(error => {
     document.getElementById("total").textContent = error.message;
@@ -674,18 +681,14 @@ function submitAIPlannerMap() {
 }
 
 // ── Auto-restore AI route dari localStorage (lintas halaman) ──────────────
+// Simpan session ke flag global — akan digambar setelah markers selesai load
 (function () {
     var raw = localStorage.getItem('wb_ai_session');
     if (!raw) return;
     var session;
     try { session = JSON.parse(raw); } catch(e) { return; }
     if (!session || !session.places || session.places.length === 0) return;
-
     var withCoords = session.places.filter(function(p) { return p.latitude && p.longitude; });
     if (withCoords.length < 1) return;
-
-    // Tunggu map siap, lalu gambar rute
-    map.whenReady(function() {
-        setTimeout(function() { drawAIRoute(session.places); }, 400);
-    });
+    window._pendingAIRestore = session.places; // ditangkap setelah get_wisata.php selesai
 })();
