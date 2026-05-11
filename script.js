@@ -494,6 +494,9 @@ function makeAIIcon(i, color) {
 function drawAIRoute(places) {
     clearAIRoute();
 
+    // Sembunyikan semua marker wisata biasa agar rute AI lebih jelas
+    if (map.hasLayer(layerGroup)) map.removeLayer(layerGroup);
+
     var withCoords = places.filter(function(p) { return p.latitude && p.longitude; });
     if (withCoords.length < 2) return;
 
@@ -562,6 +565,9 @@ function clearAIRoute() {
     var panel = document.getElementById('ai-route-panel');
     if (panel) panel.style.display = 'none';
     sessionStorage.removeItem('ai_route');
+
+    // Tampilkan kembali semua marker wisata
+    if (!map.hasLayer(layerGroup)) map.addLayer(layerGroup);
 }
 
 // Load AI route dari sessionStorage saat halaman dibuka

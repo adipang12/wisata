@@ -134,12 +134,14 @@ if (preg_match('/##PLACES_JSON##\s*([\s\S]*?)\s*##END_PLACES##/i', $fullText, $m
 // ── Geocode via Nominatim (OpenStreetMap) ─────────────────────────────────
 function nominatimGeocode($name) {
     $q   = urlencode($name . ', Bandung, Jawa Barat, Indonesia');
-    $url = "https://nominatim.openstreetmap.org/search?q={$q}&format=json&limit=1&bounded=1&viewbox=107.4,−6.7,107.8,−7.1";
+    // Gunakan countrycodes=id saja, hindari viewbox dengan karakter minus yang bisa rusak encoding
+    $url = "https://nominatim.openstreetmap.org/search?q={$q}&format=json&limit=3&countrycodes=id&accept-language=id";
     $ch  = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER     => ['User-Agent: WisataBandung/1.0 (contact@wisatabandung.com)'],
-        CURLOPT_TIMEOUT        => 5,
+        CURLOPT_TIMEOUT        => 8,
+        CURLOPT_SSL_VERIFYPEER => false,
     ]);
     $res  = curl_exec($ch);
     curl_close($ch);
@@ -158,16 +160,16 @@ if (!$conn->connect_error && count($placesRaw) > 0) {
         $nama = trim($p['nama'] ?? '');
         if (!$nama) continue;
 
-        // Coba exact match dulu, lalu LIKE
+        // Coba exact match → LIKE → reverse LIKE (nama DB ada di dalam nama AI)
         $stmt = $conn->prepare(
             "SELECT nama, latitude, longitude, kategori
              FROM wisata
-             WHERE nama = ? OR nama LIKE ?
-             ORDER BY CASE WHEN nama = ? THEN 0 ELSE 1 END
+             WHERE nama = ? OR nama LIKE ? OR ? LIKE CONCAT('%', nama, '%')
+             ORDER BY CASE WHEN nama = ? THEN 0 WHEN nama LIKE ? THEN 1 ELSE 2 END
              LIMIT 1"
         );
         $like = '%' . $nama . '%';
-        $stmt->bind_param('sss', $nama, $like, $nama);
+        $stmt->bind_param('sssss', $nama, $like, $nama, $nama, $like);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         $stmt->close();
