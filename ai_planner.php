@@ -25,6 +25,57 @@ $lokasi_lng  = isset($input['lokasi_lng']) ? (float)$input['lokasi_lng'] : null;
 if ($durasi < 1 || $durasi > 3) $durasi = 1;
 if ($lokasi_awal === '') $lokasi_awal = 'Pusat Kota Bandung';
 
+// ── Deteksi zona user dari koordinat ─────────────────────────────────────
+function detectUserZone($lat, $lng) {
+    if ($lat === null || $lng === null) return null;
+    // ZONA UTARA: Lembang, Subang area (lat > -6.84)
+    if ($lat > -6.84 && $lng >= 107.55 && $lng <= 107.72) return 'UTARA';
+    // ZONA SELATAN: Ciwidey, Rancabali (lat < -7.02)
+    if ($lat < -7.02) return 'SELATAN';
+    // ZONA TIMUR ATAS: Dago, Punclut (lat -6.87 s.d -6.84, lng > 107.62)
+    if ($lat >= -6.87 && $lat <= -6.84 && $lng > 107.62) return 'TIMUR_ATAS';
+    // ZONA BARAT: Padalarang, Cimahi barat (lng < 107.52)
+    if ($lng < 107.52) return 'BARAT';
+    // Default: pusat kota
+    return 'KOTA';
+}
+$user_zone = detectUserZone($lokasi_lat, $lokasi_lng);
+
+// Label zona untuk prompt
+$zone_labels = [
+    'UTARA'      => 'ZONA UTARA (Lembang)',
+    'SELATAN'    => 'ZONA SELATAN (Ciwidey)',
+    'TIMUR_ATAS' => 'ZONA TIMUR ATAS (Dago)',
+    'BARAT'      => 'ZONA BARAT (Padalarang)',
+    'KOTA'       => 'ZONA KOTA (Pusat Bandung)',
+];
+$user_zone_label = $user_zone ? ($zone_labels[$user_zone] ?? 'tidak diketahui') : null;
+
+// Instruksi zona hari 1 (hanya jika koordinat user tersedia)
+$zona_hari1_instruksi = '';
+if ($user_zone) {
+    $zona_hari1_instruksi = "
+═══════════════════════════════════════
+🚨 ZONA HARI 1 — WAJIB PATUHI
+═══════════════════════════════════════
+User saat ini berada di: $user_zone_label
+Lokasi penginapan/awal: $lokasi_awal
+
+KARENA USER BERADA DI $user_zone_label:
+✅ Hari 1 WAJIB menggunakan destinasi di $user_zone_label SAJA
+✅ Makan siang & makan malam hari 1 HARUS di area yang sama (zona yang sama)
+❌ DILARANG KERAS: Pergi ke pusat kota untuk makan jika zona utama bukan KOTA
+❌ DILARANG: Berpindah zona lebih dari 1x dalam 1 hari (kecuali kembali ke penginapan)
+
+KULINER DI MASING-MASING ZONA (gunakan ini untuk makan siang/malam):
+- ZONA UTARA: Floating Market Lembang (food court), The Lodge Maribaya (cafe), Sari Ater (resto), warung lokal Lembang
+- ZONA SELATAN: Warung nasi lokal Ciwidey, resto di area Situ Patengan, kios di Ranca Upas
+- ZONA TIMUR ATAS: Cafe D Pakar, Resto Kampung Daun, warung sekitar Dago
+- ZONA KOTA: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret, Mie Kocok Mang Dadeng, dll
+- ZONA BARAT: Warung lokal sekitar Padalarang
+";
+}
+
 // Daftar tempat yang ADA di database (untuk membantu AI memakai nama persis)
 $db_places_hint = "
 TEMPAT WISATA tersedia di sistem kami (gunakan nama PERSIS seperti ini):
@@ -41,7 +92,11 @@ Camping & Alam Terbuka: Ranca Upas, Bumi Perkemahan Cikole, Glamping Lakeside Ra
 
 Kebun Binatang: Kebun Binatang Bandung
 
-Kuliner & Restoran: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Cafe D Pakar, Resto Kampung Daun, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia, Sindang Reret Naripan
+Kuliner ZONA KOTA (pusat Bandung): Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia
+
+Kuliner ZONA TIMUR ATAS (Dago/Punclut): Cafe D Pakar, Resto Kampung Daun
+
+Kuliner ZONA UTARA (Lembang): Floating Market Lembang (food court tersedia di area wisata), The Lodge Maribaya (cafe dalam area wisata), Sari Ater Hot Spring (resto dalam area), warung lokal Lembang
 
 Belanja: Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
 ";
@@ -54,6 +109,7 @@ Buatkan itinerary wisata Bandung yang detail, REALISTIS, dan menarik dengan kete
 - Minat yang HARUS dicakup: $minat
 - Budget: $budget
 - 📍 Titik awal / penginapan: $lokasi_awal
+$zona_hari1_instruksi
 
 ═══════════════════════════════════════
 📍 TITIK AWAL PERJALANAN (WAJIB DIPATUHI)
@@ -65,7 +121,7 @@ ATURAN TITIK AWAL:
 2. Hitung waktu tempuh dari \"$lokasi_awal\" ke destinasi PERTAMA hari itu
 3. Sesuaikan jam berangkat berdasarkan jarak penginapan ke zona tujuan:
    - Jika penginapan di PUSAT KOTA → pakai estimasi waktu standar zona
-   - Jika penginapan sudah di/dekat LEMBANG → kurangi 30-40 menit dari estimasi zona Utara
+   - Jika penginapan sudah di/dekat LEMBANG → kurangi 30-40 menit, bisa berangkat lebih siang
    - Jika penginapan sudah di/dekat CIWIDEY → kurangi 45-60 menit dari estimasi zona Selatan
    - Jika penginapan di DAGO/TIMUR → kurangi 15-20 menit dari estimasi zona Timur Atas
 4. Setiap malam, perhitungkan waktu kembali ke \"$lokasi_awal\"
@@ -73,7 +129,8 @@ ATURAN TITIK AWAL:
 ═══════════════════════════════════════
 🗺️ ZONA GEOGRAFIS BANDUNG (WAJIB PATUHI)
 ═══════════════════════════════════════
-Kelompokkan tempat berdasarkan zona yang sama per hari. JANGAN gabungkan zona UTARA + SELATAN dalam 1 hari!
+ATURAN EMAS: Satu hari = satu zona! Semua destinasi (wisata + MAKAN) dalam 1 hari HARUS di zona yang sama.
+JANGAN pernah pergi ke pusat kota hanya untuk makan jika hari itu zona Utara/Selatan/Barat/Timur Atas!
 
 ZONA UTARA - Lembang (±45 menit dari pusat kota):
 → Tangkuban Perahu, De Ranch Lembang, Floating Market Lembang, The Lodge Maribaya, Situ Lembang, Bumi Perkemahan Cikole, Sari Ater Hot Spring, Dusun Bambu, Bukit Moko
@@ -114,10 +171,12 @@ Estimasi waktu PERJALANAN (dari pusat kota, kondisi normal):
 ATURAN WAJIB:
 1. ❌ DILARANG: Tangkuban Perahu + Kawah Putih dalam 1 hari (jarak 2,5-3 jam)
 2. ❌ DILARANG: Jarak antar tempat dalam 1 hari > 45 menit perjalanan (kecuali destinasi utama tunggal)
-3. ✅ Berangkat ke Zona Selatan: WAJIB jam 06.00-07.00 (perjalanan panjang)
-4. ✅ Berangkat ke Zona Utara: WAJIB jam 06.30-07.00 (hindari macet pagi)
-5. ✅ Maksimal 4-5 destinasi per hari (termasuk makan siang + makan malam)
-6. ✅ Tambahkan waktu tempuh perjalanan ke destinasi berikutnya dalam deskripsi
+3. ❌ DILARANG: Kuliner/restoran pusat kota (Batagor Kingsley, Warung Bancakan, dll) di hari Zona Utara/Selatan
+4. ✅ Berangkat ke Zona Selatan: WAJIB jam 06.00-07.00 (perjalanan panjang)
+5. ✅ Berangkat ke Zona Utara: WAJIB jam 06.30-07.00 (hindari macet pagi) — kecuali penginapan sudah di Lembang
+6. ✅ Maksimal 4-5 destinasi per hari (termasuk makan siang + makan malam)
+7. ✅ Makan siang/malam HARUS di area yang sama dengan zona destinasi hari itu
+8. ✅ Tambahkan waktu tempuh perjalanan ke destinasi berikutnya dalam deskripsi
 
 ═══════════════════════════════════════
 🎯 ATURAN MINAT
