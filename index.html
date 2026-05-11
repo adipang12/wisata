@@ -742,6 +742,125 @@ nav {
 
 /* ITINERARY */
 .itinerary { padding: 3rem; background: var(--cream); }
+
+/* AI PLANNER */
+.ai-planner-box {
+  background: linear-gradient(135deg, #1E2520 0%, #2D5016 100%);
+  border-radius: 1.2rem;
+  padding: 2rem;
+  margin-top: 2.5rem;
+  color: #fff;
+}
+.ai-planner-box h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ai-planner-box p {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-bottom: 1.4rem;
+}
+.ai-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+@media(max-width:600px){ .ai-form-grid { grid-template-columns: 1fr; } }
+.ai-form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ai-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.ai-chip {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: #fff;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ai-chip.active, .ai-chip:hover {
+  background: var(--earth);
+  border-color: var(--earth);
+}
+.ai-select {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+.ai-select option { color: #1E2520; background: #fff; }
+.ai-generate-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 0.7rem;
+  border: none;
+  background: var(--earth);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.ai-generate-btn:hover { opacity: 0.85; }
+.ai-generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ai-result-box {
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,0.07);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  display: none;
+  color: #f0ece6;
+}
+.ai-result-box h2, .ai-result-box h3 {
+  color: var(--earth);
+  margin: 1rem 0 0.4rem;
+  font-size: 1rem;
+}
+.ai-result-box strong { color: #fff; }
+.ai-result-box hr { border-color: rgba(255,255,255,0.15); margin: 1rem 0; }
+.ai-result-box ul, .ai-result-box ol { padding-left: 1.2rem; }
+.ai-result-box li { margin-bottom: 0.3rem; }
+.ai-loading {
+  text-align: center;
+  padding: 2rem;
+  display: none;
+}
+.ai-loading .spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: var(--earth);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 0.8rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 .iter-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1333,6 +1452,63 @@ nav.scrolled {
       </div>
     </div>
   </div>
+
+  <!-- AI PLANNER -->
+  <div class="ai-planner-box">
+    <h3>✨ Buat Itinerary dengan AI</h3>
+    <p>Ceritakan preferensimu, AI akan merancang rencana perjalanan Bandung yang personal untukmu.</p>
+
+    <div class="ai-form-grid">
+      <div class="ai-form-group">
+        <label>⏱️ Durasi</label>
+        <div class="ai-chip-group" id="durasi-group">
+          <button class="ai-chip active" data-val="1">1 Hari</button>
+          <button class="ai-chip" data-val="2">2 Hari</button>
+          <button class="ai-chip" data-val="3">3 Hari</button>
+        </div>
+      </div>
+      <div class="ai-form-group">
+        <label>👥 Jumlah Orang</label>
+        <select class="ai-select" id="orang-select">
+          <option value="1">1 Orang</option>
+          <option value="2" selected>2 Orang</option>
+          <option value="3">3-4 Orang</option>
+          <option value="5">5+ Orang (Rombongan)</option>
+        </select>
+      </div>
+      <div class="ai-form-group">
+        <label>🎯 Minat</label>
+        <div class="ai-chip-group" id="minat-group">
+          <button class="ai-chip active" data-val="Alam">🌿 Alam</button>
+          <button class="ai-chip active" data-val="Kuliner">🍜 Kuliner</button>
+          <button class="ai-chip" data-val="Budaya">🏛️ Budaya</button>
+          <button class="ai-chip" data-val="Belanja">🛍️ Belanja</button>
+          <button class="ai-chip" data-val="Seni">🎨 Seni</button>
+          <button class="ai-chip" data-val="Petualangan">🏔️ Petualangan</button>
+        </div>
+      </div>
+      <div class="ai-form-group">
+        <label>💰 Budget</label>
+        <div class="ai-chip-group" id="budget-group">
+          <button class="ai-chip" data-val="Hemat">🟢 Hemat</button>
+          <button class="ai-chip active" data-val="Sedang">🟡 Sedang</button>
+          <button class="ai-chip" data-val="Premium">🔴 Premium</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="ai-generate-btn" id="ai-generate-btn" onclick="generateItinerary()">
+      ✨ Generate Itinerary
+    </button>
+
+    <div class="ai-loading" id="ai-loading">
+      <div class="spinner"></div>
+      <p style="opacity:0.7;font-size:0.9rem">AI sedang merancang itinerary untukmu...</p>
+    </div>
+
+    <div class="ai-result-box" id="ai-result-box"></div>
+  </div>
+
 </section>
 
 <!-- EVENTS -->
@@ -1724,6 +1900,87 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     }
   });
 });
+</script>
+
+<script>
+// ── AI Planner ────────────────────────────────────────────────
+// Single-select chips (durasi & budget)
+['durasi-group', 'budget-group'].forEach(groupId => {
+  document.getElementById(groupId).addEventListener('click', e => {
+    const chip = e.target.closest('.ai-chip');
+    if (!chip) return;
+    document.querySelectorAll('#' + groupId + ' .ai-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// Multi-select chips (minat)
+document.getElementById('minat-group').addEventListener('click', e => {
+  const chip = e.target.closest('.ai-chip');
+  if (!chip) return;
+  chip.classList.toggle('active');
+  // minimal 1 aktif
+  const aktif = document.querySelectorAll('#minat-group .ai-chip.active');
+  if (aktif.length === 0) chip.classList.add('active');
+});
+
+function getChipVal(groupId) {
+  return document.querySelector('#' + groupId + ' .ai-chip.active')?.dataset.val || '';
+}
+function getChipVals(groupId) {
+  return [...document.querySelectorAll('#' + groupId + ' .ai-chip.active')].map(c => c.dataset.val);
+}
+
+function parseMarkdown(text) {
+  return text
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+async function generateItinerary() {
+  const btn     = document.getElementById('ai-generate-btn');
+  const loading = document.getElementById('ai-loading');
+  const result  = document.getElementById('ai-result-box');
+
+  const payload = {
+    durasi : parseInt(getChipVal('durasi-group')),
+    budget : getChipVal('budget-group'),
+    minat  : getChipVals('minat-group'),
+    orang  : parseInt(document.getElementById('orang-select').value),
+  };
+
+  btn.disabled    = true;
+  loading.style.display = 'block';
+  result.style.display  = 'none';
+
+  try {
+    const res  = await fetch('ai_planner.php', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    result.innerHTML     = parseMarkdown(data.result);
+    result.style.display = 'block';
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    result.innerHTML     = '⚠️ ' + (err.message || 'Terjadi kesalahan. Coba lagi.');
+    result.style.display = 'block';
+  } finally {
+    btn.disabled          = false;
+    loading.style.display = 'none';
+  }
+}
 </script>
 </body>
 </html>
