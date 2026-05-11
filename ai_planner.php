@@ -96,8 +96,10 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($response === false || $httpCode !== 200) {
+    $detail = $response ? json_decode($response, true) : null;
+    $msg = $detail['error']['message'] ?? 'Gagal menghubungi AI. Coba lagi.';
     http_response_code(500);
-    echo json_encode(['error' => 'Gagal menghubungi AI. Coba lagi.']);
+    echo json_encode(['error' => $msg]);
     exit;
 }
 
