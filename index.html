@@ -1985,9 +1985,9 @@ async function generateItinerary() {
 
     result.innerHTML = parseMarkdown(data.result);
 
-    // Tombol "Lihat Rute di Peta" jika ada tempat dengan koordinat
+    // Tombol "Lihat Rute di Peta" jika ada minimal 1 tempat dengan koordinat
     const withCoords = (data.places || []).filter(p => p.latitude && p.longitude);
-    if (withCoords.length >= 2) {
+    if (withCoords.length >= 1) {
       sessionStorage.setItem('ai_route', JSON.stringify({
         places : data.places,
         durasi : data.durasi,
@@ -1996,7 +1996,9 @@ async function generateItinerary() {
       const btn = document.createElement('a');
       btn.href      = 'map.html?ai_route=1';
       btn.className = 'ai-map-btn';
-      btn.innerHTML = '🗺️ Lihat Rute di Peta';
+      btn.innerHTML = withCoords.length >= 2
+        ? '🗺️ Lihat Rute di Peta'
+        : '🗺️ Lihat di Peta';
       result.appendChild(btn);
     }
 

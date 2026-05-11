@@ -185,6 +185,8 @@ if (!$conn->connect_error && count($placesRaw) > 0) {
             ];
         } else {
             // Tempat tidak ada di DB → coba geocode via Nominatim (gratis)
+            // Nominatim mensyaratkan max 1 req/detik — wajib jeda
+            usleep(1200000); // 1.2 detik
             $coords = nominatimGeocode($nama);
             $places[] = [
                 'jam'      => $p['jam']  ?? '',
