@@ -640,10 +640,18 @@
           <div id="ai-route-stops" class="ai-route-stops-scroll" style="font-size:0.8rem;line-height:1.8;opacity:0.9;max-height:200px;overflow-y:auto;"></div>
         </div>
 
-        <div class="list-header">
-            <span>Rekomendasi terdekat</span>
-            <small id="photo-mode">Foto lokal aktif</small>
+        <!-- Rekomendasi Accordion Header -->
+        <div class="nearby-accordion-header open" id="nearby-accordion-header" onclick="toggleNearbyAccordion()">
+            <div class="nearby-accordion-left">
+                <span>Rekomendasi terdekat</span>
+                <small id="photo-mode" class="nearby-accordion-badge">Foto lokal aktif</small>
+            </div>
+            <svg class="nearby-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
         </div>
+        <div class="nearby-accordion-body open" id="nearby-accordion-body">
+
         <div id="routing-info" style="display: none;">
 
             <!-- Mini bar: hanya tampil saat floating (sidebar tertutup) -->
@@ -700,6 +708,7 @@
 
         </div>
         <div id="sidebar-list" class="place-list"></div>
+        </div><!-- end nearby-accordion-body -->
     </aside>
 
     <section class="map-wrap">
@@ -1003,6 +1012,16 @@
         document.getElementById('nav-kat-dropdown').classList.toggle('open');
     }
     window.toggleKatDropdown = toggleKatDropdown;
+
+    // ── Rekomendasi Accordion ──
+    function toggleNearbyAccordion() {
+        var header = document.getElementById('nearby-accordion-header');
+        var body   = document.getElementById('nearby-accordion-body');
+        var isOpen = header.classList.contains('open');
+        header.classList.toggle('open', !isOpen);
+        body.classList.toggle('open', !isOpen);
+    }
+    window.toggleNearbyAccordion = toggleNearbyAccordion;
 
     // Highlight kategori aktif di dropdown
     (function highlightActiveKat() {

@@ -64,6 +64,64 @@ body {
     flex-shrink: 0;
 }
 
+/* ── Custom thin scrollbar sidebar ── */
+.sidebar-panel::-webkit-scrollbar { width: 4px; }
+.sidebar-panel::-webkit-scrollbar-track { background: transparent; }
+.sidebar-panel::-webkit-scrollbar-thumb { background: rgba(45,80,22,0.2); border-radius: 4px; }
+.sidebar-panel::-webkit-scrollbar-thumb:hover { background: rgba(45,80,22,0.4); }
+.sidebar-panel { scrollbar-width: thin; scrollbar-color: rgba(45,80,22,0.2) transparent; }
+
+/* ── Rekomendasi Accordion ── */
+.nearby-accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 18px 2px 0;
+    padding: 10px 12px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.07);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.nearby-accordion-header:hover { background: #f5f8f5; box-shadow: 0 2px 8px rgba(45,80,22,0.08); }
+.nearby-accordion-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nearby-accordion-left span {
+    font-weight: 750;
+    font-size: 0.9rem;
+    color: #1E2520;
+}
+.nearby-accordion-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--teal, #2D8C6E);
+}
+.nearby-accordion-chevron {
+    width: 18px; height: 18px;
+    color: rgba(30,37,32,0.45);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    flex-shrink: 0;
+}
+.nearby-accordion-header.open .nearby-accordion-chevron {
+    transform: rotate(180deg);
+}
+.nearby-accordion-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    opacity: 0;
+}
+.nearby-accordion-body.open {
+    max-height: 2000px;
+    opacity: 1;
+}
+
 .sidebar-panel.collapsed {
     width: 0;
     min-width: 0;
