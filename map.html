@@ -926,10 +926,10 @@
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  overflow-y: auto;
+  overflow: hidden;           /* overlay TIDAK scroll — box yang scroll */
   padding: 16px;
   box-sizing: border-box;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 #ai-plan-modal.open { display: flex; }
@@ -940,11 +940,30 @@
   border-radius: 20px;
   width: 100%;
   max-width: 520px;
-  margin: auto;
-  padding: 24px 20px 28px;
   position: relative;
   box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;           /* tinggi max = 88% viewport */
+  overflow: hidden;           /* luar tidak scroll */
 }
+
+/* Header tetap di atas */
+.ap-header {
+  padding: 22px 20px 0;
+  flex-shrink: 0;
+}
+
+/* Form bisa di-scroll secara independen */
+.ap-form-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 20px 20px;
+  flex: 1;
+}
+/* Scrollbar tipis */
+.ap-form-scroll::-webkit-scrollbar { width: 4px; }
+.ap-form-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 .ap-close {
   position: absolute;
   top: 14px; right: 16px;
@@ -1060,61 +1079,70 @@
 <div id="ai-plan-modal">
   <div class="ap-box">
     <button class="ap-close" onclick="closeAIPlannerModal()">✕</button>
-    <div class="ap-title">✨ AI Trip Planner</div>
-    <div class="ap-sub">Ceritakan preferensimu — AI rancangkan rutenya langsung di peta!</div>
 
-    <!-- Durasi -->
-    <div class="ap-label">⏱ Durasi</div>
-    <div class="ap-chips" id="ap-durasi">
-      <button class="ap-chip active" data-val="1">1 Hari</button>
-      <button class="ap-chip" data-val="2">2 Hari</button>
-      <button class="ap-chip" data-val="3">3 Hari</button>
+    <!-- Header tetap di atas, tidak ikut scroll -->
+    <div class="ap-header">
+      <div class="ap-title">✨ AI Trip Planner</div>
+      <div class="ap-sub">Ceritakan preferensimu — AI rancangkan rutenya langsung di peta!</div>
     </div>
 
-    <!-- Jumlah orang -->
-    <div class="ap-label">👥 Jumlah Orang</div>
-    <select class="ap-select" id="ap-orang">
-      <option value="1">1 Orang</option>
-      <option value="2" selected>2 Orang</option>
-      <option value="3">3–4 Orang</option>
-      <option value="5">5+ Orang (Rombongan)</option>
-    </select>
+    <!-- Semua konten form & hasil bisa di-scroll independen -->
+    <div class="ap-form-scroll">
 
-    <!-- Minat -->
-    <div class="ap-label">🎯 Minat (bisa pilih lebih dari satu)</div>
-    <div class="ap-chips" id="ap-minat">
-      <button class="ap-chip active" data-val="Alam">🌿 Alam</button>
-      <button class="ap-chip active" data-val="Kuliner">🍜 Kuliner</button>
-      <button class="ap-chip" data-val="Budaya">🏛️ Budaya</button>
-      <button class="ap-chip" data-val="Belanja">🛍️ Belanja</button>
-      <button class="ap-chip" data-val="Seni">🎨 Seni</button>
-      <button class="ap-chip" data-val="Petualangan">🏔️ Petualangan</button>
-    </div>
-
-    <!-- Budget -->
-    <div class="ap-label">💰 Budget</div>
-    <div class="ap-chips" id="ap-budget">
-      <button class="ap-chip" data-val="Hemat">🟢 Hemat</button>
-      <button class="ap-chip active" data-val="Sedang">🟡 Sedang</button>
-      <button class="ap-chip" data-val="Premium">🔴 Premium</button>
-    </div>
-
-    <button class="ap-submit" id="ap-submit" onclick="submitAIPlanMap()">✨ Buat Rencana & Tampilkan Rute</button>
-
-    <div class="ap-loading" id="ap-loading">
-      <div class="ap-spinner"></div>
-      AI sedang merancang itinerary untukmu…
-    </div>
-
-    <!-- Hasil timeline -->
-    <div class="ap-result" id="ap-result">
-      <div class="ap-result-badge">✨ Itinerary AI Planner</div>
-      <div class="ap-timeline" id="ap-timeline"></div>
-      <div class="ap-actions">
-        <a class="ap-btn-map" id="ap-map-link" href="map.html?ai_route=1">🗺️ Lihat Rute Lengkap</a>
-        <button class="ap-btn-close" onclick="closeAIPlannerModal()">✕ Tutup</button>
+      <!-- Durasi -->
+      <div class="ap-label">⏱ Durasi</div>
+      <div class="ap-chips" id="ap-durasi">
+        <button class="ap-chip active" data-val="1">1 Hari</button>
+        <button class="ap-chip" data-val="2">2 Hari</button>
+        <button class="ap-chip" data-val="3">3 Hari</button>
       </div>
-    </div>
+
+      <!-- Jumlah orang -->
+      <div class="ap-label">👥 Jumlah Orang</div>
+      <select class="ap-select" id="ap-orang">
+        <option value="1">1 Orang</option>
+        <option value="2" selected>2 Orang</option>
+        <option value="3">3–4 Orang</option>
+        <option value="5">5+ Orang (Rombongan)</option>
+      </select>
+
+      <!-- Minat -->
+      <div class="ap-label">🎯 Minat (bisa pilih lebih dari satu)</div>
+      <div class="ap-chips" id="ap-minat">
+        <button class="ap-chip active" data-val="Alam">🌿 Alam</button>
+        <button class="ap-chip active" data-val="Kuliner">🍜 Kuliner</button>
+        <button class="ap-chip" data-val="Budaya">🏛️ Budaya</button>
+        <button class="ap-chip" data-val="Belanja">🛍️ Belanja</button>
+        <button class="ap-chip" data-val="Seni">🎨 Seni</button>
+        <button class="ap-chip" data-val="Petualangan">🏔️ Petualangan</button>
+      </div>
+
+      <!-- Budget -->
+      <div class="ap-label">💰 Budget</div>
+      <div class="ap-chips" id="ap-budget">
+        <button class="ap-chip" data-val="Hemat">🟢 Hemat</button>
+        <button class="ap-chip active" data-val="Sedang">🟡 Sedang</button>
+        <button class="ap-chip" data-val="Premium">🔴 Premium</button>
+      </div>
+
+      <button class="ap-submit" id="ap-submit" onclick="submitAIPlanMap()">✨ Buat Rencana & Tampilkan Rute</button>
+
+      <div class="ap-loading" id="ap-loading">
+        <div class="ap-spinner"></div>
+        AI sedang merancang itinerary untukmu…
+      </div>
+
+      <!-- Hasil timeline -->
+      <div class="ap-result" id="ap-result">
+        <div class="ap-result-badge">✨ Itinerary AI Planner</div>
+        <div class="ap-timeline" id="ap-timeline"></div>
+        <div class="ap-actions">
+          <button class="ap-btn-map" id="ap-map-link" onclick="closeAIPlannerModal()">🗺️ Lihat Rute di Peta</button>
+          <button class="ap-btn-close" onclick="closeAIPlannerModal()">✕ Tutup</button>
+        </div>
+      </div>
+
+    </div><!-- /.ap-form-scroll -->
   </div>
 </div>
 
@@ -1153,9 +1181,11 @@ function openAIPlannerModal() {
   document.getElementById('ai-plan-modal').classList.add('open');
   document.getElementById('ap-result').style.display = 'none';
   document.getElementById('ap-loading').style.display = 'none';
+  document.body.style.overflow = 'hidden'; // kunci scroll halaman
 }
 function closeAIPlannerModal() {
   document.getElementById('ai-plan-modal').classList.remove('open');
+  document.body.style.overflow = ''; // kembalikan scroll halaman
 }
 // Klik di luar box = tutup
 document.getElementById('ai-plan-modal').addEventListener('click', function(e) {
