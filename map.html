@@ -350,10 +350,31 @@
         }
         .switch-text a { color: var(--forest); font-weight: 700; cursor: pointer; text-decoration: none; }
 
+        /* ── Nav links center ── */
+        .site-nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .site-nav-links a {
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            transition: color 0.2s;
+        }
+        .site-nav-links a:hover { color: rgba(255,255,255,0.95); }
+        .site-nav-links a.active { color: #C4956A; font-weight: 700; }
+
         /* ── Mobile nav ── */
         @media (max-width: 767px) {
             .site-nav { padding: 0.75rem 1rem; }
             .site-logo { font-size: 1.15rem; }
+            .site-nav-links { display: none; }
         }
     </style>
 </head>
@@ -362,6 +383,14 @@
 <!-- SITE NAVBAR -->
 <nav class="site-nav">
     <a href="index.html" class="site-logo">Wisata<span>Bandung</span></a>
+
+    <ul class="site-nav-links">
+        <li><a href="map.html" class="active">Peta</a></li>
+        <li><a href="index.html#destinations">Destinasi</a></li>
+        <li><a href="index.html#itinerary">Itinerary</a></li>
+        <li><a href="index.html#features">Fitur</a></li>
+        <li><a href="index.html#events">Event</a></li>
+    </ul>
 
     <div class="site-nav-right">
         <div id="nav-auth-area">
