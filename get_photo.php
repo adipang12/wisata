@@ -198,12 +198,14 @@ function wikimediaPhoto($name, $lat, $lng) {
 
         foreach ($pages as $page) {
             $mime = $page['imageinfo'][0]['mime'] ?? '';
-            // Skip SVG, portrait-only images (terlalu kecil width vs height)
+            // Skip SVG dan gambar portrait (wajah/orang) — harus landscape
             if (strpos($mime, 'svg') !== false) continue;
             $w = $page['imageinfo'][0]['width'] ?? 0;
             $h = $page['imageinfo'][0]['height'] ?? 0;
-            // Skip gambar portrait (foto orang) — landscape lebih cocok untuk tempat
-            if ($h > 0 && $w > 0 && $h > $w * 1.5) continue;
+            // Wajib landscape atau square (w >= h * 0.85), skip semua portrait
+            if ($h > 0 && $w > 0 && $w < $h * 0.85) continue;
+            // Minimum ukuran agar tidak terlalu kecil
+            if ($w < 300) continue;
             $thumb = $page['imageinfo'][0]['thumburl'] ?? $page['imageinfo'][0]['url'] ?? null;
             if ($thumb) {
                 return makePlaceInfo($thumb, 'wikimedia', 'Wikimedia Commons');
@@ -216,7 +218,7 @@ function wikimediaPhoto($name, $lat, $lng) {
         $geoUrl = 'https://commons.wikimedia.org/w/api.php?action=query'
             . '&generator=geosearch'
             . '&ggscoord=' . rawurlencode($lat . '|' . $lng)
-            . '&ggsradius=500'
+            . '&ggsradius=300'
             . '&ggsnamespace=6'
             . '&ggslimit=5'
             . '&prop=imageinfo'
@@ -232,7 +234,9 @@ function wikimediaPhoto($name, $lat, $lng) {
             if (strpos($mime, 'svg') !== false) continue;
             $w = $page['imageinfo'][0]['width'] ?? 0;
             $h = $page['imageinfo'][0]['height'] ?? 0;
-            if ($h > 0 && $w > 0 && $h > $w * 1.5) continue;
+            // Wajib landscape atau square
+            if ($h > 0 && $w > 0 && $w < $h * 0.85) continue;
+            if ($w < 300) continue;
             $thumb = $page['imageinfo'][0]['thumburl'] ?? $page['imageinfo'][0]['url'] ?? null;
             if ($thumb) {
                 return makePlaceInfo($thumb, 'wikimedia', 'Wikimedia Commons');

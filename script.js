@@ -155,6 +155,13 @@ function fetchRealPhoto(record) {
     return photoQueue;
 }
 
+function renderStars(rating) {
+    const full = Math.floor(rating);
+    const half = (rating - full) >= 0.4 ? 1 : 0;
+    const empty = 5 - full - half;
+    return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+
 function updatePhotoElements(record, data) {
     if (!data || !data.photo) {
         return;
@@ -168,15 +175,28 @@ function updatePhotoElements(record, data) {
         credit.textContent = data.attribution ? `Foto: ${data.attribution}` : '';
     });
     if (data.rating) {
-        const reviewText = data.userRatingCount ? ` (${Number(data.userRatingCount).toLocaleString('id-ID')} ulasan)` : '';
-        document.querySelectorAll(`[data-rating-key="${key}"]`).forEach(rating => {
-            rating.textContent = `Google ${Number(data.rating).toFixed(1)}${reviewText}`;
+        const ratingNum = Number(data.rating).toFixed(1);
+        const reviewCount = data.userRatingCount ? ` (${Number(data.userRatingCount).toLocaleString('id-ID')})` : '';
+        document.querySelectorAll(`[data-rating-key="${key}"]`).forEach(el => {
+            // popup uses wp-rating-num, sidebar uses old format
+            if (el.classList.contains('wp-rating-num')) {
+                el.textContent = `${ratingNum}${reviewCount}`;
+            } else {
+                el.textContent = `Google ${ratingNum}${reviewCount}`;
+            }
+        });
+        document.querySelectorAll(`[data-stars-key="${key}"]`).forEach(el => {
+            el.textContent = renderStars(Number(data.rating));
         });
     }
     if (data.googleMapsUri) {
         document.querySelectorAll(`[data-maps-key="${key}"]`).forEach(link => {
             link.href = data.googleMapsUri;
-            link.textContent = 'Buka di Google Maps';
+            if (link.classList.contains('wp-maps-btn')) {
+                link.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Google Maps`;
+            } else {
+                link.textContent = 'Buka di Google Maps';
+            }
             link.hidden = false;
         });
     }
@@ -369,32 +389,37 @@ function renderUI(data) {
         let marker = L.marker([lat, lon], {icon: createColoredMarkerIcon(markerColor)}).addTo(layerGroup);
         // Simpan untuk akses via ?place= URL param
         _markersByName[namaRaw.toLowerCase()] = { marker, lat, lon, d };
-        let reviewText = d.review ? escapeHTML(d.review).substring(0, 120) + (d.review.length > 120 ? '…' : '') : '';
+        let reviewText = d.review ? escapeHTML(d.review).substring(0, 110) + (d.review.length > 110 ? '…' : '') : '';
+        let initRating = d.rating ? Number(d.rating) : 0;
+        let initStars = initRating > 0 ? renderStars(initRating) : '';
         marker.bindPopup(`
             <div class="wp-img-wrap">
                 <img src="${photo}" alt="${nama}" data-photo-key="${photoKey}">
+                <div class="wp-img-gradient"></div>
                 <span class="wp-cat-badge">${escapeHTML(getCategoryLabel(d.kategori))}</span>
                 <span class="wp-open-badge" data-open-key="${photoKey}" style="display:none;"></span>
             </div>
             <div class="wp-content">
                 <div class="wp-title">${nama}</div>
                 <div class="wp-rating-row">
-                    <span class="wp-star-icon">★</span>
-                    <span data-rating-key="${photoKey}">Rating ${rating}</span>
+                    <span class="wp-stars" data-stars-key="${photoKey}">${initStars}</span>
+                    <span class="wp-rating-num" data-rating-key="${photoKey}">${initRating > 0 ? Number(initRating).toFixed(1) : '–'}</span>
                 </div>
                 ${reviewText ? `<p class="wp-desc">${reviewText}</p>` : ''}
                 <div class="wp-details" data-details-key="${photoKey}"></div>
                 <p class="wp-credit" data-credit-key="${photoKey}"></p>
-                <a class="wp-maps-link" data-maps-key="${photoKey}" target="_blank" rel="noopener" hidden>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    Buka di Google Maps
-                </a>
-                <button class="wp-route-btn" onclick="showRoute({lat:${lat},lng:${lon},name:decodeURIComponent('${namaEnc}')})">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                    Arah Jalan
-                </button>
+                <div class="wp-action-row">
+                    <a class="wp-maps-btn" data-maps-key="${photoKey}" target="_blank" rel="noopener" hidden>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Google Maps
+                    </a>
+                    <button class="wp-route-btn" onclick="showRoute({lat:${lat},lng:${lon},name:decodeURIComponent('${namaEnc}')})">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                        Rute
+                    </button>
+                </div>
             </div>
-        `, { maxWidth: 300, minWidth: 300, className: 'wisata-popup' });
+        `, { maxWidth: 360, minWidth: 360, className: 'wisata-popup' });
         marker.on('click', () => {
             fetchRealPhoto(d).then(realPhoto => updatePhotoElements(d, realPhoto));
         });
