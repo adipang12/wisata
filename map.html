@@ -381,6 +381,15 @@
             <button type="button" onclick="lokasiSaya()">Gunakan Lokasi Saya</button>
         </div>
 
+        <!-- AI ROUTE PANEL -->
+        <div id="ai-route-panel" style="display:none; margin: 0.8rem 0; background: linear-gradient(135deg,#1E2520,#2D5016); border-radius:0.8rem; padding:0.8rem 1rem; color:#fff;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+            <span style="font-weight:700;font-size:0.9rem;">✨ Rute AI Planner</span>
+            <button onclick="clearAIRoute()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem;">✕ Hapus</button>
+          </div>
+          <div id="ai-route-stops" style="font-size:0.8rem;line-height:1.8;opacity:0.9;max-height:200px;overflow-y:auto;"></div>
+        </div>
+
         <div class="list-header">
             <span>Rekomendasi terdekat</span>
             <small id="photo-mode">Foto lokal aktif</small>

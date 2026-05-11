@@ -5,6 +5,7 @@ header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -12,11 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
-$durasi  = intval($input['durasi']  ?? 1);
-$minat   = implode(', ', (array)($input['minat']  ?? ['Alam']));
-$budget  = $input['budget']  ?? 'Sedang';
-$orang   = intval($input['orang']   ?? 2);
+$input  = json_decode(file_get_contents('php://input'), true);
+$durasi = intval($input['durasi'] ?? 1);
+$minat  = implode(', ', (array)($input['minat'] ?? ['Alam']));
+$budget = $input['budget'] ?? 'Sedang';
+$orang  = intval($input['orang'] ?? 2);
 
 if ($durasi < 1 || $durasi > 3) $durasi = 1;
 
@@ -60,7 +61,16 @@ Format WAJIB (gunakan format ini persis, dengan emoji):
 ### 🚗 Transportasi
 - [rekomendasi transportasi sesuai budget]
 
-Gunakan tempat wisata nyata di Bandung. Sesuaikan rekomendasi dengan minat dan budget yang diminta. Gunakan Bahasa Indonesia yang ramah dan informatif.";
+Setelah itinerary, WAJIB tambahkan blok berikut (format JSON tepat, jangan diubah):
+
+##PLACES_JSON##
+[
+  {\"jam\": \"07.00\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"},
+  {\"jam\": \"09.30\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"}
+]
+##END_PLACES##
+
+Gunakan tempat wisata nyata di Bandung yang populer. Gunakan Bahasa Indonesia yang ramah.";
 
 $apiKey = defined('GROQ_API_KEY') ? GROQ_API_KEY : '';
 
@@ -73,11 +83,9 @@ if (empty($apiKey)) {
 $url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
     'model'       => 'llama-3.3-70b-versatile',
-    'messages'    => [
-        ['role' => 'user', 'content' => $prompt]
-    ],
+    'messages'    => [['role' => 'user', 'content' => $prompt]],
     'temperature' => 0.8,
-    'max_tokens'  => 2048,
+    'max_tokens'  => 3000,
 ]);
 
 $ch = curl_init($url);
@@ -89,7 +97,7 @@ curl_setopt_array($ch, [
         'Content-Type: application/json',
         'Authorization: Bearer ' . $apiKey,
     ],
-    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_TIMEOUT => 30,
 ]);
 
 $response = curl_exec($ch);
@@ -98,19 +106,77 @@ curl_close($ch);
 
 if ($response === false || $httpCode !== 200) {
     $detail = $response ? json_decode($response, true) : null;
-    $msg = $detail['error']['message'] ?? 'Gagal menghubungi AI. Coba lagi.';
+    $msg    = $detail['error']['message'] ?? 'Gagal menghubungi AI. Coba lagi.';
     http_response_code(500);
     echo json_encode(['error' => $msg]);
     exit;
 }
 
-$data = json_decode($response, true);
-$text = $data['choices'][0]['message']['content'] ?? null;
+$data     = json_decode($response, true);
+$fullText = $data['choices'][0]['message']['content'] ?? '';
 
-if (!$text) {
+if (!$fullText) {
     http_response_code(500);
     echo json_encode(['error' => 'AI tidak menghasilkan respons.']);
     exit;
 }
 
-echo json_encode(['result' => $text]);
+// ── Pisahkan itinerary text dari places JSON ──────────────────────────────
+$placesRaw = [];
+$itinerary = $fullText;
+
+if (preg_match('/##PLACES_JSON##\s*([\s\S]*?)\s*##END_PLACES##/i', $fullText, $m)) {
+    $itinerary = trim(str_replace($m[0], '', $fullText));
+    $decoded   = json_decode(trim($m[1]), true);
+    if (is_array($decoded)) $placesRaw = $decoded;
+}
+
+// ── Cari koordinat dari database ─────────────────────────────────────────
+$places = [];
+if (!$conn->connect_error && count($placesRaw) > 0) {
+    foreach ($placesRaw as $p) {
+        $nama = trim($p['nama'] ?? '');
+        if (!$nama) continue;
+
+        // Coba exact match dulu, lalu LIKE
+        $stmt = $conn->prepare(
+            "SELECT nama, latitude, longitude, kategori
+             FROM wisata
+             WHERE nama = ? OR nama LIKE ?
+             ORDER BY CASE WHEN nama = ? THEN 0 ELSE 1 END
+             LIMIT 1"
+        );
+        $like = '%' . $nama . '%';
+        $stmt->bind_param('sss', $nama, $like, $nama);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if ($row) {
+            $places[] = [
+                'jam'       => $p['jam']  ?? '',
+                'hari'      => intval($p['hari'] ?? 1),
+                'nama'      => $row['nama'],
+                'latitude'  => (float)$row['latitude'],
+                'longitude' => (float)$row['longitude'],
+                'kategori'  => $row['kategori'],
+            ];
+        } else {
+            // Tempat tidak ada di DB, tetap masukkan tanpa koordinat
+            $places[] = [
+                'jam'      => $p['jam']  ?? '',
+                'hari'     => intval($p['hari'] ?? 1),
+                'nama'     => $nama,
+                'latitude' => null,
+                'longitude'=> null,
+                'kategori' => '',
+            ];
+        }
+    }
+}
+
+echo json_encode([
+    'result' => $itinerary,
+    'places' => $places,
+    'durasi' => $durasi,
+], JSON_UNESCAPED_UNICODE);

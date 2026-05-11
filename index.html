@@ -861,6 +861,19 @@ nav {
   margin: 0 auto 0.8rem;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.ai-map-btn {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.7rem 1.4rem;
+  background: #2D5016;
+  color: #fff;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.ai-map-btn:hover { opacity: 0.85; }
 .iter-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1970,7 +1983,23 @@ async function generateItinerary() {
 
     if (data.error) throw new Error(data.error);
 
-    result.innerHTML     = parseMarkdown(data.result);
+    result.innerHTML = parseMarkdown(data.result);
+
+    // Tombol "Lihat Rute di Peta" jika ada tempat dengan koordinat
+    const withCoords = (data.places || []).filter(p => p.latitude && p.longitude);
+    if (withCoords.length >= 2) {
+      sessionStorage.setItem('ai_route', JSON.stringify({
+        places : data.places,
+        durasi : data.durasi,
+        result : data.result,
+      }));
+      const btn = document.createElement('a');
+      btn.href      = 'map.html?ai_route=1';
+      btn.className = 'ai-map-btn';
+      btn.innerHTML = '🗺️ Lihat Rute di Peta';
+      result.appendChild(btn);
+    }
+
     result.style.display = 'block';
     result.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {

@@ -475,3 +475,82 @@ function clearRoute() {
     var stepsEl = document.getElementById('route-steps');
     if (stepsEl) stepsEl.innerHTML = '';
 }
+
+// ── AI ROUTE ─────────────────────────────────────────────────────────────
+var aiRouteMarkers = [];
+var aiRouteLine    = null;
+
+function drawAIRoute(places) {
+    clearAIRoute();
+
+    var withCoords = places.filter(function(p) { return p.latitude && p.longitude; });
+    if (withCoords.length < 1) return;
+
+    var colors = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#1abc9c','#e91e63'];
+    var latlngs = [];
+
+    withCoords.forEach(function(p, i) {
+        var lat = p.latitude, lng = p.longitude;
+        latlngs.push([lat, lng]);
+
+        var color = colors[i % colors.length];
+        var icon  = L.divIcon({
+            className: '',
+            html: '<div style="background:' + color + ';color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);">' + (i + 1) + '</div>',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+        });
+
+        var marker = L.marker([lat, lng], { icon: icon })
+            .addTo(map)
+            .bindPopup('<strong>' + p.jam + '</strong> — ' + p.nama + (p.kategori ? ' <small>(' + p.kategori + ')</small>' : ''));
+        aiRouteMarkers.push(marker);
+    });
+
+    // Garis antar tempat
+    aiRouteLine = L.polyline(latlngs, {
+        color: '#C4956A',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '8, 6',
+    }).addTo(map);
+
+    // Fit bounds
+    map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] });
+
+    // Tampilkan panel
+    var panel = document.getElementById('ai-route-panel');
+    var stops = document.getElementById('ai-route-stops');
+    if (panel && stops) {
+        stops.innerHTML = withCoords.map(function(p, i) {
+            var color = colors[i % colors.length];
+            return '<div style="display:flex;align-items:center;gap:6px;">' +
+                '<span style="background:' + color + ';color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + (i + 1) + '</span>' +
+                '<span><b>' + p.jam + '</b> ' + p.nama + '</span></div>';
+        }).join('');
+        panel.style.display = 'block';
+    }
+}
+
+function clearAIRoute() {
+    aiRouteMarkers.forEach(function(m) { map.removeLayer(m); });
+    aiRouteMarkers = [];
+    if (aiRouteLine) { map.removeLayer(aiRouteLine); aiRouteLine = null; }
+    var panel = document.getElementById('ai-route-panel');
+    if (panel) panel.style.display = 'none';
+    sessionStorage.removeItem('ai_route');
+}
+
+// Load AI route dari sessionStorage saat halaman dibuka
+(function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('ai_route') !== '1') return;
+    var raw = sessionStorage.getItem('ai_route');
+    if (!raw) return;
+    try {
+        var data = JSON.parse(raw);
+        if (data.places && data.places.length > 0) {
+            setTimeout(function() { drawAIRoute(data.places); }, 800);
+        }
+    } catch(e) {}
+})();
