@@ -2,7 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a3a2a">
     <title>Explore Bandung - Peta Wisata Interaktif</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -342,6 +346,12 @@
 
 <main class="app-shell">
     <aside class="sidebar-panel" id="sidebar">
+        <!-- Handle drag (mobile only) -->
+        <div class="sheet-handle" id="sheet-handle" onclick="toggleMobileSheet()">
+            <div class="sheet-handle-bar"></div>
+            <span class="sheet-collapsed-hint">▲ Cari &amp; Filter Tempat</span>
+        </div>
+
         <section class="brand-banner">
             <span class="eyebrow">Bandung Explorer</span>
             <h1>Temukan tempat seru di Bandung</h1>
@@ -764,6 +774,54 @@
     .then(function(r) { return r.json(); })
     .then(function(data) { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
     .catch(function() {});
+
+// ── Mobile Bottom Sheet ──────────────────────────────────────
+(function() {
+    var isMobile = function() { return window.innerWidth <= 767; };
+    var sidebar  = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    function toggleMobileSheet() {
+        if (!isMobile()) return;
+        sidebar.classList.toggle('sheet-open');
+        // Invalidate map size agar tiles reload dengan benar
+        setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+    }
+    window.toggleMobileSheet = toggleMobileSheet;
+
+    // Auto-expand saat marker diklik atau rute AI aktif
+    var _origDrawAI = window.drawAIRoute;
+    if (_origDrawAI) {
+        window.drawAIRoute = function(places) {
+            _origDrawAI(places);
+            if (isMobile()) sidebar.classList.add('sheet-open');
+        };
+    }
+
+    // Touch drag untuk tarik sheet
+    var startY = 0, startOpen = false;
+    var handle = document.getElementById('sheet-handle');
+    if (handle) {
+        handle.addEventListener('touchstart', function(e) {
+            startY    = e.touches[0].clientY;
+            startOpen = sidebar.classList.contains('sheet-open');
+        }, { passive: true });
+        handle.addEventListener('touchend', function(e) {
+            var dy = e.changedTouches[0].clientY - startY;
+            if (dy < -30)       sidebar.classList.add('sheet-open');    // tarik ke atas = buka
+            else if (dy > 30)   sidebar.classList.remove('sheet-open'); // tarik ke bawah = tutup
+            else                toggleMobileSheet();                     // tap = toggle
+            setTimeout(function() { if (window.map) map.invalidateSize(); }, 400);
+        }, { passive: true });
+    }
+
+    // Tutup sheet saat user tap di peta
+    if (window.map) {
+        map.on('click', function() {
+            if (isMobile()) sidebar.classList.remove('sheet-open');
+        });
+    }
+})();
 </script>
 </body>
 </html>

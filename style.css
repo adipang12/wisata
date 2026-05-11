@@ -1053,6 +1053,9 @@ body {
 .leaflet-routing-container::-webkit-scrollbar-thumb { background: #dce5ee; border-radius: 4px; }
 .leaflet-routing-container::-webkit-scrollbar-thumb:hover { background: #b0bec5; }
 
+/* ══════════════════════════════════════════════════════════════
+   MOBILE — Bottom Sheet Layout (Google Maps style)
+   ══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
     .leaflet-routing-container {
         right: 8px !important;
@@ -1061,125 +1064,134 @@ body {
         max-height: 38vh !important;
         border-radius: 10px !important;
     }
-}
 
-@media (max-width: 767px) {
-    :root {
-        font-size: 14px;
-    }
+    :root { font-size: 14px; }
 
+    /* ── App shell: relative container untuk map + bottom sheet ── */
     .app-shell {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        min-height: 100vh;
+        position: relative;
+        height: 100svh;
+        height: 100vh;          /* fallback */
         overflow: hidden;
         padding: 0;
         gap: 0;
-        background: var(--wash);
+        background: #e8e0d8;
     }
 
-    .sidebar-panel {
+    /* ── Map: penuh layar di belakang ── */
+    .map-wrap {
         order: 1;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100% !important;
+        border-radius: 0;
+        z-index: 1;
+    }
+    #map { height: 100% !important; width: 100%; }
+    .map-badge { display: none; }
+
+    /* ── Sidebar: bottom sheet ── */
+    .sidebar-panel {
+        order: 2;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
         width: 100%;
         min-width: 0;
-        height: 55vh;
-        max-height: 55vh;
-        border-radius: 0;
-        border-bottom: 2px solid var(--line);
-        padding: 12px;
-        overflow-y: auto;
+        height: auto;
+        max-height: 82svh;
+        max-height: 82vh;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        padding: 0;
+        overflow: hidden;
+        z-index: 2000;
+        box-shadow: 0 -6px 32px rgba(0,0,0,0.22);
+        transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+        transform: translateY(calc(100% - 156px)); /* collapsed: 156px terlihat */
+        display: flex;
+        flex-direction: column;
+        background: var(--panel, #fff);
         -webkit-overflow-scrolling: touch;
-        box-shadow: none;
+    }
+    .sidebar-panel.sheet-open {
+        transform: translateY(0);
+        overflow-y: auto;
     }
 
-    .brand-banner {
-        min-height: 110px;
-        padding: 12px;
-        border-radius: 6px;
+    /* ── Handle tarik (drag bar) ── */
+    .sheet-handle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 16px 4px;
+        cursor: pointer;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
     }
-
-    .brand-banner h1 {
-        max-width: 15ch;
-        font-size: 1.35rem;
-        margin: 10px 0 8px;
+    .sheet-handle-bar {
+        width: 40px;
+        height: 4px;
+        background: rgba(0,0,0,0.18);
+        border-radius: 2px;
+        margin-bottom: 10px;
     }
-
-    .brand-banner p {
-        max-width: 28ch;
-        font-size: 0.85rem;
+    /* Judul mini saat collapsed */
+    .sheet-collapsed-hint {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--teal, #008c8c);
+        letter-spacing: 0.4px;
+        margin-bottom: 6px;
+        opacity: 1;
+        transition: opacity 0.2s;
     }
+    .sidebar-panel.sheet-open .sheet-collapsed-hint { opacity: 0; height: 0; margin: 0; overflow: hidden; }
 
-    .eyebrow {
-        font-size: 0.65rem;
-    }
+    /* ── Sembunyikan elemen berat saat collapsed ── */
+    .brand-banner { display: none; }
+    .stats-strip  { display: none; }
+    .sidebar-panel.sheet-open .stats-strip { display: flex; margin: 0 12px 8px; gap: 8px; }
+    .sidebar-panel.sheet-open .stats-strip div { padding: 10px; }
+    .sidebar-panel.sheet-open .stats-strip strong { font-size: 1.05rem; }
 
-    .stats-strip {
-        gap: 8px;
-        margin: 8px 0;
-    }
-
-    .stats-strip div {
-        padding: 10px;
-    }
-
-    .stats-strip strong {
-        font-size: 1.05rem;
-    }
-
+    /* ── Control stack compact ── */
     .control-stack {
-        padding: 12px;
-        margin: 0 0 8px;
+        padding: 4px 12px 8px;
+        margin: 0;
+        gap: 6px;
     }
-
-    .control-stack label {
-        margin: 0 0 6px;
-    }
-
+    .control-stack label { margin: 0 0 3px; font-size: 0.78rem; }
     .control-stack input,
-    .control-stack select,
-    .control-stack button {
-        height: 42px;
-        min-height: 42px;
+    .control-stack select {
+        height: 44px;
+        min-height: 44px;
         font-size: 1rem;
+        border-radius: 10px;
+    }
+    .control-stack button {
+        height: 44px;
+        min-height: 44px;
+        font-size: 0.95rem;
+        border-radius: 10px;
     }
 
-    .list-header {
-        margin-top: 12px;
-        font-size: 0.9rem;
-    }
+    /* ── Sidebar expand chevron: sembunyikan (pakai handle drag) ── */
+    .sidebar-expand-btn { display: none !important; }
 
-    .place-list {
-        padding-bottom: 8px;
-    }
+    /* ── Place list & card ── */
+    .list-header { margin: 8px 12px 4px; font-size: 0.9rem; }
+    .place-list  { padding: 0 12px 80px; }
+    .place-card  { gap: 10px; padding: 10px 10px 10px 8px; grid-template-columns: 64px 1fr; }
+    .place-card img { width: 64px; height: 64px; }
+    .place-card h5  { font-size: 0.9rem; }
 
-    .place-card {
-        gap: 10px;
-        padding: 10px 10px 10px 8px;
-        grid-template-columns: 66px 1fr;
-    }
+    /* ── AI route panel ── */
+    #ai-route-panel { margin: 0 12px 8px; }
 
-    .place-card img {
-        width: 66px;
-        height: 66px;
-    }
-
-    .place-card h5 {
-        font-size: 0.92rem;
-    }
-
-    .map-wrap {
-        order: 2;
-        height: 45vh;
-        min-height: 45vh;
-        border-radius: 0;
-    }
-
-    #map {
-        height: 45vh;
-    }
-
-    .map-badge {
-        display: none;
-    }
+    /* ── Route info panel ── */
+    #routing-info { margin: 0 12px 8px; }
 }

@@ -2,7 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2D5016">
 <meta name="description" content="Jelajahi lebih dari 200 destinasi wisata pilihan di Bandung melalui peta interaktif.">
 <title>WisataBandung — Peta Wisata Kota Kembang</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -1150,13 +1153,55 @@ nav.scrolled {
 }
 
 @media (max-width: 768px) {
-  nav { padding: 1rem 1.5rem; }
+  nav { padding: 0.9rem 1.2rem; }
   .nav-links { display: none; }
-  .hero { padding: 2.5rem 1.5rem; }
-  .categories, .destinations, .features, .itinerary, .reviews, .events, .cta { padding-left: 1.5rem; padding-right: 1.5rem; }
-  .map-section { margin: 0 1.5rem 2.5rem; }
-  footer { grid-template-columns: 1fr 1fr; padding: 2rem 1.5rem; }
-  .footer-bottom { padding: 1rem 1.5rem; }
+  .hero { padding: 2.5rem 1.2rem; }
+  .categories, .destinations, .features, .itinerary, .reviews, .events, .cta { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .map-section { margin: 0 1.2rem 2.5rem; }
+  footer { grid-template-columns: 1fr 1fr; padding: 2rem 1.2rem; }
+  .footer-bottom { padding: 1rem 1.2rem; }
+
+  /* Hero typography */
+  .hero h1 { font-size: 2.3rem; }
+  .hero-eyebrow { font-size: 0.75rem; }
+  .hero-buttons { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .hero-buttons a, .hero-buttons button { text-align: center; width: 100%; }
+
+  /* AI Planner chips wrap */
+  .chip-group { gap: 0.5rem; }
+  .chip { padding: 0.45rem 1rem; font-size: 0.82rem; }
+
+  /* Itinerary section */
+  .itinerary { padding-top: 3rem; padding-bottom: 3rem; }
+  .itinerary-inner { gap: 1.5rem; }
+  .planner-box { padding: 1.5rem 1.2rem; border-radius: 12px; }
+  .planner-box h3 { font-size: 1.3rem; }
+
+  /* Destinations grid: 1 col */
+  .dest-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Categories: 3 col */
+  .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+
+  /* Features */
+  .features-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Reviews */
+  .reviews-grid { grid-template-columns: 1fr; }
+
+  /* Events */
+  .events-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+
+  /* CTA */
+  .cta-buttons { flex-direction: column; gap: 0.8rem; }
+  .cta-buttons a { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.9rem; }
+  .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  nav { padding: 0.8rem 1rem; }
+  .logo { font-size: 1.2rem; }
 }
 </style>
 </head>
