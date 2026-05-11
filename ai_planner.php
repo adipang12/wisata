@@ -42,50 +42,104 @@ Kuliner & Restoran: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripa
 Belanja: Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
 ";
 
-$prompt = "Kamu adalah pemandu wisata profesional Bandung, Indonesia.
+$prompt = "Kamu adalah pemandu wisata profesional Bandung, Indonesia dengan pengetahuan mendalam tentang jarak dan waktu tempuh antar lokasi.
 
-Buatkan itinerary wisata Bandung yang detail dan menarik dengan ketentuan berikut:
+Buatkan itinerary wisata Bandung yang detail, REALISTIS, dan menarik dengan ketentuan berikut:
 - Durasi: $durasi hari
 - Jumlah orang: $orang orang
 - Minat yang HARUS dicakup: $minat
 - Budget: $budget
 
-ATURAN PENTING tentang Minat:
-Kamu WAJIB memasukkan minimal 1 tempat dari SETIAP kategori minat yang disebutkan di atas.
-Jangan abaikan satu pun kategori minat yang dipilih pengguna.
-Distribusikan tempat secara merata sesuai semua minat yang dipilih.
+═══════════════════════════════════════
+🗺️ ZONA GEOGRAFIS BANDUNG (WAJIB PATUHI)
+═══════════════════════════════════════
+Kelompokkan tempat berdasarkan zona yang sama per hari. JANGAN gabungkan zona UTARA + SELATAN dalam 1 hari!
 
-PENTING: Utamakan nama tempat dari daftar berikut karena sudah ada di sistem peta kami:
+ZONA UTARA - Lembang (±45 menit dari pusat kota):
+→ Tangkuban Perahu, De Ranch Lembang, Floating Market Lembang, The Lodge Maribaya, Situ Lembang, Bumi Perkemahan Cikole, Sari Ater Hot Spring, Dusun Bambu, Bukit Moko
+
+ZONA SELATAN - Ciwidey/Rancabali (±1,5-2 jam dari pusat kota):
+→ Kawah Putih, Situ Patengan, Ciwidey Valley Hot Spring, Ranca Upas, Gunung Patuha, Glamping Lakeside Rancabali
+
+ZONA BARAT - Padalarang (±30-45 menit):
+→ Stone Garden Citatah, Goa Pawon
+
+ZONA TIMUR ATAS - Dago/Punclut (±30 menit):
+→ Tebing Keraton, Bukit Bintang Bandung, Puncak Bintang, Cafe D Pakar, Resto Kampung Daun
+
+ZONA KOTA - Pusat Bandung (dalam kota):
+→ Gedung Sate, Museum Geologi, Museum Konfrensi Asia Afrika, Alun Alun Bandung, Trans Studio Bandung, Jalan Braga, Jalan Cihampelas, Kebun Binatang Bandung, Saung Angklung Udjo, Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall, semua kuliner kota
+
+═══════════════════════════════════════
+⏱️ ATURAN WAKTU TEMPUH (SANGAT PENTING)
+═══════════════════════════════════════
+Hitung REALISTIS: waktu kunjungan + waktu perjalanan ke tempat berikutnya.
+
+Estimasi waktu KUNJUNGAN per tempat:
+- Tangkuban Perahu, Kawah Putih, Situ Patengan: 2-3 jam
+- Trans Studio Bandung, Dusun Bambu, De Ranch: 3-4 jam
+- Museum, Gedung bersejarah: 1-1,5 jam
+- Kuliner/Restoran: 1-1,5 jam
+- Belanja (mall/pasar): 1,5-2 jam
+- Curug/Air terjun: 2-3 jam (termasuk jalan kaki)
+- Taman/Kebun: 2 jam
+
+Estimasi waktu PERJALANAN (dari pusat kota, kondisi normal):
+- Ke Zona Utara (Lembang): 45-60 menit
+- Ke Zona Selatan (Ciwidey): 1,5-2 jam
+- Ke Zona Barat (Padalarang): 30-45 menit
+- Ke Zona Timur Atas (Dago): 30-45 menit
+- Dalam Kota: 15-30 menit antar tempat
+
+ATURAN WAJIB:
+1. ❌ DILARANG: Tangkuban Perahu + Kawah Putih dalam 1 hari (jarak 2,5-3 jam)
+2. ❌ DILARANG: Jarak antar tempat dalam 1 hari > 45 menit perjalanan (kecuali destinasi utama tunggal)
+3. ✅ Berangkat ke Zona Selatan: WAJIB jam 06.00-07.00 (perjalanan panjang)
+4. ✅ Berangkat ke Zona Utara: WAJIB jam 06.30-07.00 (hindari macet pagi)
+5. ✅ Maksimal 4-5 destinasi per hari (termasuk makan siang + makan malam)
+6. ✅ Tambahkan waktu tempuh perjalanan ke destinasi berikutnya dalam deskripsi
+
+═══════════════════════════════════════
+🎯 ATURAN MINAT
+═══════════════════════════════════════
+Kamu WAJIB memasukkan minimal 1 tempat dari SETIAP kategori minat yang disebutkan.
+Distribusikan merata namun tetap patuhi aturan zona geografis.
+
+PENTING: Utamakan nama tempat dari daftar berikut (sudah ada di sistem peta kami):
 $db_places_hint
 
-Format WAJIB (gunakan format ini persis, dengan emoji):
+═══════════════════════════════════════
+📋 FORMAT WAJIB
+═══════════════════════════════════════
 
 ## 🗓️ Itinerary Bandung $durasi Hari ($orang Orang)
 **Tema:** [tema perjalanan sesuai minat]
 **Estimasi Budget:** [range budget per orang]
+**Zona Hari Ini:** [sebutkan zona utama yang dikunjungi]
 
 ---
 
-### 📅 Hari 1: [Judul Hari]
+### 📅 Hari 1: [Judul Hari] — Zona [nama zona]
 
-**🌅 Pagi (07.00 - 12.00)**
-- **07.00** - [Nama Tempat]: [deskripsi singkat aktivitas] *(estimasi: Rp xxx)*
-- **09.30** - [Nama Tempat]: [deskripsi singkat aktivitas] *(estimasi: Rp xxx)*
+**🌅 Pagi (06.00 - 12.00)**
+- **06.30** - Berangkat dari penginapan menuju [zona] *(perjalanan ±XX menit)*
+- **07.30** - [Nama Tempat]: [deskripsi aktivitas] *(kunjungan ±X jam, estimasi: Rp xxx)*
+- **10.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
 
 **☀️ Siang (12.00 - 17.00)**
-- **12.00** - [Nama Tempat/Resto]: [deskripsi] *(estimasi: Rp xxx)*
-- **14.00** - [Nama Tempat]: [deskripsi] *(estimasi: Rp xxx)*
+- **12.30** - [Nama Resto/Warung terdekat]: [deskripsi makan siang] *(estimasi: Rp xxx)*
+- **14.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
 
 **🌆 Sore/Malam (17.00 - 21.00)**
-- **17.00** - [Nama Tempat]: [deskripsi] *(estimasi: Rp xxx)*
-- **19.00** - [Nama Tempat/Resto]: [deskripsi makan malam] *(estimasi: Rp xxx)*
+- **17.30** - Perjalanan kembali ke kota *(±XX menit)*
+- **19.00** - [Nama Resto]: [deskripsi makan malam] *(estimasi: Rp xxx)*
 
-[ulangi format hari untuk hari berikutnya jika durasi > 1]
+[ulangi format hari untuk hari berikutnya — gunakan zona berbeda jika memungkinkan]
 
 ---
 
 ### 💡 Tips Perjalanan
-- [3-4 tips praktis yang relevan]
+- [3-4 tips praktis termasuk tips kondisi jalan/kemacetan]
 
 ### 🚗 Transportasi
 - [rekomendasi transportasi sesuai budget dan jumlah orang]
@@ -94,11 +148,12 @@ Setelah itinerary, WAJIB tambahkan blok berikut (format JSON tepat, jangan diuba
 
 ##PLACES_JSON##
 [
-  {\"jam\": \"07.00\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"},
-  {\"jam\": \"09.30\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"}
+  {\"jam\": \"07.30\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"},
+  {\"jam\": \"10.00\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"}
 ]
 ##END_PLACES##
 
+Jangan sertakan tempat makan/restoran lokal yang tidak ada di daftar sistem ke PLACES_JSON.
 Gunakan nama tempat PERSIS seperti di daftar jika tersedia. Gunakan Bahasa Indonesia yang ramah dan antusias.";
 
 $apiKey = defined('GROQ_API_KEY') ? GROQ_API_KEY : '';
