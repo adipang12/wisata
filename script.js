@@ -3,6 +3,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 var layerGroup = L.layerGroup().addTo(map);
 var allData = [];
+var _markersByName = {}; // { namaLower: {marker, lat, lon, d} }
 var userMarker;
 var userLocation = null;
 var renderToken = 0;
@@ -230,6 +231,32 @@ fetch('get_wisata.php')
 
     applyFilters();
 
+    // ── Baca URL param ?place= → zoom & buka popup marker ────────────────
+    (function applyPlaceParam() {
+        var params = new URLSearchParams(window.location.search);
+        var placeName = params.get('place');
+        if (!placeName) return;
+        var key = decodeURIComponent(placeName).toLowerCase();
+        var found = _markersByName[key];
+        // fallback: partial match
+        if (!found) {
+            var keys = Object.keys(_markersByName);
+            var partialKey = keys.find(function(k) {
+                return k.indexOf(key) !== -1 || key.indexOf(k) !== -1;
+            });
+            if (partialKey) found = _markersByName[partialKey];
+        }
+        if (found) {
+            setTimeout(function() {
+                map.setView([found.lat, found.lon], 17);
+                found.marker.openPopup();
+                fetchRealPhoto(found.d).then(function(realPhoto) {
+                    updatePhotoElements(found.d, realPhoto);
+                });
+            }, 300);
+        }
+    })();
+
     // Gambar rute AI setelah semua marker selesai dimuat (tidak ada race condition)
     if (window._pendingAIRestore) {
         var places = window._pendingAIRestore;
@@ -306,6 +333,8 @@ function renderUI(data) {
         // Marker Peta dengan warna by kategori
         let markerColor = getMarkerColor(d.kategori);
         let marker = L.marker([lat, lon], {icon: createColoredMarkerIcon(markerColor)}).addTo(layerGroup);
+        // Simpan untuk akses via ?place= URL param
+        _markersByName[namaRaw.toLowerCase()] = { marker, lat, lon, d };
         marker.bindPopup(`
             <div class="wp-img-wrap">
                 <img src="${photo}" alt="${nama}" data-photo-key="${photoKey}">
