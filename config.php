@@ -1,9 +1,9 @@
 <?php
-// Isi dengan API key dari Google Maps Platform yang sudah mengaktifkan Places API (New).
-define('GOOGLE_MAPS_API_KEY', '');
+// Semua key dibaca dari environment variable (.env file di VPS)
+// Jangan isi langsung di sini — gunakan .env
 
-// Groq API Key — ambil gratis di https://console.groq.com (6000 req/hari)
-define('GROQ_API_KEY', '');
+define('GOOGLE_MAPS_API_KEY', getenv('GOOGLE_MAPS_API_KEY') ?: '');
+define('GROQ_API_KEY',        getenv('GROQ_API_KEY')        ?: '');
 
 // Opsional: true untuk coba foto gratis dari Wikimedia kalau Google tidak menemukan foto.
 define('ENABLE_WIKIMEDIA_FALLBACK', true);
