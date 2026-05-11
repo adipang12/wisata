@@ -97,10 +97,10 @@ if (empty($apiKey)) {
 
 $url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
-    'model'       => 'llama-3.3-70b-versatile',
+    'model'       => 'llama-3.1-8b-instant',   // 500K TPD vs 100K TPD llama-3.3-70b
     'messages'    => [['role' => 'user', 'content' => $prompt]],
     'temperature' => 0.8,
-    'max_tokens'  => 3000,
+    'max_tokens'  => 2500,
 ]);
 
 $ch = curl_init($url);
@@ -121,7 +121,18 @@ curl_close($ch);
 
 if ($response === false || $httpCode !== 200) {
     $detail = $response ? json_decode($response, true) : null;
-    $msg    = $detail['error']['message'] ?? 'Gagal menghubungi AI. Coba lagi.';
+    $rawMsg = $detail['error']['message'] ?? '';
+    // Terjemahkan pesan rate-limit ke bahasa yang ramah
+    if ($httpCode === 429 || stripos($rawMsg, 'rate limit') !== false || stripos($rawMsg, 'tokens per day') !== false) {
+        // Coba ekstrak waktu tunggu dari pesan
+        $wait = '';
+        if (preg_match('/try again in ([\d]+m[\d.]+s)/i', $rawMsg, $wm)) {
+            $wait = ' Coba lagi dalam ±' . $wm[1] . '.';
+        }
+        $msg = '⏳ Kuota AI harian sedang penuh.' . $wait . ' Silakan tunggu beberapa menit lalu coba lagi.';
+    } else {
+        $msg = $rawMsg ?: 'Gagal menghubungi AI. Coba lagi.';
+    }
     http_response_code(500);
     echo json_encode(['error' => $msg]);
     exit;
