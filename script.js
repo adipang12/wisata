@@ -210,6 +210,24 @@ fetch('get_wisata.php')
     }
 
     allData = data;
+
+    // ── Baca URL param ?kategori= dan apply filter langsung ──────────────
+    (function applyURLFilter() {
+        var params = new URLSearchParams(window.location.search);
+        var kat = params.get('kategori');
+        if (kat) {
+            var sel = document.getElementById('filter');
+            if (sel) {
+                sel.value = kat;
+                // Update label aktif di sidebar
+                var label = document.getElementById('category-label');
+                if (label) label.textContent = sel.options[sel.selectedIndex]
+                    ? sel.options[sel.selectedIndex].text.replace(/^[^\s]+\s/, '')
+                    : kat;
+            }
+        }
+    })();
+
     applyFilters();
 
     // Gambar rute AI setelah semua marker selesai dimuat (tidak ada race condition)
