@@ -144,44 +144,57 @@ body {
 }
 
 .brand-banner {
-    min-height: 188px;
-    padding: 20px;
+    min-height: 200px;
+    padding: 22px 20px 20px;
     color: white;
     background:
-        linear-gradient(180deg, rgba(23, 50, 77, 0.22), rgba(23, 50, 77, 0.72)),
+        linear-gradient(160deg, rgba(23,50,77,0.15) 0%, rgba(23,50,77,0.78) 100%),
         url("images/3.jpg") center / cover;
-    border-radius: 8px;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
 }
+.brand-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15,35,55,0.65) 0%, transparent 55%);
+    border-radius: inherit;
+    pointer-events: none;
+}
+.brand-banner > * { position: relative; z-index: 1; }
 
 .eyebrow {
     width: fit-content;
-    padding: 5px 8px;
+    padding: 4px 10px;
     color: #17324d;
-    background: #f9d36a;
-    border-radius: 6px;
-    font-size: 0.72rem;
+    background: #C4956A;
+    border-radius: 20px;
+    font-size: 0.68rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    margin-bottom: 10px;
 }
 
 .brand-banner h1 {
-    margin: 14px 0 10px;
-    font-size: 1.72rem;
+    margin: 0 0 8px;
+    font-size: 1.6rem;
     font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.3px;
+    line-height: 1.18;
+    letter-spacing: -0.4px;
     overflow-wrap: break-word;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.25);
 }
 
 .brand-banner p {
     max-width: 30ch;
     margin: 0;
-    color: rgba(255, 255, 255, 0.92);
-    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.85rem;
     line-height: 1.5;
     font-weight: 400;
 }
@@ -197,28 +210,33 @@ body {
 .control-stack,
 .place-card,
 .map-badge {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(220, 229, 238, 0.95);
-    border-radius: 8px;
-    box-shadow: 0 12px 28px rgba(23, 50, 77, 0.08);
+    background: #fff;
+    border: 1px solid #e8eef4;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(23, 50, 77, 0.07);
 }
 
 .stats-strip div {
-    padding: 12px;
+    padding: 14px 16px;
 }
 
 .stats-strip strong {
     display: block;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #17324d;
+    letter-spacing: -0.5px;
 }
 
 .stats-strip span {
     color: var(--muted);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
+    margin-top: 2px;
+    display: block;
 }
 
 .control-stack {
-    padding: 14px;
+    padding: 16px;
 }
 
 .control-stack label {
@@ -239,56 +257,65 @@ body {
     padding: 0 14px;
     color: var(--ink);
     background: #f8fbfd;
-    border: 1.5px solid var(--line);
-    border-radius: 8px;
+    border: 1.5px solid #e0e8f0;
+    border-radius: 10px;
     outline: none;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
 }
 
 .control-stack input::placeholder {
-    color: var(--muted);
+    color: #a0afc0;
 }
 
 .control-stack input:hover,
 .control-stack select:hover {
-    border-color: rgba(0, 140, 140, 0.5);
+    border-color: #b0c4d8;
     background: #ffffff;
 }
 
 .control-stack input:focus,
 .control-stack select:focus {
-    border-color: var(--teal);
-    box-shadow: 0 0 0 4px rgba(0, 140, 140, 0.12), inset 0 0 0 1px var(--teal);
+    border-color: #17324d;
+    box-shadow: 0 0 0 3px rgba(23,50,77,0.1);
     background: #ffffff;
+}
+
+.control-stack label {
+    display: block;
+    margin: 0 0 7px;
+    color: #17324d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .control-stack button {
     width: 100%;
-    min-height: 44px;
+    min-height: 46px;
     padding: 0 18px;
     color: white;
-    background: linear-gradient(135deg, var(--teal), var(--green));
+    background: #17324d;
     border: 0;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.3px;
     cursor: pointer;
-    box-shadow: 0 8px 18px rgba(0, 140, 140, 0.2);
-    transition: all 220ms ease;
-    position: relative;
-    overflow: hidden;
+    transition: all 200ms ease;
+    margin-bottom: 8px;
 }
 
 .control-stack button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0, 140, 140, 0.28);
+    background: #1e4266;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(23,50,77,0.22);
 }
 
 .control-stack button:active {
     transform: translateY(0);
-    box-shadow: 0 6px 14px rgba(0, 140, 140, 0.18);
+    box-shadow: none;
 }
 
 .list-header {
