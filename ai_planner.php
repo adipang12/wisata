@@ -24,12 +24,21 @@ if ($durasi < 1 || $durasi > 3) $durasi = 1;
 // Daftar tempat yang ADA di database (untuk membantu AI memakai nama persis)
 $db_places_hint = "
 TEMPAT WISATA tersedia di sistem kami (gunakan nama PERSIS seperti ini):
-Alam & Pemandangan: Tangkuban Perahu, Kawah Putih, Tebing Keraton, Bukit Moko, Bukit Bintang Bandung, Puncak Bintang, Situ Lembang, Curug Cimahi, Curug Malela, Stone Garden Citatah, The Lodge Maribaya, Sari Ater Hot Spring, Ciwidey Valley Hot Spring
-Wisata Kota: Gedung Sate, Gedung Merdeka, Alun Alun Bandung, Jalan Braga, Jalan Cihampelas
-Hiburan: Trans Studio Bandung, De Ranch Lembang, Dusun Bambu, Floating Market Lembang, Resto Kampung Daun, The Peak Resort, The Valley Bistro Cafe
-Museum: Museum Geologi, Museum Konfrensi Asia Afrika
-Seni & Budaya: Saung Angklung Udjo
-Kuliner Ikonik: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Cafe D Pakar, Floating Market Lembang, Dusun Bambu, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia
+
+Alam & Pemandangan: Tangkuban Perahu, Kawah Putih, Tebing Keraton, Bukit Moko, Bukit Bintang Bandung, Puncak Bintang, Situ Lembang, Curug Cimahi, Curug Malela, Stone Garden Citatah, The Lodge Maribaya, Sari Ater Hot Spring, Ciwidey Valley Hot Spring, Situ Patengan, Gunung Patuha
+
+Hiburan & Taman: Trans Studio Bandung, De Ranch Lembang, Dusun Bambu, Floating Market Lembang, The Peak Resort, The Valley Bistro Cafe
+
+Museum & Sejarah: Museum Geologi, Museum Konfrensi Asia Afrika, Gedung Sate, Gedung Merdeka
+
+Seni & Budaya: Saung Angklung Udjo, Jalan Braga, Alun Alun Bandung, Jalan Cihampelas
+
+Camping & Alam Terbuka: Ranca Upas, Bumi Perkemahan Cikole, Glamping Lakeside Rancabali
+
+Kebun Binatang: Kebun Binatang Bandung
+
+Kuliner & Restoran: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Cafe D Pakar, Resto Kampung Daun, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia, Sindang Reret Naripan
+
 Belanja: Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
 ";
 
@@ -38,8 +47,13 @@ $prompt = "Kamu adalah pemandu wisata profesional Bandung, Indonesia.
 Buatkan itinerary wisata Bandung yang detail dan menarik dengan ketentuan berikut:
 - Durasi: $durasi hari
 - Jumlah orang: $orang orang
-- Minat: $minat
+- Minat yang HARUS dicakup: $minat
 - Budget: $budget
+
+ATURAN PENTING tentang Minat:
+Kamu WAJIB memasukkan minimal 1 tempat dari SETIAP kategori minat yang disebutkan di atas.
+Jangan abaikan satu pun kategori minat yang dipilih pengguna.
+Distribusikan tempat secara merata sesuai semua minat yang dipilih.
 
 PENTING: Utamakan nama tempat dari daftar berikut karena sudah ada di sistem peta kami:
 $db_places_hint
