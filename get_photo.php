@@ -311,9 +311,22 @@ if ($cached) {
     respondPlaceInfo($cached);
 }
 
-// 1. Google Places (foto + detail lengkap — butuh API key)
+// 1. Google Places (detail lengkap: rating, alamat, jam, telp, website)
 $google = googlePlaceInfo($name, $lat, $lng, $fallbackPhoto);
 if ($google) {
+    // Jika foto Google gagal (billing foto belum aktif), cari foto dari Wikipedia
+    if ($google['photo'] === $fallbackPhoto) {
+        $wikiForPhoto = wikipediaPhoto($name, $lat, $lng);
+        if (!$wikiForPhoto || $wikiForPhoto['photo'] === $fallbackPhoto) {
+            if (defined('ENABLE_WIKIMEDIA_FALLBACK') && ENABLE_WIKIMEDIA_FALLBACK) {
+                $wikiForPhoto = wikimediaPhoto($name, $lat, $lng);
+            }
+        }
+        if ($wikiForPhoto && $wikiForPhoto['photo'] !== $fallbackPhoto) {
+            $google['photo']       = $wikiForPhoto['photo'];
+            $google['attribution'] = $wikiForPhoto['attribution'];
+        }
+    }
     writePlaceCache($name, $lat, $lng, $google);
     respondPlaceInfo($google);
 }
