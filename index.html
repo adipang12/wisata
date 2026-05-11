@@ -919,6 +919,100 @@ nav {
 .feat-card h3 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.45rem; }
 .feat-card p { font-size: 0.82rem; color: rgba(30,37,32,0.58); line-height: 1.65; }
 
+/* ── AI Feature Card (keunggulan utama) ── */
+.feat-card.feat-ai {
+  background: linear-gradient(135deg, #1e1b4b 0%, #1e3a5f 50%, #0f2a1e 100%);
+  border: none;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  grid-column: span 2;
+}
+@media (max-width: 600px) { .feat-card.feat-ai { grid-column: span 1; } }
+.feat-card.feat-ai::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(167,139,250,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(96,165,250,0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at 60% 90%, rgba(52,211,153,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+.feat-card.feat-ai:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(167,139,250,0.25); }
+.feat-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+.feat-ai-icon {
+  width: 54px; height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(167,139,250,0.3), rgba(96,165,250,0.3));
+  border: 1px solid rgba(167,139,250,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+.feat-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: linear-gradient(90deg, rgba(167,139,250,0.25), rgba(96,165,250,0.2));
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 20px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #a78bfa;
+  margin-bottom: 0.35rem;
+}
+.feat-card.feat-ai h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.feat-card.feat-ai p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+.feat-ai-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.feat-ai-tag {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.75);
+}
+.feat-ai-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%);
+  top: -60px; right: -40px;
+  pointer-events: none;
+  animation: ai-glow-pulse 3s ease-in-out infinite;
+}
+@keyframes ai-glow-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
 /* ITINERARY */
 .itinerary { padding: 3rem; background: var(--cream); }
 
@@ -1612,6 +1706,25 @@ nav.scrolled {
   <div class="section-label">Mengapa Kami</div>
   <div class="section-title">Fitur Unggulan Platform</div>
   <div class="feat-grid">
+    <!-- AI Feature Card — Keunggulan Utama -->
+    <div class="feat-card feat-ai">
+      <div class="feat-ai-glow"></div>
+      <div class="feat-ai-header">
+        <div class="feat-ai-icon">🤖</div>
+        <div>
+          <div class="feat-ai-badge">✦ Unggulan Utama</div>
+          <h3>AI Itinerary Planner</h3>
+        </div>
+      </div>
+      <p>Ceritakan preferensimu — minat, durasi, jumlah orang, dan budget — lalu biarkan AI kami merancang itinerary perjalanan Bandung yang personal, detail, dan siap pakai hanya dalam hitungan detik.</p>
+      <div class="feat-ai-tags">
+        <span class="feat-ai-tag">✨ Powered by Groq LLM</span>
+        <span class="feat-ai-tag">🗓️ 1–3 Hari</span>
+        <span class="feat-ai-tag">📍 Lokasi Real</span>
+        <span class="feat-ai-tag">💰 Estimasi Budget</span>
+        <span class="feat-ai-tag">🗺️ Rute di Peta</span>
+      </div>
+    </div>
     <div class="feat-card">
       <div class="feat-icon" style="background:#E1F5EE;">🗺️</div>
       <h3>Peta Interaktif Real-Time</h3>
