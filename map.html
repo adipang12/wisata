@@ -1198,8 +1198,8 @@
     /* ══ Auto-expand saat AI route aktif ════════════════════ */
     var _origDraw = window.drawAIRoute;
     if (_origDraw) {
-        window.drawAIRoute = function (places) {
-            _origDraw(places);
+        window.drawAIRoute = function (places, startCoords) {
+            _origDraw(places, startCoords);
             if (isMobile()) snapTo(true);
         };
     }
@@ -1327,6 +1327,32 @@
   font-size: 0.9rem; cursor: pointer; font-family: inherit;
 }
 .ap-select option { background: #1a2e1a; }
+
+/* Lokasi awal */
+.ap-location-row {
+  display: flex; gap: 8px; align-items: stretch;
+}
+.ap-location-input {
+  flex: 1; padding: 10px 12px; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: #f0ebe3;
+  font-size: 0.88rem; font-family: inherit; outline: none;
+}
+.ap-location-input::placeholder { opacity: 0.45; }
+.ap-location-input:focus { border-color: rgba(196,149,106,0.7); background: rgba(255,255,255,0.12); }
+.ap-loc-btn {
+  padding: 10px 12px; border-radius: 10px; white-space: nowrap;
+  border: 1.5px solid rgba(196,149,106,0.5);
+  background: rgba(196,149,106,0.15); color: #f0ebe3;
+  font-size: 0.82rem; cursor: pointer; font-family: inherit;
+  transition: background .15s;
+}
+.ap-loc-btn:hover { background: rgba(196,149,106,0.3); }
+.ap-loc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ap-loc-status {
+  font-size: 0.75rem; margin-top: 5px; min-height: 16px;
+  opacity: 0.65; padding-left: 2px;
+}
 
 .ap-submit {
   width: 100%; margin-top: 20px;
@@ -1463,6 +1489,16 @@
         <button class="ap-chip" data-val="Premium">🔴 Premium</button>
       </div>
 
+      <!-- Lokasi Awal -->
+      <div class="ap-label">📍 Lokasi Awal / Penginapan</div>
+      <div class="ap-location-row">
+        <input type="text" class="ap-location-input" id="ap-lokasi"
+               placeholder="cth: Hotel Savoy Homann, Jl. Asia Afrika…"
+               value="Pusat Kota Bandung">
+        <button class="ap-loc-btn" id="ap-loc-btn" onclick="apDetectLocation()">📍 Lokasiku</button>
+      </div>
+      <div class="ap-loc-status" id="ap-loc-status"></div>
+
       <button class="ap-submit" id="ap-submit" onclick="submitAIPlanMap()">✨ Buat Rencana & Tampilkan Rute</button>
 
       <div class="ap-loading" id="ap-loading">
@@ -1518,6 +1554,65 @@ function apGetVals(id) {
   return Array.from(document.querySelectorAll('#' + id + ' .ap-chip.active')).map(function(c) { return c.dataset.val; });
 }
 
+// ── Deteksi lokasi awal ──────────────────────────────────────
+var _apUserCoords = null; // { lat, lng, name }
+
+function apDetectLocation() {
+  var btn    = document.getElementById('ap-loc-btn');
+  var status = document.getElementById('ap-loc-status');
+  var input  = document.getElementById('ap-lokasi');
+
+  function reverseGeocode(lat, lng) {
+    status.textContent = '⏳ Mencari nama area…';
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng
+        + '&format=json&accept-language=id&zoom=14',
+      { headers: { 'User-Agent': 'WisataBandung/1.0' } })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var addr   = d.address || {};
+      var area   = addr.suburb || addr.village || addr.neighbourhood
+                 || addr.city_district || addr.town || addr.city || 'Bandung';
+      var label  = area + (addr.city && addr.city !== area ? ', ' + addr.city : '');
+      input.value = label;
+      status.textContent = '✅ Lokasi terdeteksi: ' + area;
+      _apUserCoords = { lat: lat, lng: lng, name: label };
+    })
+    .catch(function() {
+      input.value = 'Koordinat: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+      status.textContent = '✅ Koordinat tersimpan';
+      _apUserCoords = { lat: lat, lng: lng, name: input.value };
+    })
+    .finally(function() { btn.disabled = false; });
+  }
+
+  // Jika peta sudah punya lokasi user (dari tombol 📍 di peta)
+  if (window.userLocation && window.userLocation.lat) {
+    btn.disabled = true;
+    reverseGeocode(window.userLocation.lat, window.userLocation.lng);
+    return;
+  }
+
+  // Minta izin geolokasi baru
+  if (!navigator.geolocation) {
+    status.textContent = '❌ Browser tidak mendukung geolokasi. Ketik manual.';
+    return;
+  }
+  btn.disabled = true;
+  status.textContent = '⏳ Mendapatkan lokasi…';
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      reverseGeocode(lat, lng);
+    },
+    function() {
+      status.textContent = '❌ Izin lokasi ditolak. Silakan ketik manual.';
+      btn.disabled = false;
+    },
+    { timeout: 9000, maximumAge: 60000 }
+  );
+}
+
 // ── Modal open/close ─────────────────────────────────────────
 function openAIPlannerModal() {
   // Wajib login untuk menggunakan AI Planner
@@ -1550,6 +1645,8 @@ function openAIPlannerModal() {
           renderAPTimeline(saved.places || []);
           result.style.display    = 'block';
           bottomBar.style.display = 'block';
+          // Pulihkan startCoords ke variabel global agar tersedia bila submit lagi
+          if (saved.startCoords) _apUserCoords = saved.startCoords;
         }
       } catch(e) {}
     }
@@ -1604,15 +1701,23 @@ function submitAIPlanMap() {
   result.style.display  = 'none';
   bottomBar.style.display = 'none'; // sembunyikan bar saat loading
 
+  var lokasiAwal = (document.getElementById('ap-lokasi').value || '').trim() || 'Pusat Kota Bandung';
+  var payload = {
+    durasi : parseInt(apGetVal('ap-durasi')) || 1,
+    minat  : apGetVals('ap-minat'),
+    budget : apGetVal('ap-budget'),
+    orang  : parseInt(document.getElementById('ap-orang').value) || 2,
+    lokasi_awal: lokasiAwal,
+  };
+  if (_apUserCoords && _apUserCoords.lat) {
+    payload.lokasi_lat = _apUserCoords.lat;
+    payload.lokasi_lng = _apUserCoords.lng;
+  }
+
   fetch('ai_planner.php', {
     method : 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body   : JSON.stringify({
-      durasi : parseInt(apGetVal('ap-durasi')) || 1,
-      minat  : apGetVals('ap-minat'),
-      budget : apGetVal('ap-budget'),
-      orang  : parseInt(document.getElementById('ap-orang').value) || 2,
-    }),
+    body   : JSON.stringify(payload),
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
@@ -1626,15 +1731,17 @@ function submitAIPlanMap() {
 
     // Gambar rute di peta + simpan ke localStorage (persist lintas halaman)
     if (withCoords.length >= 1) {
+      var startCoords = _apUserCoords || null;
       localStorage.setItem('wb_ai_session', JSON.stringify({
-        places  : places,
-        durasi  : data.durasi,
-        result  : data.result,
-        aiStops : places.map(function(p) {
+        places     : places,
+        durasi     : data.durasi,
+        result     : data.result,
+        startCoords: startCoords,
+        aiStops    : places.map(function(p) {
           return { time: p.jam||'', name: p.nama||'', desc: p.kategori||'' };
         }),
       }));
-      drawAIRoute(places);
+      drawAIRoute(places, startCoords);
     }
 
     result.style.display    = 'block';

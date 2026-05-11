@@ -315,9 +315,10 @@ fetch('get_wisata.php')
 
     // Gambar rute AI setelah semua marker selesai dimuat (tidak ada race condition)
     if (window._pendingAIRestore) {
-        var places = window._pendingAIRestore;
+        var places = window._pendingAIRestore.places;
+        var startC = window._pendingAIRestore.startCoords || null;
         window._pendingAIRestore = null;
-        setTimeout(function() { drawAIRoute(places); }, 150);
+        setTimeout(function() { drawAIRoute(places, startC); }, 150);
     }
 })
 .catch(error => {
@@ -616,7 +617,7 @@ function makeAIIcon(i, color) {
 
 var DAY_COLORS = ['#e74c3c','#2980b9','#27ae60','#8e44ad','#e67e22'];
 
-function drawAIRoute(places) {
+function drawAIRoute(places, startCoords) {
     clearAIRoute(false); // false = jangan hapus localStorage saat redraw
 
     // Sembunyikan semua marker wisata biasa
@@ -633,7 +634,28 @@ function drawAIRoute(places) {
         byDay[d].push(Object.assign({}, p, { _idx: i }));
     });
 
-    // Marker bernomor per stop (warna berdasarkan hari)
+    // ── Marker titik awal / penginapan ───────────────────────────────────
+    if (startCoords && startCoords.lat && startCoords.lng) {
+        var homeIcon = L.divIcon({
+            className: '',
+            html: '<div style="background:#27ae60;color:#fff;width:34px;height:34px;border-radius:50%;'
+                + 'display:flex;align-items:center;justify-content:center;font-size:17px;'
+                + 'border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,0.5);">🏠</div>',
+            iconSize: [34, 34], iconAnchor: [17, 17],
+        });
+        var homeMarker = L.marker([startCoords.lat, startCoords.lng], { icon: homeIcon, zIndexOffset: 600 })
+            .addTo(map)
+            .bindPopup('<div style="min-width:140px"><b>📍 Titik Awal</b><br>' + (startCoords.name || 'Lokasi Kamu') + '</div>');
+        aiRouteMarkers.push(homeMarker);
+
+        // Sisipkan titik awal ke awal rute hari 1
+        var days0 = Object.keys(byDay).sort(function(a,b){ return a-b; });
+        if (days0.length > 0) {
+            byDay[days0[0]].unshift({ latitude: startCoords.lat, longitude: startCoords.lng, _isHome: true });
+        }
+    }
+
+    // Marker bernomor per stop (warna berdasarkan hari, skip titik home)
     withCoords.forEach(function(p, i) {
         var dayColor = DAY_COLORS[((p.hari || 1) - 1) % DAY_COLORS.length];
         var marker = L.marker([p.latitude, p.longitude], { icon: makeAIIcon(i, dayColor), zIndexOffset: 500 })
@@ -679,10 +701,11 @@ function drawAIRoute(places) {
         if (Array.isArray(aiRoutingControl)) aiRoutingControl.push(ctrl);
     });
 
-    // Fit bounds semua stops
-    if (withCoords.length > 0) {
-        var bounds = L.latLngBounds(withCoords.map(function(p){ return [p.latitude, p.longitude]; }));
-        map.fitBounds(bounds, { padding: [40, 40] });
+    // Fit bounds semua stops + titik awal
+    var allPts = withCoords.map(function(p){ return [p.latitude, p.longitude]; });
+    if (startCoords && startCoords.lat && startCoords.lng) allPts.push([startCoords.lat, startCoords.lng]);
+    if (allPts.length > 0) {
+        map.fitBounds(L.latLngBounds(allPts), { padding: [40, 40] });
     }
 
     // Panel sidebar — kelompokkan per hari
@@ -805,5 +828,5 @@ function submitAIPlannerMap() {
     if (!session || !session.places || session.places.length === 0) return;
     var withCoords = session.places.filter(function(p) { return p.latitude && p.longitude; });
     if (withCoords.length < 1) return;
-    window._pendingAIRestore = session.places;
+    window._pendingAIRestore = { places: session.places, startCoords: session.startCoords || null };
 })();

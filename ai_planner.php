@@ -13,13 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$input  = json_decode(file_get_contents('php://input'), true);
-$durasi = intval($input['durasi'] ?? 1);
-$minat  = implode(', ', (array)($input['minat'] ?? ['Alam']));
-$budget = $input['budget'] ?? 'Sedang';
-$orang  = intval($input['orang'] ?? 2);
+$input       = json_decode(file_get_contents('php://input'), true);
+$durasi      = intval($input['durasi'] ?? 1);
+$minat       = implode(', ', (array)($input['minat'] ?? ['Alam']));
+$budget      = $input['budget'] ?? 'Sedang';
+$orang       = intval($input['orang'] ?? 2);
+$lokasi_awal = trim($input['lokasi_awal'] ?? 'Pusat Kota Bandung');
+$lokasi_lat  = isset($input['lokasi_lat']) ? (float)$input['lokasi_lat'] : null;
+$lokasi_lng  = isset($input['lokasi_lng']) ? (float)$input['lokasi_lng'] : null;
 
 if ($durasi < 1 || $durasi > 3) $durasi = 1;
+if ($lokasi_awal === '') $lokasi_awal = 'Pusat Kota Bandung';
 
 // Daftar tempat yang ADA di database (untuk membantu AI memakai nama persis)
 $db_places_hint = "
@@ -49,6 +53,22 @@ Buatkan itinerary wisata Bandung yang detail, REALISTIS, dan menarik dengan kete
 - Jumlah orang: $orang orang
 - Minat yang HARUS dicakup: $minat
 - Budget: $budget
+- 📍 Titik awal / penginapan: $lokasi_awal
+
+═══════════════════════════════════════
+📍 TITIK AWAL PERJALANAN (WAJIB DIPATUHI)
+═══════════════════════════════════════
+Setiap hari dimulai DARI: $lokasi_awal
+
+ATURAN TITIK AWAL:
+1. Sebutkan \"$lokasi_awal\" sebagai titik berangkat di awal setiap hari
+2. Hitung waktu tempuh dari \"$lokasi_awal\" ke destinasi PERTAMA hari itu
+3. Sesuaikan jam berangkat berdasarkan jarak penginapan ke zona tujuan:
+   - Jika penginapan di PUSAT KOTA → pakai estimasi waktu standar zona
+   - Jika penginapan sudah di/dekat LEMBANG → kurangi 30-40 menit dari estimasi zona Utara
+   - Jika penginapan sudah di/dekat CIWIDEY → kurangi 45-60 menit dari estimasi zona Selatan
+   - Jika penginapan di DAGO/TIMUR → kurangi 15-20 menit dari estimasi zona Timur Atas
+4. Setiap malam, perhitungkan waktu kembali ke \"$lokasi_awal\"
 
 ═══════════════════════════════════════
 🗺️ ZONA GEOGRAFIS BANDUNG (WAJIB PATUHI)
@@ -122,7 +142,7 @@ $db_places_hint
 ### 📅 Hari 1: [Judul Hari] — Zona [nama zona]
 
 **🌅 Pagi (06.00 - 12.00)**
-- **06.30** - Berangkat dari penginapan menuju [zona] *(perjalanan ±XX menit)*
+- **06.30** - Berangkat dari $lokasi_awal menuju [zona] *(perjalanan ±XX menit dari penginapan)*
 - **07.30** - [Nama Tempat]: [deskripsi aktivitas] *(kunjungan ±X jam, estimasi: Rp xxx)*
 - **10.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
 
@@ -131,7 +151,7 @@ $db_places_hint
 - **14.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
 
 **🌆 Sore/Malam (17.00 - 21.00)**
-- **17.30** - Perjalanan kembali ke kota *(±XX menit)*
+- **17.30** - Perjalanan kembali ke $lokasi_awal *(±XX menit)*
 - **19.00** - [Nama Resto]: [deskripsi makan malam] *(estimasi: Rp xxx)*
 
 [ulangi format hari untuk hari berikutnya — gunakan zona berbeda jika memungkinkan]
