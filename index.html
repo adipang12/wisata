@@ -12,6 +12,12 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* Offset scroll agar section tidak tertutup navbar */
+#categories, #destinations, #features, #itinerary, #ai-planner, #events, #reviews {
+  scroll-margin-top: 72px;
+}
 :root {
   --cream: #F7F3EE;
   --earth: #C4956A;
