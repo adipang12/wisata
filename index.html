@@ -84,6 +84,9 @@ nav {
 .nav-links a:hover { opacity: 1; }
 
 /* ── AI Planning gradient nav link ── */
+.nav-links li.nav-ai-wrap {
+  position: relative;
+}
 .nav-links a.nav-ai {
   opacity: 1;
   font-weight: 700;
@@ -94,11 +97,93 @@ nav {
   background-clip: text;
   animation: ai-shimmer 4s linear infinite;
   letter-spacing: 1.5px;
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), filter 0.3s;
+  display: inline-block;
+  position: relative;
 }
-.nav-links a.nav-ai:hover { opacity: 1; }
+
+/* Hover: speed up shimmer + glow + scale */
+.nav-links a.nav-ai:hover {
+  opacity: 1;
+  animation: ai-shimmer 1s linear infinite;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 6px rgba(167,139,250,0.7)) drop-shadow(0 0 12px rgba(96,165,250,0.5));
+}
+
+/* Tooltip */
+.nav-links a.nav-ai::after {
+  content: '✨ Powered by AI';
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: linear-gradient(135deg, #1e1b4b, #1e3a5f);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(167,139,250,0.4), 0 0 0 1px rgba(167,139,250,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  text-transform: none;
+  -webkit-text-fill-color: #fff;
+  background-clip: unset;
+  -webkit-background-clip: unset;
+  z-index: 999;
+}
+.nav-links a.nav-ai:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Sparkle stars */
+.nav-links a.nav-ai::before {
+  content: '★';
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  font-size: 0.55rem;
+  color: #fbbf24;
+  opacity: 0;
+  transform: scale(0) rotate(0deg);
+  transition: opacity 0.3s, transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+  -webkit-text-fill-color: #fbbf24;
+}
+.nav-links a.nav-ai:hover::before {
+  opacity: 1;
+  transform: scale(1.4) rotate(20deg);
+}
+
 @keyframes ai-shimmer {
   0%   { background-position: 0% 50%; }
   100% { background-position: 300% 50%; }
+}
+
+/* Floating sparkle particles via li wrapper */
+.nav-ai-wrap::before,
+.nav-ai-wrap::after {
+  content: '✦';
+  position: absolute;
+  font-size: 0.5rem;
+  color: #a78bfa;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.5s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-ai-wrap::before { top: -6px; left: 2px; }
+.nav-ai-wrap::after  { bottom: -6px; right: 2px; color: #34d399; }
+.nav-ai-wrap:hover::before {
+  opacity: 1;
+  transform: translateY(-6px) rotate(-15deg) scale(1.3);
+}
+.nav-ai-wrap:hover::after {
+  opacity: 1;
+  transform: translateY(6px) rotate(15deg) scale(1.3);
 }
 
 /* ── Kategori dropdown (index) ── */
@@ -1311,7 +1396,7 @@ nav.scrolled {
     <li><a href="#destinations">Destinasi</a></li>
     <li><a href="#features">Fitur</a></li>
     <li><a href="#itinerary">Itinerary</a></li>
-    <li><a href="#ai-planner" class="nav-ai">AI Planning</a></li>
+    <li class="nav-ai-wrap"><a href="#ai-planner" class="nav-ai">AI Planning</a></li>
     <li><a href="#events">Event</a></li>
     <li><a href="#reviews">Ulasan</a></li>
     <li><a href="#about">About Us</a></li>
