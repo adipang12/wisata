@@ -1918,7 +1918,7 @@ nav.scrolled {
   <p>Buka peta interaktif dan temukan destinasi wisata impianmu sekarang — gratis dan selalu lengkap.</p>
   <div class="cta-actions">
     <a href="map.html" class="btn-primary">🗺️ Buka Peta Interaktif</a>
-    <button class="btn-ghost" onclick="openModal('register')">Daftar Gratis</button>
+    <button class="btn-ghost" id="cta-register-btn" onclick="openModal('register')">Daftar Gratis</button>
   </div>
 </section>
 
@@ -2154,6 +2154,10 @@ function updateNavAuth(name, role) {
     +   '</button>'
     + '</div>'
     + '</div>';
+
+  // Sembunyikan tombol "Daftar Gratis" di CTA jika sudah login
+  var ctaBtn = document.getElementById('cta-register-btn');
+  if (ctaBtn) ctaBtn.style.display = 'none';
 }
 
 function toggleProfileDropdown(e) {
