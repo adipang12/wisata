@@ -699,8 +699,11 @@ function submitAIPlannerMap() {
 }
 
 // ── Auto-restore AI route dari localStorage (lintas halaman) ──────────────
-// Simpan session ke flag global — akan digambar setelah markers selesai load
+// Jangan restore jika user datang dari klik kategori (?kategori= di URL)
 (function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('kategori')) return; // user mau lihat kategori, bukan rute AI
+
     var raw = localStorage.getItem('wb_ai_session');
     if (!raw) return;
     var session;
@@ -708,5 +711,5 @@ function submitAIPlannerMap() {
     if (!session || !session.places || session.places.length === 0) return;
     var withCoords = session.places.filter(function(p) { return p.latitude && p.longitude; });
     if (withCoords.length < 1) return;
-    window._pendingAIRestore = session.places; // ditangkap setelah get_wisata.php selesai
+    window._pendingAIRestore = session.places;
 })();
