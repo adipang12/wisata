@@ -896,6 +896,10 @@ nav {
   font-family: 'DM Sans', sans-serif;
 }
 .iter-tab.active { background: var(--forest); color: #fff; }
+.iter-tab-loc { border-color: #2980b9; color: #2980b9; }
+.iter-tab-loc.active { background: #2980b9; color: #fff; }
+.iter-tab-ai  { border-color: var(--earth); color: var(--earth); }
+.iter-tab-ai.active { background: linear-gradient(135deg, var(--forest), var(--earth)); color: #fff; }
 .iter-row {
   display: flex;
   gap: 0.8rem;
@@ -1462,53 +1466,15 @@ nav.scrolled {
 <section class="itinerary reveal" id="itinerary">
   <div class="section-label">Inspirasi Perjalanan</div>
   <div class="section-title">Rute Wisata Sehari</div>
-  <p class="section-sub">Ikuti rute yang telah dikurasi atau eksplorasi sendiri dengan peta interaktif.</p>
-  <div class="iter-tabs">
-    <div class="iter-tab active">🏔️ Bandung Utara</div>
-    <div class="iter-tab">🌊 Bandung Selatan</div>
-    <div class="iter-tab">🏛️ Wisata Kota</div>
+  <p class="section-sub">Pilih rute dikurasi, pakai lokasi kamu, atau biarkan AI merancangnya!</p>
+  <div class="iter-tabs" id="iter-tabs">
+    <div class="iter-tab active" data-route="utara">🏔️ Bandung Utara</div>
+    <div class="iter-tab" data-route="selatan">🌊 Bandung Selatan</div>
+    <div class="iter-tab" data-route="kota">🏛️ Wisata Kota</div>
+    <div class="iter-tab iter-tab-loc" data-route="lokasi" id="tab-lokasi">📍 Dekat Saya</div>
   </div>
   <div id="iter-content">
-    <div class="iter-row">
-      <div class="iter-time">07.00</div>
-      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
-      <div>
-        <div class="iter-name">Sarapan di Warung Nasi Ampera</div>
-        <div class="iter-desc">Mulai hari dengan nasi sunda tradisional yang autentik dan mengenyangkan</div>
-      </div>
-    </div>
-    <div class="iter-row">
-      <div class="iter-time">09.00</div>
-      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
-      <div>
-        <div class="iter-name">Tangkuban Perahu</div>
-        <div class="iter-desc">Menikmati kawah vulkanik aktif dan udara sejuk pegunungan Lembang</div>
-      </div>
-    </div>
-    <div class="iter-row">
-      <div class="iter-time">12.00</div>
-      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
-      <div>
-        <div class="iter-name">Floating Market Lembang</div>
-        <div class="iter-desc">Kuliner unik di atas danau dengan suasana alam yang sejuk</div>
-      </div>
-    </div>
-    <div class="iter-row">
-      <div class="iter-time">14.30</div>
-      <div class="iter-dot-col"><div class="iter-dot"></div><div class="iter-line"></div></div>
-      <div>
-        <div class="iter-name">Farm House Lembang</div>
-        <div class="iter-desc">Wisata agro bergaya Eropa dengan aneka spot foto tematik yang populer</div>
-      </div>
-    </div>
-    <div class="iter-row">
-      <div class="iter-time">17.00</div>
-      <div class="iter-dot-col"><div class="iter-dot"></div></div>
-      <div>
-        <div class="iter-name">Sunset di The Lodge Maribaya</div>
-        <div class="iter-desc">Tutup hari dengan pemandangan panorama kota Bandung dari ketinggian</div>
-      </div>
-    </div>
+    <!-- diisi oleh JavaScript -->
   </div>
 
   <!-- AI PLANNER -->
@@ -1911,12 +1877,118 @@ fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json
   .catch(() => {});
 
 // Itinerary tabs
-document.querySelectorAll('.iter-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
-    tab.classList.add('active');
+// ── Rute Wisata Sehari — data + tab logic ─────────────────────────────
+var CURATED_ROUTES = {
+  utara: [
+    { time:'07.00', name:'Sarapan di Warung Nasi Ampera',    desc:'Mulai hari dengan nasi sunda tradisional yang autentik dan mengenyangkan' },
+    { time:'09.00', name:'Tangkuban Perahu',                 desc:'Menikmati kawah vulkanik aktif dan udara sejuk pegunungan Lembang' },
+    { time:'12.00', name:'Floating Market Lembang',          desc:'Kuliner unik di atas danau dengan suasana alam yang sejuk' },
+    { time:'14.30', name:'Dusun Bambu',                      desc:'Wisata alam dan kuliner di suasana pedesaan Lembang yang asri' },
+    { time:'17.00', name:'The Lodge Maribaya',               desc:'Tutup hari dengan pemandangan panorama kota Bandung dari ketinggian' },
+  ],
+  selatan: [
+    { time:'06.30', name:'Kawah Putih',                      desc:'Danau kawah berwarna putih kehijauan yang memukau di pagi hari' },
+    { time:'10.00', name:'Situ Patengan',                    desc:'Danau hijau dikelilingi kebun teh yang menenangkan jiwa' },
+    { time:'12.30', name:'Warung Nasi Bancakan',             desc:'Makan siang dengan masakan sunda autentik yang terkenal' },
+    { time:'14.30', name:'Ciwidey Valley Hot Spring',        desc:'Berendam di kolam air panas alami yang menyegarkan' },
+    { time:'17.00', name:'Bukit Bintang Bandung',            desc:'Nikmati panorama kerlap-kerlip lampu kota saat senja tiba' },
+  ],
+  kota: [
+    { time:'08.00', name:'Kopi Progo',                       desc:'Kopi legendaris Bandung sejak 1930 di kawasan pusat kota' },
+    { time:'09.30', name:'Museum Geologi',                   desc:'Pelajari sejarah geologi dan fosil langka dari seluruh Indonesia' },
+    { time:'11.00', name:'Gedung Sate',                      desc:'Ikon arsitektur kolonial Bandung yang megah dan bersejarah' },
+    { time:'13.00', name:'Jalan Braga',                      desc:'Berjalan di kawasan vintage paling ikonik Bandung sambil makan siang' },
+    { time:'15.00', name:'Saung Angklung Udjo',              desc:'Nikmati pertunjukan seni budaya Sunda yang memukau' },
+    { time:'19.00', name:'Batagor Kingsley',                 desc:'Tutup hari dengan batagor legendaris khas Bandung' },
+  ],
+};
+
+function renderIterContent(stops, badge) {
+  var content = document.getElementById('iter-content');
+  if (!content) return;
+  var html = '';
+  if (badge) html += '<div style="margin-bottom:12px;font-size:0.8rem;font-weight:700;color:var(--earth);letter-spacing:0.5px;">' + badge + '</div>';
+  stops.forEach(function(s, i) {
+    var isLast = i === stops.length - 1;
+    html += '<div class="iter-row">'
+      + '<div class="iter-time">' + (s.time || s.jam || '') + '</div>'
+      + '<div class="iter-dot-col"><div class="iter-dot"></div>' + (isLast ? '' : '<div class="iter-line"></div>') + '</div>'
+      + '<div><div class="iter-name">' + (s.name || s.nama || '') + '</div>'
+      + '<div class="iter-desc">' + (s.desc || s.review || s.jarak_desc || '') + '</div></div>'
+      + '</div>';
   });
+  content.innerHTML = html;
+  content.style.opacity = '0';
+  setTimeout(function() { content.style.transition = 'opacity 0.35s'; content.style.opacity = '1'; }, 10);
+}
+
+// Inisialisasi tab utara
+renderIterContent(CURATED_ROUTES.utara);
+
+// Tab click handler
+document.getElementById('iter-tabs').addEventListener('click', function(e) {
+  var tab = e.target.closest('.iter-tab');
+  if (!tab) return;
+  document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
+  tab.classList.add('active');
+
+  var route = tab.dataset.route;
+
+  if (route === 'utara' || route === 'selatan' || route === 'kota') {
+    renderIterContent(CURATED_ROUTES[route]);
+  } else if (route === 'lokasi') {
+    loadNearbyPlaces(tab);
+  } else if (route === 'ai') {
+    // tab AI sudah punya konten dari last generate — render ulang
+    if (window._lastAIPlaces && window._lastAIPlaces.length > 0) {
+      renderIterContent(window._lastAIPlaces, '✨ Hasil AI Planner');
+    }
+  }
 });
+
+// ── "Dekat Saya" — ambil lokasi & query DB ────────────────────
+function loadNearbyPlaces(tabEl) {
+  var content = document.getElementById('iter-content');
+  content.innerHTML = '<div style="text-align:center;padding:24px 0;opacity:0.6;font-size:0.9rem;">📍 Mengambil lokasi kamu...</div>';
+
+  if (!navigator.geolocation) {
+    content.innerHTML = '<div style="padding:16px;opacity:0.6;">Browser tidak mendukung geolokasi.</div>';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    content.innerHTML = '<div style="text-align:center;padding:24px 0;opacity:0.6;font-size:0.9rem;">🔍 Mencari tempat terdekat...</div>';
+
+    fetch('get_nearby.php', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ lat: lat, lng: lng, limit: 6 }),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var stops = (data.places || []).map(function(p) {
+        return {
+          time: p.jarak_km < 1
+            ? (p.jarak_km * 1000).toFixed(0) + ' m'
+            : p.jarak_km.toFixed(1) + ' km',
+          name: p.nama,
+          desc: p.review || ('Kategori: ' + (p.kategori || '-')),
+        };
+      });
+      if (stops.length === 0) {
+        content.innerHTML = '<div style="padding:16px;opacity:0.6;">Tidak ada tempat ditemukan di sekitar kamu.</div>';
+        return;
+      }
+      renderIterContent(stops, '📍 Tempat Terdekat dari Lokasimu');
+    })
+    .catch(function() {
+      content.innerHTML = '<div style="padding:16px;color:#c0392b;">Gagal mengambil data. Coba lagi.</div>';
+    });
+  }, function() {
+    content.innerHTML = '<div style="padding:16px;opacity:0.6;">⚠️ Izin lokasi ditolak. Aktifkan GPS dan izinkan akses lokasi.</div>';
+  }, { timeout: 10000, maximumAge: 60000 });
+}
 
 // Scroll-reveal via IntersectionObserver
 var observer = new IntersectionObserver(function(entries) {
@@ -2030,7 +2102,33 @@ async function generateItinerary() {
 
     result.innerHTML = parseMarkdown(data.result);
 
-    // Tombol "Lihat Rute di Peta" jika ada minimal 1 tempat dengan koordinat
+    // ── Update timeline "Rute Wisata Sehari" dengan hasil AI ──
+    const aiStops = (data.places || []).map(p => ({
+      time : p.jam  || '',
+      name : p.nama || '',
+      desc : p.kategori
+               ? '📍 ' + p.kategori
+               : (p.review || ''),
+    }));
+    if (aiStops.length > 0) {
+      window._lastAIPlaces = aiStops;
+      // Tambah / aktifkan tab "✨ AI Planner"
+      let aiTab = document.querySelector('.iter-tab[data-route="ai"]');
+      if (!aiTab) {
+        aiTab = document.createElement('div');
+        aiTab.className   = 'iter-tab iter-tab-ai';
+        aiTab.dataset.route = 'ai';
+        aiTab.textContent = '✨ AI Planner';
+        document.getElementById('iter-tabs').appendChild(aiTab);
+      }
+      document.querySelectorAll('.iter-tab').forEach(t => t.classList.remove('active'));
+      aiTab.classList.add('active');
+      renderIterContent(aiStops, '✨ Direncanakan oleh AI');
+      // Scroll ke timeline
+      document.getElementById('itinerary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Tombol "Lihat Rute di Peta" ──
     const withCoords = (data.places || []).filter(p => p.latitude && p.longitude);
     if (withCoords.length >= 1) {
       sessionStorage.setItem('ai_route', JSON.stringify({
@@ -2038,17 +2136,14 @@ async function generateItinerary() {
         durasi : data.durasi,
         result : data.result,
       }));
-      const btn = document.createElement('a');
-      btn.href      = 'map.html?ai_route=1';
-      btn.className = 'ai-map-btn';
-      btn.innerHTML = withCoords.length >= 2
-        ? '🗺️ Lihat Rute di Peta'
-        : '🗺️ Lihat di Peta';
-      result.appendChild(btn);
+      const mapBtn = document.createElement('a');
+      mapBtn.href      = 'map.html?ai_route=1';
+      mapBtn.className = 'ai-map-btn';
+      mapBtn.innerHTML = withCoords.length >= 2 ? '🗺️ Lihat Rute di Peta' : '🗺️ Lihat di Peta';
+      result.appendChild(mapBtn);
     }
 
     result.style.display = 'block';
-    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
     result.innerHTML     = '⚠️ ' + (err.message || 'Terjadi kesalahan. Coba lagi.');
     result.style.display = 'block';
