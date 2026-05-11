@@ -63,6 +63,7 @@ nav {
   display: flex;
   gap: 2rem;
   list-style: none;
+  align-items: center;
 }
 .nav-links a {
   text-decoration: none;
@@ -75,6 +76,71 @@ nav {
   transition: opacity 0.2s;
 }
 .nav-links a:hover { opacity: 1; }
+/* ── Kategori dropdown (index) ── */
+.nav-dropdown { position: relative; }
+.nav-dropdown-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  opacity: 0.65;
+  transition: opacity 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: inherit;
+}
+.nav-dropdown-btn:hover { opacity: 1; }
+.nav-dropdown.open .nav-dropdown-btn { opacity: 1; color: var(--earth); }
+.nav-dropdown-btn svg { transition: transform 0.2s; }
+.nav-dropdown.open .nav-dropdown-btn svg { transform: rotate(180deg); }
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.5rem;
+  min-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 1px solid #e8eef4;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+  transform: translateX(-50%) translateY(-6px);
+  z-index: 999;
+}
+.nav-dropdown.open .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.nav-dropdown-menu a {
+  display: flex !important;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  text-transform: none !important;
+  font-weight: 500;
+  color: var(--charcoal) !important;
+  opacity: 1 !important;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.nav-dropdown-menu a:hover {
+  background: rgba(196,149,106,0.1);
+  color: var(--earth) !important;
+}
 .nav-right { display: flex; align-items: center; gap: 0.75rem; }
 .nav-btn {
   background: var(--forest);
@@ -1217,6 +1283,28 @@ nav.scrolled {
   <ul class="nav-links">
     <li><a href="map.html">Peta</a></li>
     <li><a href="#destinations">Destinasi</a></li>
+    <li class="nav-dropdown" id="nav-kat-dropdown">
+      <button class="nav-dropdown-btn" onclick="toggleKatDropdown(event)">
+        Kategori
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-dropdown-menu" id="nav-kat-menu">
+        <a href="map.html">🗺️ Semua Tempat</a>
+        <a href="map.html?kategori=attraction">🎢 Atraksi Wisata</a>
+        <a href="map.html?kategori=kuliner">🍜 Kuliner</a>
+        <a href="map.html?kategori=viewpoint">🏞️ Pemandangan</a>
+        <a href="map.html?kategori=museum">🏛️ Museum & Sejarah</a>
+        <a href="map.html?kategori=theme_park">🎠 Taman Hiburan</a>
+        <a href="map.html?kategori=belanja">🛍️ Belanja</a>
+        <a href="map.html?kategori=gallery">🎨 Galeri & Seni</a>
+        <a href="map.html?kategori=zoo">🦁 Kebun Binatang</a>
+        <a href="map.html?kategori=camp_site">⛺ Camping</a>
+        <a href="map.html?kategori=picnic_site">🌿 Piknik</a>
+        <a href="map.html?kategori=artwork">🖼️ Seni Publik</a>
+      </div>
+    </li>
     <li><a href="#features">Fitur</a></li>
     <li><a href="#itinerary">Itinerary</a></li>
     <li><a href="#events">Event</a></li>
@@ -1865,9 +1953,18 @@ function toggleProfileDropdown(e) {
   if (d) d.classList.toggle('open');
 }
 
+// ── Kategori Dropdown ──
+function toggleKatDropdown(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('nav-kat-dropdown').classList.toggle('open');
+}
+window.toggleKatDropdown = toggleKatDropdown;
+
 document.addEventListener('click', function() {
   var d = document.getElementById('nav-profile-dropdown');
   if (d) d.classList.remove('open');
+  var kd = document.getElementById('nav-kat-dropdown');
+  if (kd) kd.classList.remove('open');
 });
 
 function doLogout() {
