@@ -1479,6 +1479,20 @@ function apGetVals(id) {
 
 // ── Modal open/close ─────────────────────────────────────────
 function openAIPlannerModal() {
+  // Wajib login untuk menggunakan AI Planner
+  if (!window.isLoggedIn) {
+    openModal('login');
+    // Tampilkan pesan setelah modal login terbuka
+    setTimeout(function() {
+      var msg = document.getElementById('login-msg');
+      if (msg) {
+        msg.textContent = '🔒 Silakan masuk atau buat akun untuk menggunakan fitur AI Planning.';
+        msg.className = 'modal-msg error';
+        msg.style.display = 'block';
+      }
+    }, 100);
+    return;
+  }
   document.getElementById('ai-plan-modal').classList.add('open');
   document.getElementById('ap-loading').style.display = 'none';
   document.body.style.overflow = 'hidden';

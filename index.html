@@ -2147,6 +2147,7 @@ function doRegister() {
 }
 
 function updateNavAuth(name, role) {
+  window.isLoggedIn = true;
   var area      = document.getElementById('nav-auth-area');
   var initials  = name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
   var roleLabel = role === 'admin' ? 'Administrator' : 'Pengguna';
@@ -2206,17 +2207,23 @@ document.addEventListener('click', function() {
 function doLogout() {
   fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'logout'})})
     .finally(function() {
+      window.isLoggedIn = false;
       document.getElementById('nav-auth-area').innerHTML = '<button class="nav-login-btn" onclick="openModal(\'login\')">Masuk / Daftar</button>';
-      // Tampilkan kembali tombol Daftar Gratis di CTA
       var ctaBtn = document.getElementById('cta-register-btn');
       if (ctaBtn) ctaBtn.style.display = '';
     });
 }
 
 // Check session on load
+window.isLoggedIn = false;
 fetch('auth_user.php', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'check'})})
   .then(r => r.json())
-  .then(data => { if (data.success && data.name) updateNavAuth(data.name, data.role || 'user'); })
+  .then(data => {
+    if (data.success && data.name) {
+      window.isLoggedIn = true;
+      updateNavAuth(data.name, data.role || 'user');
+    }
+  })
   .catch(() => {});
 
 // Itinerary tabs
@@ -2460,6 +2467,19 @@ function parseMarkdown(text) {
 }
 
 async function generateItinerary() {
+  // Wajib login
+  if (!window.isLoggedIn) {
+    openModal('login');
+    setTimeout(function() {
+      var msg = document.getElementById('login-msg');
+      if (msg) {
+        msg.textContent = '🔒 Silakan masuk atau buat akun untuk menggunakan fitur AI Planning.';
+        msg.className = 'modal-msg error';
+        msg.style.display = 'block';
+      }
+    }, 100);
+    return;
+  }
   const btn     = document.getElementById('ai-generate-btn');
   const loading = document.getElementById('ai-loading');
   const result  = document.getElementById('ai-result-box');
