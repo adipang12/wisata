@@ -2822,23 +2822,39 @@ async function generateItinerary() {
 (function() {
   var overlay = document.getElementById('page-transition');
 
+  // Reset overlay saat back/forward (bfcache restore) agar tidak stuck hijau
+  window.addEventListener('pageshow', function(e) {
+    overlay.classList.remove('fade-out');
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+  });
+
   // Intersep semua link yang menuju map.html
   document.addEventListener('click', function(e) {
     var link = e.target.closest('a[href]');
     if (!link) return;
     var href = link.getAttribute('href') || '';
     if (!href.startsWith('map.html') && !href.includes('/map.html')) return;
-    // Cegah navigasi langsung
     e.preventDefault();
-    // Fade out
     overlay.classList.add('fade-out');
     setTimeout(function() {
       window.location.href = href;
     }, 370);
   });
 
-  // Intersep onclick location.href (footer links)
-  var origHref = Object.getOwnPropertyDescriptor(window.location.__proto__, 'href');
+  // Intersep onclick location.href (footer links ke map.html)
+  var _origAssign = window.location.assign.bind(window.location);
+  document.querySelectorAll('[onclick]').forEach(function(el) {
+    var oc = el.getAttribute('onclick') || '';
+    if (!oc.includes('map.html')) return;
+    el.addEventListener('click', function(e) {
+      var match = oc.match(/location\.href\s*=\s*['"]([^'"]*map\.html[^'"]*)['"]/);
+      if (!match) return;
+      e.stopImmediatePropagation();
+      overlay.classList.add('fade-out');
+      setTimeout(function() { window.location.href = match[1]; }, 370);
+    }, true);
+  });
 })();
 </script>
 </body>
