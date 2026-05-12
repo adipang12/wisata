@@ -2423,53 +2423,6 @@ function renderAIDayColumns(places) {
 // Inisialisasi tab utara
 renderIterContent(CURATED_ROUTES.utara);
 
-// ── Restore AI session dari localStorage (jika ada) ────────────────────────
-(function restoreAISession() {
-  var raw = localStorage.getItem('wb_ai_session');
-  if (!raw) return;
-  try {
-    var saved = JSON.parse(raw);
-    var aiPlaces = saved.places || [];
-    if (aiPlaces.length === 0 && saved.aiStops) {
-      // fallback data lama (tidak ada hari)
-      aiPlaces = saved.aiStops.map(function(s,i){ return Object.assign({hari:1},s); });
-    }
-    if (aiPlaces.length === 0) return;
-
-    window._lastAIPlaces = aiPlaces;
-
-    // Tambahkan / aktifkan tab AI
-    var aiTab = document.querySelector('.iter-tab[data-route="ai"]');
-    if (!aiTab) {
-      aiTab = document.createElement('div');
-      aiTab.className   = 'iter-tab iter-tab-ai';
-      aiTab.dataset.route = 'ai';
-      aiTab.textContent = '✨ AI Planner';
-      document.getElementById('iter-tabs').appendChild(aiTab);
-    }
-    document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
-    aiTab.classList.add('active');
-    renderAIDayColumns(aiPlaces);
-
-    // Restore kotak hasil markdown
-    if (saved.result) {
-      var resultBox = document.getElementById('ai-result-box');
-      if (resultBox) {
-        resultBox.innerHTML = parseMarkdown(saved.result);
-        var withCoords = (saved.places || []).filter(function(p) { return p.latitude && p.longitude; });
-        if (withCoords.length >= 1) {
-          var mapBtn = document.createElement('a');
-          mapBtn.href      = 'map.html';
-          mapBtn.className = 'ai-map-btn';
-          mapBtn.innerHTML = withCoords.length >= 2 ? '🗺️ Lihat Rute di Peta' : '🗺️ Lihat di Peta';
-          resultBox.appendChild(mapBtn);
-        }
-        resultBox.style.display = 'block';
-      }
-    }
-  } catch(e) {}
-})();
-
 // Tab click handler
 document.getElementById('iter-tabs').addEventListener('click', function(e) {
   var tab = e.target.closest('.iter-tab');
@@ -2657,6 +2610,53 @@ function parseMarkdown(text) {
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
 }
+
+// ── Restore AI session dari localStorage (jika ada) ────────────────────────
+// Catatan: diletakkan di sini agar parseMarkdown sudah terdefinisi
+(function restoreAISession() {
+  var raw = localStorage.getItem('wb_ai_session');
+  if (!raw) return;
+  try {
+    var saved = JSON.parse(raw);
+    var aiPlaces = saved.places || [];
+    if (aiPlaces.length === 0 && saved.aiStops) {
+      aiPlaces = saved.aiStops.map(function(s,i){ return Object.assign({hari:1},s); });
+    }
+    if (aiPlaces.length === 0) return;
+
+    window._lastAIPlaces = aiPlaces;
+
+    // Tambahkan / aktifkan tab AI
+    var aiTab = document.querySelector('.iter-tab[data-route="ai"]');
+    if (!aiTab) {
+      aiTab = document.createElement('div');
+      aiTab.className    = 'iter-tab iter-tab-ai';
+      aiTab.dataset.route = 'ai';
+      aiTab.textContent  = '✨ AI Planner';
+      document.getElementById('iter-tabs').appendChild(aiTab);
+    }
+    document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
+    aiTab.classList.add('active');
+    renderAIDayColumns(aiPlaces);
+
+    // Restore kotak hasil markdown
+    if (saved.result) {
+      var resultBox = document.getElementById('ai-result-box');
+      if (resultBox) {
+        resultBox.innerHTML = parseMarkdown(saved.result);
+        var withCoords = (saved.places || []).filter(function(p) { return p.latitude && p.longitude; });
+        if (withCoords.length >= 1) {
+          var mapBtn = document.createElement('a');
+          mapBtn.href      = 'map.html';
+          mapBtn.className = 'ai-map-btn';
+          mapBtn.innerHTML = withCoords.length >= 2 ? '🗺️ Lihat Rute di Peta' : '🗺️ Lihat di Peta';
+          resultBox.appendChild(mapBtn);
+        }
+        resultBox.style.display = 'block';
+      }
+    }
+  } catch(e) { console.error('restoreAISession error:', e); }
+})();
 
 // ── Deteksi lokasi awal (index.html) ─────────────────────────────────────
 var _aiUserCoords = null;
