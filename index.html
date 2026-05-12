@@ -1248,6 +1248,53 @@ nav {
 .iter-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
 .iter-desc { font-size: 0.78rem; color: rgba(30,37,32,0.54); }
 
+/* ── Multi-hari side-by-side ── */
+.iter-days-row {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+.iter-day-col {
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+  padding: 0 18px 0 0;
+  border-right: 1.5px solid rgba(196,149,106,0.18);
+  scroll-snap-align: start;
+}
+.iter-day-col:first-child { padding-left: 0; }
+.iter-day-col:last-child { border-right: none; padding-right: 0; }
+.iter-day-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--earth);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding: 5px 10px;
+  background: rgba(196,149,106,0.13);
+  border-radius: 6px;
+  border-left: 3px solid var(--earth);
+}
+.iter-day-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 4px;
+  opacity: 0.55;
+  letter-spacing: 0.3px;
+}
+@media (max-width: 640px) {
+  .iter-days-row { gap: 0; }
+  .iter-day-col { min-width: 75vw; padding-right: 16px; }
+}
+
 /* REVIEWS */
 .reviews { padding: 3rem; background: var(--soft); }
 .review-grid {
@@ -2283,11 +2330,9 @@ var CURATED_ROUTES = {
   ],
 };
 
-function renderIterContent(stops, badge) {
-  var content = document.getElementById('iter-content');
-  if (!content) return;
+// Render satu kolom timeline (dipakai untuk rute kurasi & per-hari AI)
+function buildTimelineHTML(stops) {
   var html = '';
-  if (badge) html += '<div style="margin-bottom:12px;font-size:0.8rem;font-weight:700;color:var(--earth);letter-spacing:0.5px;">' + badge + '</div>';
   stops.forEach(function(s, i) {
     var isLast = i === stops.length - 1;
     html += '<div class="iter-row">'
@@ -2297,6 +2342,60 @@ function renderIterContent(stops, badge) {
       + '<div class="iter-desc">' + (s.desc || s.review || s.jarak_desc || '') + '</div></div>'
       + '</div>';
   });
+  return html;
+}
+
+// Render rute kurasi / single-day (tidak ada info hari)
+function renderIterContent(stops, badge) {
+  var content = document.getElementById('iter-content');
+  if (!content) return;
+  var html = '';
+  if (badge) html += '<div style="margin-bottom:12px;font-size:0.8rem;font-weight:700;color:var(--earth);letter-spacing:0.5px;">' + badge + '</div>';
+  html += buildTimelineHTML(stops);
+  content.innerHTML = html;
+  content.style.opacity = '0';
+  setTimeout(function() { content.style.transition = 'opacity 0.35s'; content.style.opacity = '1'; }, 10);
+}
+
+// Render AI multi-hari — tiap hari jadi kolom berderet ke kanan
+function renderAIDayColumns(places) {
+  var content = document.getElementById('iter-content');
+  if (!content) return;
+
+  // Kelompokkan per hari
+  var byDay = {};
+  (places || []).forEach(function(p) {
+    var d = p.hari || 1;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(p);
+  });
+  var days = Object.keys(byDay).map(Number).sort(function(a,b){ return a-b; });
+
+  // Jika hanya 1 hari, pakai tampilan biasa
+  if (days.length <= 1) {
+    var stops = (byDay[days[0]] || []).map(function(p) {
+      return { time: p.jam||p.time||'', name: p.nama||p.name||'', desc: p.kategori ? '📍 '+p.kategori : '' };
+    });
+    renderIterContent(stops, '✨ Direncanakan oleh AI');
+    return;
+  }
+
+  // Multiple hari — buat kolom berderet
+  var DAY_COLORS = ['#C4956A','#2980b9','#27ae60','#8e44ad','#e67e22'];
+  var html = '<div style="margin-bottom:12px;font-size:0.8rem;font-weight:700;color:var(--earth);letter-spacing:0.5px;">✨ Direncanakan oleh AI</div>';
+  html += '<div class="iter-days-row">';
+  days.forEach(function(d, idx) {
+    var color = DAY_COLORS[idx % DAY_COLORS.length];
+    var stops = byDay[d].map(function(p) {
+      return { time: p.jam||p.time||'', name: p.nama||p.name||'', desc: p.kategori ? '📍 '+p.kategori : '' };
+    });
+    html += '<div class="iter-day-col">';
+    html += '<div class="iter-day-header" style="color:'+color+';background:'+color+'18;border-color:'+color+';">📅 Hari ' + d + '</div>';
+    html += buildTimelineHTML(stops);
+    html += '</div>';
+  });
+  html += '</div>';
+
   content.innerHTML = html;
   content.style.opacity = '0';
   setTimeout(function() { content.style.transition = 'opacity 0.35s'; content.style.opacity = '1'; }, 10);
@@ -2311,9 +2410,14 @@ renderIterContent(CURATED_ROUTES.utara);
   if (!raw) return;
   try {
     var saved = JSON.parse(raw);
-    if (!saved.aiStops || saved.aiStops.length === 0) return;
+    var aiPlaces = saved.places || [];
+    if (aiPlaces.length === 0 && saved.aiStops) {
+      // fallback data lama (tidak ada hari)
+      aiPlaces = saved.aiStops.map(function(s,i){ return Object.assign({hari:1},s); });
+    }
+    if (aiPlaces.length === 0) return;
 
-    window._lastAIPlaces = saved.aiStops;
+    window._lastAIPlaces = aiPlaces;
 
     // Tambahkan / aktifkan tab AI
     var aiTab = document.querySelector('.iter-tab[data-route="ai"]');
@@ -2326,7 +2430,7 @@ renderIterContent(CURATED_ROUTES.utara);
     }
     document.querySelectorAll('.iter-tab').forEach(function(t) { t.classList.remove('active'); });
     aiTab.classList.add('active');
-    renderIterContent(saved.aiStops, '✨ Direncanakan oleh AI');
+    renderAIDayColumns(aiPlaces);
 
     // Restore kotak hasil markdown
     if (saved.result) {
@@ -2577,16 +2681,10 @@ async function generateItinerary() {
 
     result.innerHTML = parseMarkdown(data.result);
 
-    // ── Update timeline "Rute Wisata Sehari" dengan hasil AI ──
-    const aiStops = (data.places || []).map(p => ({
-      time : p.jam  || '',
-      name : p.nama || '',
-      desc : p.kategori
-               ? '📍 ' + p.kategori
-               : (p.review || ''),
-    }));
-    if (aiStops.length > 0) {
-      window._lastAIPlaces = aiStops;
+    // ── Update timeline "Rute Wisata Sehari" — multi-hari per kolom ──
+    const aiPlaces = data.places || [];
+    if (aiPlaces.length > 0) {
+      window._lastAIPlaces = aiPlaces;
       // Tambah / aktifkan tab "✨ AI Planner"
       let aiTab = document.querySelector('.iter-tab[data-route="ai"]');
       if (!aiTab) {
@@ -2598,7 +2696,7 @@ async function generateItinerary() {
       }
       document.querySelectorAll('.iter-tab').forEach(t => t.classList.remove('active'));
       aiTab.classList.add('active');
-      renderIterContent(aiStops, '✨ Direncanakan oleh AI');
+      renderAIDayColumns(aiPlaces);
       // Scroll ke timeline
       document.getElementById('itinerary').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -2609,7 +2707,7 @@ async function generateItinerary() {
       places  : data.places,
       durasi  : data.durasi,
       result  : data.result,
-      aiStops : aiStops,
+      aiStops : aiPlaces,
     }));
 
     // ── Tombol "Lihat Rute di Peta" ──
