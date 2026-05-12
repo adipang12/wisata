@@ -598,12 +598,11 @@ nav {
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
   font-family: 'DM Sans', sans-serif;
   text-decoration: none;
   display: inline-block;
+  /* transition & animation diatur di seksi MAP-REDIRECT BUTTON ANIMATIONS */
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
 .btn-ghost {
   background: transparent;
   color: #fff;
@@ -1215,7 +1214,7 @@ nav {
   text-decoration: none;
   transition: opacity 0.2s;
 }
-.ai-map-btn:hover { opacity: 0.85; }
+/* .ai-map-btn hover diatur di seksi MAP-REDIRECT BUTTON ANIMATIONS */
 .iter-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1498,11 +1497,138 @@ footer {
 
 /* SMOOTH PILL */
 .pill { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+.pill:active { transform: scale(0.92); }
 
 /* SMOOTH CARDS */
 .dest-card, .feat-card, .review-card, .event-card {
   transition: transform 0.25s cubic-bezier(0.4,0,0.2,1),
               box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ══════════════════════════════════════════════
+   MAP-REDIRECT BUTTON ANIMATIONS
+══════════════════════════════════════════════ */
+
+/* Keyframes */
+@keyframes shimmer-slide {
+  0%   { left: -75%; }
+  100% { left: 125%; }
+}
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(212,168,83,0.2); }
+  50%       { box-shadow: 0 4px 28px rgba(212,168,83,0.55); }
+}
+@keyframes green-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(45,80,22,0.25); }
+  50%       { box-shadow: 0 4px 28px rgba(45,80,22,0.55); }
+}
+
+/* ── .btn-primary (hero & about CTA) ── */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+              box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);
+  animation: gold-pulse 2.8s ease-in-out infinite;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg,
+    transparent 0%,
+    rgba(255,255,255,0.5) 50%,
+    transparent 100%);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 30px rgba(212,168,83,0.5);
+  animation: none;
+}
+.btn-primary:hover::after {
+  animation: shimmer-slide 0.55s ease forwards;
+}
+.btn-primary:active { transform: scale(0.97); animation: none; }
+
+/* ── .map-overlay-btn (tombol di preview peta) ── */
+.map-overlay-btn {
+  transition: background 0.2s, transform 0.22s cubic-bezier(0.4,0,0.2,1),
+              box-shadow 0.22s;
+  animation: green-pulse 2.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+.map-overlay-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.map-overlay-btn:hover {
+  background: rgba(45,80,22,1);
+  transform: translateX(-50%) translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(45,80,22,0.45);
+  animation: none;
+}
+.map-overlay-btn:hover::after {
+  animation: shimmer-slide 0.55s ease forwards;
+}
+.map-overlay-btn:active {
+  transform: translateX(-50%) scale(0.97);
+  animation: none;
+}
+
+/* ── .ai-map-btn (tombol rute peta dari AI) ── */
+.ai-map-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+              box-shadow 0.22s, opacity 0.2s;
+  animation: green-pulse 2.5s ease-in-out infinite;
+}
+.ai-map-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.ai-map-btn:hover {
+  opacity: 1;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(45,80,22,0.45);
+  animation: none;
+}
+.ai-map-btn:hover::after {
+  animation: shimmer-slide 0.55s ease forwards;
+}
+.ai-map-btn:active { transform: scale(0.97); animation: none; }
+
+/* ── .see-all (Lihat semua destinasi →) ── */
+.see-all {
+  transition: color 0.2s, letter-spacing 0.2s, border-color 0.2s;
+  display: inline-block;
+}
+.see-all:hover {
+  color: var(--forest);
+  border-color: var(--forest);
+  letter-spacing: 0.5px;
+}
+
+/* ── .dest-card image zoom ── */
+.dest-img {
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.dest-card:hover .dest-img {
+  transform: scale(1.07);
 }
 
 /* SMOOTH MODAL */
