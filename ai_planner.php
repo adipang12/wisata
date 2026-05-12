@@ -51,189 +51,60 @@ $zone_labels = [
 ];
 $user_zone_label = $user_zone ? ($zone_labels[$user_zone] ?? 'tidak diketahui') : null;
 
-// Instruksi zona hari 1 (hanya jika koordinat user tersedia)
-$zona_hari1_instruksi = '';
-if ($user_zone) {
-    $zona_hari1_instruksi = "
-═══════════════════════════════════════
-🚨 ZONA HARI 1 — WAJIB PATUHI
-═══════════════════════════════════════
-User saat ini berada di: $user_zone_label
-Lokasi penginapan/awal: $lokasi_awal
+// Instruksi zona hari 1 — hanya jika koordinat tersedia (singkat)
+$zona_hari1_instruksi = $user_zone
+    ? "PENTING: User di $user_zone_label. Hari 1 WAJIB semua destinasi + makan di $user_zone_label. Jangan ke pusat kota untuk makan."
+    : "";
 
-KARENA USER BERADA DI $user_zone_label:
-✅ Hari 1 WAJIB menggunakan destinasi di $user_zone_label SAJA
-✅ Makan siang & makan malam hari 1 HARUS di area yang sama (zona yang sama)
-❌ DILARANG KERAS: Pergi ke pusat kota untuk makan jika zona utama bukan KOTA
-❌ DILARANG: Berpindah zona lebih dari 1x dalam 1 hari (kecuali kembali ke penginapan)
+// Kuliner per zona (ringkas)
+$kuliner_zona = "Kuliner per zona — gunakan sesuai zona hari itu:
+- UTARA: Floating Market Lembang, The Lodge Maribaya, Sari Ater Hot Spring, warung Lembang
+- SELATAN: warung lokal Ciwidey, resto area Situ Patengan
+- TIMUR ATAS: Cafe D Pakar, Resto Kampung Daun
+- KOTA: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Bu Eha, Batagor Riri, Es Oyen, Nasi Goreng Mafia
+- BARAT: warung lokal Padalarang";
 
-KULINER DI MASING-MASING ZONA (gunakan ini untuk makan siang/malam):
-- ZONA UTARA: Floating Market Lembang (food court), The Lodge Maribaya (cafe), Sari Ater (resto), warung lokal Lembang
-- ZONA SELATAN: Warung nasi lokal Ciwidey, resto di area Situ Patengan, kios di Ranca Upas
-- ZONA TIMUR ATAS: Cafe D Pakar, Resto Kampung Daun, warung sekitar Dago
-- ZONA KOTA: Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret, Mie Kocok Mang Dadeng, dll
-- ZONA BARAT: Warung lokal sekitar Padalarang
-";
-}
+// Daftar tempat di database (nama persis)
+$db_places_hint = "Tempat wisata di sistem (nama PERSIS):
+UTARA: Tangkuban Perahu, De Ranch Lembang, Floating Market Lembang, The Lodge Maribaya, Situ Lembang, Sari Ater Hot Spring, Dusun Bambu, Bukit Moko, Bumi Perkemahan Cikole
+SELATAN: Kawah Putih, Situ Patengan, Ciwidey Valley Hot Spring, Ranca Upas, Gunung Patuha, Glamping Lakeside Rancabali
+TIMUR ATAS: Tebing Keraton, Bukit Bintang Bandung, Puncak Bintang, Cafe D Pakar, Resto Kampung Daun
+BARAT: Stone Garden Citatah
+KOTA: Gedung Sate, Museum Geologi, Museum Konfrensi Asia Afrika, Alun Alun Bandung, Trans Studio Bandung, Jalan Braga, Jalan Cihampelas, Kebun Binatang Bandung, Saung Angklung Udjo, Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
+Camping: Ranca Upas, Bumi Perkemahan Cikole, Glamping Lakeside Rancabali
+Lain: Curug Cimahi, Curug Malela, Stone Garden Citatah, The Peak Resort
+$kuliner_zona";
 
-// Daftar tempat yang ADA di database (untuk membantu AI memakai nama persis)
-$db_places_hint = "
-TEMPAT WISATA tersedia di sistem kami (gunakan nama PERSIS seperti ini):
-
-Alam & Pemandangan: Tangkuban Perahu, Kawah Putih, Tebing Keraton, Bukit Moko, Bukit Bintang Bandung, Puncak Bintang, Situ Lembang, Curug Cimahi, Curug Malela, Stone Garden Citatah, The Lodge Maribaya, Sari Ater Hot Spring, Ciwidey Valley Hot Spring, Situ Patengan, Gunung Patuha
-
-Hiburan & Taman: Trans Studio Bandung, De Ranch Lembang, Dusun Bambu, Floating Market Lembang, The Peak Resort, The Valley Bistro Cafe
-
-Museum & Sejarah: Museum Geologi, Museum Konfrensi Asia Afrika, Gedung Sate, Gedung Merdeka
-
-Seni & Budaya: Saung Angklung Udjo, Jalan Braga, Alun Alun Bandung, Jalan Cihampelas
-
-Camping & Alam Terbuka: Ranca Upas, Bumi Perkemahan Cikole, Glamping Lakeside Rancabali
-
-Kebun Binatang: Kebun Binatang Bandung
-
-Kuliner ZONA KOTA (pusat Bandung): Batagor Kingsley, Warung Nasi Bancakan, Sindang Reret Naripan, Mie Kocok Mang Dadeng, Cendol Elizabeth, Sate Hadori, Warung Nasi Ampera, Surabi Enhaii, Kopi Progo, Warung Sudi Mampir, Nanny s Pavillon, Philosophy Coffee Bandung, Warung Bu Eha, Warung Daun, Batagor Riri, Laksana Restaurant, Es Oyen, Nasi Goreng Mafia
-
-Kuliner ZONA TIMUR ATAS (Dago/Punclut): Cafe D Pakar, Resto Kampung Daun
-
-Kuliner ZONA UTARA (Lembang): Floating Market Lembang (food court tersedia di area wisata), The Lodge Maribaya (cafe dalam area wisata), Sari Ater Hot Spring (resto dalam area), warung lokal Lembang
-
-Belanja: Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall
-";
-
-$prompt = "Kamu adalah pemandu wisata profesional Bandung, Indonesia dengan pengetahuan mendalam tentang jarak dan waktu tempuh antar lokasi.
-
-Buatkan itinerary wisata Bandung yang detail, REALISTIS, dan menarik dengan ketentuan berikut:
-- Durasi: $durasi hari
-- Jumlah orang: $orang orang
-- Minat yang HARUS dicakup: $minat
-- Budget: $budget
-- 📍 Titik awal / penginapan: $lokasi_awal
+$prompt = "Kamu pemandu wisata Bandung profesional. Buat itinerary REALISTIS $durasi hari untuk $orang orang, minat: $minat, budget: $budget, start dari: $lokasi_awal.
 $zona_hari1_instruksi
 
-═══════════════════════════════════════
-📍 TITIK AWAL PERJALANAN (WAJIB DIPATUHI)
-═══════════════════════════════════════
-Setiap hari dimulai DARI: $lokasi_awal
+ATURAN ZONA (wajib patuhi — 1 hari = 1 zona):
+- UTARA/Lembang (45-60 mnt dari kota): Tangkuban Perahu, De Ranch, Floating Market, The Lodge, Situ Lembang, Sari Ater, Dusun Bambu, Bukit Moko
+- SELATAN/Ciwidey (1,5-2 jam): Kawah Putih, Situ Patengan, Ciwidey Valley, Ranca Upas, Gunung Patuha
+- TIMUR ATAS/Dago (30-45 mnt): Tebing Keraton, Bukit Bintang, Puncak Bintang
+- BARAT/Padalarang (30-45 mnt): Stone Garden Citatah
+- KOTA: museum, gedung bersejarah, mall, kuliner kota
+LARANGAN: Tangkuban+Kawah Putih 1 hari | kuliner kota di hari zona luar kota | antar tempat >45 mnt dalam 1 hari.
 
-ATURAN TITIK AWAL:
-1. Sebutkan \"$lokasi_awal\" sebagai titik berangkat di awal setiap hari
-2. Hitung waktu tempuh dari \"$lokasi_awal\" ke destinasi PERTAMA hari itu
-3. Sesuaikan jam berangkat berdasarkan jarak penginapan ke zona tujuan:
-   - Jika penginapan di PUSAT KOTA → pakai estimasi waktu standar zona
-   - Jika penginapan sudah di/dekat LEMBANG → kurangi 30-40 menit, bisa berangkat lebih siang
-   - Jika penginapan sudah di/dekat CIWIDEY → kurangi 45-60 menit dari estimasi zona Selatan
-   - Jika penginapan di DAGO/TIMUR → kurangi 15-20 menit dari estimasi zona Timur Atas
-4. Setiap malam, perhitungkan waktu kembali ke \"$lokasi_awal\"
+WAKTU KUNJUNGAN: Tangkuban/Kawah Putih/Situ Patengan=2-3j | Trans Studio/De Ranch/Dusun Bambu=3-4j | museum=1-1,5j | kuliner=1j | belanja=1,5j | curug=2j.
+BERANGKAT: zona Selatan wajib 06.00-07.00 | zona Utara 06.30-07.00 (kecuali penginapan sudah di sana) | max 4-5 destinasi/hari termasuk makan.
+Tiap hari mulai dari $lokasi_awal, sebutkan waktu tempuh ke destinasi pertama, dan waktu kembali malam hari.
 
-═══════════════════════════════════════
-🗺️ ZONA GEOGRAFIS BANDUNG (WAJIB PATUHI)
-═══════════════════════════════════════
-ATURAN EMAS: Satu hari = satu zona! Semua destinasi (wisata + MAKAN) dalam 1 hari HARUS di zona yang sama.
-JANGAN pernah pergi ke pusat kota hanya untuk makan jika hari itu zona Utara/Selatan/Barat/Timur Atas!
-
-ZONA UTARA - Lembang (±45 menit dari pusat kota):
-→ Tangkuban Perahu, De Ranch Lembang, Floating Market Lembang, The Lodge Maribaya, Situ Lembang, Bumi Perkemahan Cikole, Sari Ater Hot Spring, Dusun Bambu, Bukit Moko
-
-ZONA SELATAN - Ciwidey/Rancabali (±1,5-2 jam dari pusat kota):
-→ Kawah Putih, Situ Patengan, Ciwidey Valley Hot Spring, Ranca Upas, Gunung Patuha, Glamping Lakeside Rancabali
-
-ZONA BARAT - Padalarang (±30-45 menit):
-→ Stone Garden Citatah, Goa Pawon
-
-ZONA TIMUR ATAS - Dago/Punclut (±30 menit):
-→ Tebing Keraton, Bukit Bintang Bandung, Puncak Bintang, Cafe D Pakar, Resto Kampung Daun
-
-ZONA KOTA - Pusat Bandung (dalam kota):
-→ Gedung Sate, Museum Geologi, Museum Konfrensi Asia Afrika, Alun Alun Bandung, Trans Studio Bandung, Jalan Braga, Jalan Cihampelas, Kebun Binatang Bandung, Saung Angklung Udjo, Pasar Baru Trade Center, Cihampelas Walk CiWalk, Paris Van Java Mall, semua kuliner kota
-
-═══════════════════════════════════════
-⏱️ ATURAN WAKTU TEMPUH (SANGAT PENTING)
-═══════════════════════════════════════
-Hitung REALISTIS: waktu kunjungan + waktu perjalanan ke tempat berikutnya.
-
-Estimasi waktu KUNJUNGAN per tempat:
-- Tangkuban Perahu, Kawah Putih, Situ Patengan: 2-3 jam
-- Trans Studio Bandung, Dusun Bambu, De Ranch: 3-4 jam
-- Museum, Gedung bersejarah: 1-1,5 jam
-- Kuliner/Restoran: 1-1,5 jam
-- Belanja (mall/pasar): 1,5-2 jam
-- Curug/Air terjun: 2-3 jam (termasuk jalan kaki)
-- Taman/Kebun: 2 jam
-
-Estimasi waktu PERJALANAN (dari pusat kota, kondisi normal):
-- Ke Zona Utara (Lembang): 45-60 menit
-- Ke Zona Selatan (Ciwidey): 1,5-2 jam
-- Ke Zona Barat (Padalarang): 30-45 menit
-- Ke Zona Timur Atas (Dago): 30-45 menit
-- Dalam Kota: 15-30 menit antar tempat
-
-ATURAN WAJIB:
-1. ❌ DILARANG: Tangkuban Perahu + Kawah Putih dalam 1 hari (jarak 2,5-3 jam)
-2. ❌ DILARANG: Jarak antar tempat dalam 1 hari > 45 menit perjalanan (kecuali destinasi utama tunggal)
-3. ❌ DILARANG: Kuliner/restoran pusat kota (Batagor Kingsley, Warung Bancakan, dll) di hari Zona Utara/Selatan
-4. ✅ Berangkat ke Zona Selatan: WAJIB jam 06.00-07.00 (perjalanan panjang)
-5. ✅ Berangkat ke Zona Utara: WAJIB jam 06.30-07.00 (hindari macet pagi) — kecuali penginapan sudah di Lembang
-6. ✅ Maksimal 4-5 destinasi per hari (termasuk makan siang + makan malam)
-7. ✅ Makan siang/malam HARUS di area yang sama dengan zona destinasi hari itu
-8. ✅ Tambahkan waktu tempuh perjalanan ke destinasi berikutnya dalam deskripsi
-
-═══════════════════════════════════════
-🎯 ATURAN MINAT
-═══════════════════════════════════════
-Kamu WAJIB memasukkan minimal 1 tempat dari SETIAP kategori minat yang disebutkan.
-Distribusikan merata namun tetap patuhi aturan zona geografis.
-
-PENTING: Utamakan nama tempat dari daftar berikut (sudah ada di sistem peta kami):
 $db_places_hint
 
-═══════════════════════════════════════
-📋 FORMAT WAJIB
-═══════════════════════════════════════
+FORMAT (ikuti persis):
+## 🗓️ Itinerary Bandung $durasi Hari
+**Tema:** ... | **Budget:** Rp.../orang | **Zona:** ...
+### 📅 Hari 1: [judul] — Zona [nama]
+- **HH.MM** - [Nama Tempat]: [aktivitas] *(±Xj, Rp xxx)*
+[lanjut hari berikutnya dengan zona berbeda jika bisa]
+### 💡 Tips & 🚗 Transportasi
 
-## 🗓️ Itinerary Bandung $durasi Hari ($orang Orang)
-**Tema:** [tema perjalanan sesuai minat]
-**Estimasi Budget:** [range budget per orang]
-**Zona Hari Ini:** [sebutkan zona utama yang dikunjungi]
-
----
-
-### 📅 Hari 1: [Judul Hari] — Zona [nama zona]
-
-**🌅 Pagi (06.00 - 12.00)**
-- **06.30** - Berangkat dari $lokasi_awal menuju [zona] *(perjalanan ±XX menit dari penginapan)*
-- **07.30** - [Nama Tempat]: [deskripsi aktivitas] *(kunjungan ±X jam, estimasi: Rp xxx)*
-- **10.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
-
-**☀️ Siang (12.00 - 17.00)**
-- **12.30** - [Nama Resto/Warung terdekat]: [deskripsi makan siang] *(estimasi: Rp xxx)*
-- **14.00** - [Nama Tempat terdekat]: [deskripsi] *(kunjungan ±X jam, estimasi: Rp xxx)*
-
-**🌆 Sore/Malam (17.00 - 21.00)**
-- **17.30** - Perjalanan kembali ke $lokasi_awal *(±XX menit)*
-- **19.00** - [Nama Resto]: [deskripsi makan malam] *(estimasi: Rp xxx)*
-
-[ulangi format hari untuk hari berikutnya — gunakan zona berbeda jika memungkinkan]
-
----
-
-### 💡 Tips Perjalanan
-- [3-4 tips praktis termasuk tips kondisi jalan/kemacetan]
-
-### 🚗 Transportasi
-- [rekomendasi transportasi sesuai budget dan jumlah orang]
-
-Setelah itinerary, WAJIB tambahkan blok berikut (format JSON tepat, jangan diubah):
-
+Setelah itinerary tambahkan TEPAT seperti ini:
 ##PLACES_JSON##
-[
-  {\"jam\": \"07.30\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"},
-  {\"jam\": \"10.00\", \"hari\": 1, \"nama\": \"Nama Tempat Persis\"}
-]
+[{\"jam\":\"07.30\",\"hari\":1,\"nama\":\"Nama Persis\"},{\"jam\":\"10.00\",\"hari\":1,\"nama\":\"Nama Persis\"}]
 ##END_PLACES##
-
-Jangan sertakan tempat makan/restoran lokal yang tidak ada di daftar sistem ke PLACES_JSON.
-Gunakan nama tempat PERSIS seperti di daftar jika tersedia. Gunakan Bahasa Indonesia yang ramah dan antusias.";
+Jangan masukkan restoran yang tidak ada di daftar ke PLACES_JSON. Jawab dalam Bahasa Indonesia.";
 
 $apiKey = defined('GROQ_API_KEY') ? GROQ_API_KEY : '';
 
@@ -243,12 +114,13 @@ if (empty($apiKey)) {
     exit;
 }
 
-// Token cukup: 1 hari ~1800 token, 2 hari ~3200, 3 hari ~4500
-$max_tokens = [1 => 2500, 2 => 3800, 3 => 5500][$durasi] ?? 2500;
+// gemma2-9b-it: 15.000 TPM (vs 6.000 TPM llama-3.1-8b) — lebih aman untuk prompt panjang
+// Max output: 1hr=2000, 2hr=3200, 3hr=4500
+$max_tokens = [1 => 2000, 2 => 3200, 3 => 4500][$durasi] ?? 2000;
 
 $url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
-    'model'       => 'llama-3.1-8b-instant',   // 500K TPD vs 100K TPD llama-3.3-70b
+    'model'       => 'gemma2-9b-it',
     'messages'    => [['role' => 'user', 'content' => $prompt]],
     'temperature' => 0.7,
     'max_tokens'  => $max_tokens,
