@@ -114,13 +114,13 @@ if (empty($apiKey)) {
     exit;
 }
 
-// gemma2-9b-it: 15.000 TPM (vs 6.000 TPM llama-3.1-8b) — lebih aman untuk prompt panjang
+// llama-4-scout: 30K TPM, 500K TPD — terbaik untuk proyek ini
 // Max output: 1hr=2000, 2hr=3200, 3hr=4500
 $max_tokens = [1 => 2000, 2 => 3200, 3 => 4500][$durasi] ?? 2000;
 
 $url  = "https://api.groq.com/openai/v1/chat/completions";
 $body = json_encode([
-    'model'       => 'gemma2-9b-it',
+    'model'       => 'meta-llama/llama-4-scout-17b-16e-instruct',
     'messages'    => [['role' => 'user', 'content' => $prompt]],
     'temperature' => 0.7,
     'max_tokens'  => $max_tokens,
