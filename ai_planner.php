@@ -92,13 +92,26 @@ Tiap hari mulai dari $lokasi_awal, sebutkan waktu tempuh ke destinasi pertama, d
 
 $db_places_hint
 
-FORMAT (ikuti persis):
+FORMAT WAJIB — gunakan tabel markdown untuk jadwal setiap hari:
+
 ## 🗓️ Itinerary Bandung $durasi Hari
-**Tema:** ... | **Budget:** Rp.../orang | **Zona:** ...
-### 📅 Hari 1: [judul] — Zona [nama]
-- **HH.MM** - [Nama Tempat]: [aktivitas] *(±Xj, Rp xxx)*
-[lanjut hari berikutnya dengan zona berbeda jika bisa]
-### 💡 Tips & 🚗 Transportasi
+**Tema:** ... | **Budget:** Rp.../orang | **Zona:** Hari1=..., Hari2=...
+
+### 📅 Hari 1: [Judul Hari] — Zona [nama]
+| Waktu | Tempat | Aktivitas | Durasi | Estimasi |
+|-------|--------|-----------|--------|----------|
+| 07.00 | 🚗 Berangkat dari $lokasi_awal | Menuju [zona], ±Xmnt | ±Xmnt | - |
+| 07.30 | [Nama Tempat] | [deskripsi singkat] | ±Xj | Rp xxx |
+| 12.30 | 🍽️ [Nama Resto/Warung] | Makan siang | ±1j | Rp xxx |
+| 17.30 | 🚗 Kembali ke $lokasi_awal | Perjalanan pulang | ±Xmnt | - |
+| 19.00 | 🍽️ [Nama Resto] | Makan malam | ±1j | Rp xxx |
+
+[ulangi tabel untuk hari berikutnya — zona berbeda]
+
+### 💡 Tips Perjalanan
+- [tips singkat]
+### 🚗 Transportasi
+- [rekomendasi]
 
 Setelah itinerary tambahkan TEPAT seperti ini:
 ##PLACES_JSON##

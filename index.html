@@ -1131,6 +1131,36 @@ nav {
 .ai-result-box hr { border-color: rgba(255,255,255,0.15); margin: 1rem 0; }
 .ai-result-box ul, .ai-result-box ol { padding-left: 1.2rem; }
 .ai-result-box li { margin-bottom: 0.3rem; }
+
+/* ── Tabel Itinerary AI ── */
+.ai-table-wrap { overflow-x: auto; margin: 0.6rem 0 1.4rem; border-radius: 10px; }
+.ai-table {
+  width: 100%; border-collapse: collapse; font-size: 0.85rem;
+  background: rgba(0,0,0,0.25); border-radius: 10px; overflow: hidden;
+}
+.ai-table thead tr { background: rgba(196,149,106,0.35); }
+.ai-table th {
+  padding: 9px 12px; text-align: left; font-weight: 700;
+  color: #f5ece0; letter-spacing: 0.3px; white-space: nowrap;
+}
+.ai-table td {
+  padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  vertical-align: top; color: #e8e0d5;
+}
+.ai-table tr:last-child td { border-bottom: none; }
+.ai-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+.ai-table tr:hover td { background: rgba(196,149,106,0.1); transition: background .15s; }
+/* Kolom waktu — bold & cream */
+.ai-table td:first-child { font-weight: 700; color: #C4956A; white-space: nowrap; }
+/* Baris perjalanan — biru subtle */
+.ai-table tr.tr-travel td { background: rgba(41,128,185,0.12); }
+.ai-table tr.tr-travel td:first-child { color: #7fb3d3; }
+/* Baris makan — oranye subtle */
+.ai-table tr.tr-food td { background: rgba(230,126,34,0.12); }
+.ai-table tr.tr-food td:first-child { color: #e8a87c; }
+@media (max-width: 600px) {
+  .ai-table th, .ai-table td { padding: 7px 8px; font-size: 0.8rem; }
+}
 .ai-loading {
   text-align: center;
   padding: 2rem;
@@ -2453,15 +2483,55 @@ function getChipVals(groupId) {
   return [...document.querySelectorAll('#' + groupId + ' .ai-chip.active')].map(c => c.dataset.val);
 }
 
+function renderAITable(tableLines) {
+  var html = '<div class="ai-table-wrap"><table class="ai-table"><thead>';
+  var bodyStarted = false;
+  tableLines.forEach(function(line, idx) {
+    // Baris separator |---|---|...
+    if (/^\|[\s\-|:]+\|?\s*$/.test(line)) { html += '</thead><tbody>'; bodyStarted = true; return; }
+    var cells = line.split('|');
+    // Hapus elemen kosong awal/akhir dari split
+    if (cells[0].trim() === '') cells.shift();
+    if (cells.length && cells[cells.length-1].trim() === '') cells.pop();
+    if (!cells.length) return;
+    if (!bodyStarted) {
+      // Header row
+      html += '<tr>' + cells.map(function(c){ return '<th>' + c.trim() + '</th>'; }).join('') + '</tr>';
+    } else {
+      // Data row — deteksi tipe untuk warna baris
+      var place = (cells[1] || '').trim().toLowerCase();
+      var rowCls = '';
+      if (place.includes('berangkat') || place.includes('🚗') || place.includes('kembali') || place.includes('perjalanan')) rowCls = ' class="tr-travel"';
+      else if (place.includes('makan') || place.includes('warung') || place.includes('resto') || place.includes('cafe') || place.includes('🍽') || place.includes('kuliner')) rowCls = ' class="tr-food"';
+      html += '<tr' + rowCls + '>' + cells.map(function(c){ return '<td>' + c.trim() + '</td>'; }).join('') + '</tr>';
+    }
+  });
+  if (!bodyStarted) html += '</thead><tbody>';
+  html += '</tbody></table></div>';
+  return html;
+}
+
 function parseMarkdown(text) {
-  return text
+  // Proses tabel dulu (baris yang diawali |)
+  var lines = text.split('\n');
+  var out = [], i = 0;
+  while (i < lines.length) {
+    if (/^\|/.test(lines[i].trim())) {
+      var tbl = [];
+      while (i < lines.length && /^\|/.test(lines[i].trim())) { tbl.push(lines[i]); i++; }
+      out.push(renderAITable(tbl));
+    } else {
+      out.push(lines[i]); i++;
+    }
+  }
+  return out.join('\n')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/^---$/gm, '<hr>')
     .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+    .replace(/(<li>.*<\/li>\n?)+/g, function(m){ return '<ul>' + m + '</ul>'; })
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
 }
