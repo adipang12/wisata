@@ -2498,14 +2498,13 @@ document.getElementById('iter-tabs').addEventListener('click', function(e) {
 
   var route = tab.dataset.route;
 
-  if (route === 'utara' || route === 'selatan' || route === 'kota') {
+  if (CURATED_ROUTES[route]) {
     renderIterContent(CURATED_ROUTES[route]);
   } else if (route === 'lokasi') {
     loadNearbyPlaces(tab);
   } else if (route === 'ai') {
-    // tab AI sudah punya konten dari last generate — render ulang
     if (window._lastAIPlaces && window._lastAIPlaces.length > 0) {
-      renderIterContent(window._lastAIPlaces, '✨ Hasil AI Planner');
+      renderAIDayColumns(window._lastAIPlaces);
     }
   }
 });
