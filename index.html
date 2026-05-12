@@ -1279,7 +1279,7 @@ nav {
 /* ── Multi-hari side-by-side ── */
 .iter-days-row {
   display: flex;
-  gap: 0;
+  gap: 32px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -1288,39 +1288,20 @@ nav {
 .iter-day-col {
   flex: 1;
   min-width: 200px;
-  max-width: 320px;
-  padding: 0 18px 0 0;
-  border-right: 1.5px solid rgba(196,149,106,0.18);
+  max-width: 300px;
   scroll-snap-align: start;
 }
-.iter-day-col:first-child { padding-left: 0; }
-.iter-day-col:last-child { border-right: none; padding-right: 0; }
 .iter-day-header {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--earth);
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  padding: 5px 10px;
-  background: rgba(196,149,106,0.13);
-  border-radius: 6px;
-  border-left: 3px solid var(--earth);
-}
-.iter-day-badge {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--forest);
-  margin-bottom: 4px;
-  opacity: 0.55;
-  letter-spacing: 0.3px;
+  margin-bottom: 16px;
+  opacity: 0.85;
 }
 @media (max-width: 640px) {
-  .iter-days-row { gap: 0; }
-  .iter-day-col { min-width: 75vw; padding-right: 16px; }
+  .iter-days-row { gap: 20px; }
+  .iter-day-col { min-width: 78vw; }
 }
 
 /* REVIEWS */
@@ -2428,7 +2409,7 @@ function renderAIDayColumns(places) {
       return { time: p.jam||p.time||'', name: p.nama||p.name||'', desc: p.kategori ? '📍 '+p.kategori : '' };
     });
     html += '<div class="iter-day-col">';
-    html += '<div class="iter-day-header" style="color:'+color+';background:'+color+'18;border-color:'+color+';">📅 Hari ' + d + '</div>';
+    html += '<div class="iter-day-header" style="color:'+color+';">Hari ' + d + '</div>';
     html += buildTimelineHTML(stops);
     html += '</div>';
   });
