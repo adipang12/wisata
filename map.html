@@ -1758,5 +1758,32 @@ function submitAIPlanMap() {
   .finally(function() { submitBtn.disabled = false; });
 }
 </script>
+
+<!-- PAGE TRANSITION: fade in saat masuk -->
+<style>
+#page-transition-in {
+  position: fixed;
+  inset: 0;
+  background: #2D5016;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+#page-transition-in.done { opacity: 0; }
+</style>
+<div id="page-transition-in"></div>
+<script>
+(function() {
+  var el = document.getElementById('page-transition-in');
+  // Tunggu halaman siap lalu fade out overlay
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      el.classList.add('done');
+      setTimeout(function() { el.style.display = 'none'; }, 460);
+    });
+  });
+})();
+</script>
 </body>
 </html>
