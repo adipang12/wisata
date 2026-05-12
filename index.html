@@ -1094,6 +1094,34 @@ nav {
   outline: none;
 }
 .ai-select option { color: #1E2520; background: #fff; }
+
+/* Lokasi awal — index.html */
+.ai-loc-row {
+  display: flex; gap: 8px; align-items: stretch;
+  margin-bottom: 1rem;
+}
+.ai-loc-input {
+  flex: 1; padding: 0.5rem 0.8rem; border-radius: 0.5rem;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-size: 0.88rem; font-family: inherit; outline: none;
+}
+.ai-loc-input::placeholder { opacity: 0.45; }
+.ai-loc-input:focus { border-color: rgba(196,149,106,0.7); background: rgba(255,255,255,0.15); }
+.ai-loc-btn {
+  padding: 0.5rem 0.9rem; border-radius: 0.5rem; white-space: nowrap;
+  border: 1.5px solid rgba(196,149,106,0.5);
+  background: rgba(196,149,106,0.15); color: #f0ebe3;
+  font-size: 0.82rem; cursor: pointer; font-family: inherit;
+  transition: background .15s;
+}
+.ai-loc-btn:hover { background: rgba(196,149,106,0.3); }
+.ai-loc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ai-loc-status {
+  font-size: 0.75rem; margin-top: -0.6rem; margin-bottom: 0.8rem;
+  opacity: 0.65; min-height: 16px;
+}
+
 .ai-generate-btn {
   width: 100%;
   padding: 0.85rem;
@@ -1912,6 +1940,16 @@ nav.scrolled {
       </div>
     </div>
 
+    <!-- Lokasi Awal -->
+    <div style="font-size:0.8rem;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">📍 Lokasi Awal / Penginapan</div>
+    <div class="ai-loc-row">
+      <input type="text" class="ai-loc-input" id="ai-lokasi"
+             placeholder="cth: Hotel Grand Preanger, Jl. Asia Afrika, Lembang…"
+             value="Pusat Kota Bandung">
+      <button class="ai-loc-btn" id="ai-loc-btn" onclick="aiDetectLocation()">📍 Lokasiku</button>
+    </div>
+    <div class="ai-loc-status" id="ai-loc-status"></div>
+
     <button class="ai-generate-btn" id="ai-generate-btn" onclick="generateItinerary()">
       ✨ Generate Itinerary
     </button>
@@ -2640,6 +2678,53 @@ function parseMarkdown(text) {
     .replace(/\n/g, '<br>');
 }
 
+// ── Deteksi lokasi awal (index.html) ─────────────────────────────────────
+var _aiUserCoords = null;
+
+function aiDetectLocation() {
+  var btn    = document.getElementById('ai-loc-btn');
+  var status = document.getElementById('ai-loc-status');
+  var input  = document.getElementById('ai-lokasi');
+
+  function reverseGeocode(lat, lng) {
+    status.textContent = '⏳ Mencari nama area…';
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng
+        + '&format=json&accept-language=id&zoom=14',
+      { headers: { 'User-Agent': 'WisataBandung/1.0' } })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var addr = d.address || {};
+      var area = addr.suburb || addr.village || addr.neighbourhood
+               || addr.city_district || addr.town || addr.city || 'Bandung';
+      var label = area + (addr.city && addr.city !== area ? ', ' + addr.city : '');
+      input.value = label;
+      status.textContent = '✅ Lokasi terdeteksi: ' + area;
+      _aiUserCoords = { lat: lat, lng: lng, name: label };
+    })
+    .catch(function() {
+      input.value = 'Koordinat: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+      status.textContent = '✅ Koordinat tersimpan';
+      _aiUserCoords = { lat: lat, lng: lng, name: input.value };
+    })
+    .finally(function() { btn.disabled = false; });
+  }
+
+  if (!navigator.geolocation) {
+    status.textContent = '❌ Browser tidak mendukung geolokasi. Ketik manual.';
+    return;
+  }
+  btn.disabled = true;
+  status.textContent = '⏳ Mendapatkan lokasi…';
+  navigator.geolocation.getCurrentPosition(
+    function(pos) { reverseGeocode(pos.coords.latitude, pos.coords.longitude); },
+    function() {
+      status.textContent = '❌ Izin lokasi ditolak. Silakan ketik manual.';
+      btn.disabled = false;
+    },
+    { timeout: 9000, maximumAge: 60000 }
+  );
+}
+
 async function generateItinerary() {
   // Wajib login
   if (!window.isLoggedIn) {
@@ -2658,12 +2743,18 @@ async function generateItinerary() {
   const loading = document.getElementById('ai-loading');
   const result  = document.getElementById('ai-result-box');
 
+  const lokasiAwal = (document.getElementById('ai-lokasi').value || '').trim() || 'Pusat Kota Bandung';
   const payload = {
-    durasi : parseInt(getChipVal('durasi-group')),
-    budget : getChipVal('budget-group'),
-    minat  : getChipVals('minat-group'),
-    orang  : parseInt(document.getElementById('orang-select').value),
+    durasi      : parseInt(getChipVal('durasi-group')),
+    budget      : getChipVal('budget-group'),
+    minat       : getChipVals('minat-group'),
+    orang       : parseInt(document.getElementById('orang-select').value),
+    lokasi_awal : lokasiAwal,
   };
+  if (_aiUserCoords && _aiUserCoords.lat) {
+    payload.lokasi_lat = _aiUserCoords.lat;
+    payload.lokasi_lng = _aiUserCoords.lng;
+  }
 
   btn.disabled    = true;
   loading.style.display = 'block';
